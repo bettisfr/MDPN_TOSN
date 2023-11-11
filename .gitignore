@@ -51,14 +51,14 @@ data/graph/generated/
 *.code-workspace
 
 .DS_Store
-*/.DS_Store
+.DS_Store
 
-*/.idea
-*/.idea/*
+.idea
+.idea/*
 
-*/cmake*
-*/cmake*/*
+cmake*
+cmake*/*
 
 *.bin
-*/input/*.csv
+
 
