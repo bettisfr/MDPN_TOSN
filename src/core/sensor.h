@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <utility>
+#include <vector>
 
 using namespace std;
 
@@ -11,19 +12,17 @@ class sensor {
     friend ostream &operator<<(ostream &os, const sensor &s);
 
 private:
-    double x;
-    double y;
-    double data;
-    double r;
-    double r_doi[360];
+    double pos_x;
+    double pos_y;
+    double data_size;
+    vector<double> radius_doi;
 
 public:
-    sensor(double, double, double, double);
+    sensor(double, double, double, vector<double>);
 
     pair<double, double> get_position();
-    double get_data() const;
-    double get_radius() const;
-    double* get_radius_doi();
+    double get_data_size() const;
+    vector<double> get_radius_doi() const;
 };
 
 

@@ -36,11 +36,11 @@ build/
 tests/build/
 src/build/
 examples/build/
-data/output/
-data/bkp/
-data/plots/
+data_size/output/
+data_size/bkp/
+data_size/plots/
 scripts/__pycache__/
-data/graph/generated/
+data_size/graph/generated/
 
 # Visual Studio Code
 .vscode/*

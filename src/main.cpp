@@ -1,13 +1,19 @@
 #include <iostream>
 
 #include "core/sensor.h"
+#include "core/deployment.h"
 
 using namespace std;
 
 int main(int argc, char **argv) {
 
-    sensor s(10, 20, 100, 50);
-    cout << s << endl;
+    int n = 100;
+    int length = 1000;
+    int width = 1000;
+    double radius = 150;
+    double doi = 1;
+
+    deployment dep(n, length, width, radius, doi);
 
     return 0;
 }

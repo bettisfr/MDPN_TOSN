@@ -1,36 +1,29 @@
 #include "sensor.h"
 
-sensor::sensor(double _x, double _y, double _data, double _r) {
-    x = _x;
-    y = _y;
-    data = _data;
-    r = _r;
+#include <utility>
 
-    for (double & i : r_doi) {
-        i = r;
-    }
+sensor::sensor(double x, double y, double data, vector<double> r_doi) {
+    pos_x = x;
+    pos_y = y;
+    data_size = data;
+//    radius_doi = std::move(r_doi);
 }
 
 pair<double, double> sensor::get_position() {
-    return make_pair(x, y);
+    return make_pair(pos_x, pos_y);
 }
 
-double sensor::get_data() const {
-    return data;
+double sensor::get_data_size() const {
+    return data_size;
 }
 
-double sensor::get_radius() const {
-    return r;
-}
-
-double *sensor::get_radius_doi() {
-    return r_doi;
+vector<double> sensor::get_radius_doi() const {
+    return radius_doi;
 }
 
 ostream &operator<<(ostream &os, const sensor &s) {
-    cout << "pos=(" << s.x << "," << s.y << ")" << endl;
-    cout << "data=" << s.data << endl;
-    cout << "radius=" << s.r << endl;
+    cout << "pos=(" << s.pos_x << "," << s.pos_y << ")" << endl;
+    cout << "data_size=" << s.data_size << endl;
 
     return os;
 }
