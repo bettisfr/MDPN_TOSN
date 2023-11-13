@@ -23,8 +23,8 @@ public:
 
     double get_distance(sensor, point);
     int get_angle(sensor, point);
-    bool are_within_radius(const sensor&, point);
-    bool are_within_radius_doi(const sensor&, point);
+    bool is_within_radius(const sensor&, point);
+    bool is_within_radius_doi(const sensor&, point);
 
     // TODO: random names now
     void algorithm_1();

@@ -53,12 +53,12 @@ int algorithms::get_angle(sensor s, point p) {
     return rounded_angle;
 }
 
-bool algorithms::are_within_radius(const sensor& s, point p) {
+bool algorithms::is_within_radius(const sensor& s, point p) {
     double dist = get_distance(s, p);
     return (dist <= sensor_radius);
 }
 
-bool algorithms::are_within_radius_doi(const sensor& s, point p) {
+bool algorithms::is_within_radius_doi(const sensor& s, point p) {
     double dist = get_distance(s, p);
 
     int angle = get_angle(s, p);
