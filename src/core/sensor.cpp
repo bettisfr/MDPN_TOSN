@@ -6,7 +6,7 @@ sensor::sensor(double x, double y, double data, vector<double> r_doi) {
     pos_x = x;
     pos_y = y;
     data_size = data;
-//    radius_doi = std::move(r_doi);
+    radius_doi = std::move(r_doi);
 }
 
 pair<double, double> sensor::get_position() {

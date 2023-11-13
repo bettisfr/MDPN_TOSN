@@ -4,22 +4,36 @@
 #include <iostream>
 #include <vector>
 
+#include "../input.h"
 #include "sensor.h"
 
 using namespace std;
 
+typedef tuple<double, double> depot;
+typedef tuple<double, double> point;
+
 class deployment {
 private:
     int num_sensors;
+    int num_depots;
     int area_length;
     int area_width;
+    int max_data;
     double sensor_radius;
     double doi;
 
     vector<sensor> sensors;
+    vector<depot> depots;
 
 public:
-    deployment(int, int, int, double, double);
+    deployment(const input &);
+
+    int get_num_sensors() const;
+    int get_area_length() const;
+    int get_area_width() const;
+    double get_sensor_radius() const;
+    vector<sensor> get_sensors();
+    vector<depot> get_depots();
 };
 
 
