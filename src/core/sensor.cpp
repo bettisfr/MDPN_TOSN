@@ -17,8 +17,8 @@ double sensor::get_data_size() const {
     return data_size;
 }
 
-vector<double> sensor::get_radius_doi() const {
-    return radius_doi;
+double sensor::get_radius_doi(int angle) const {
+    return radius_doi[angle];
 }
 
 ostream &operator<<(ostream &os, const sensor &s) {

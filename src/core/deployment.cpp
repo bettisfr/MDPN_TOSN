@@ -62,7 +62,7 @@ vector<sensor> deployment::get_sensors() {
     return sensors;
 }
 
-vector<depot> deployment::get_depots() {
+vector<point> deployment::get_depots() {
     return depots;
 }
 

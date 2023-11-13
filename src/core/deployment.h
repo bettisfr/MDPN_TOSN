@@ -9,7 +9,6 @@
 
 using namespace std;
 
-typedef tuple<double, double> depot;
 typedef tuple<double, double> point;
 
 class deployment {
@@ -23,7 +22,7 @@ private:
     double doi;
 
     vector<sensor> sensors;
-    vector<depot> depots;
+    vector<point> depots;
 
 public:
     deployment(const input &);
@@ -33,7 +32,7 @@ public:
     int get_area_width() const;
     double get_sensor_radius() const;
     vector<sensor> get_sensors();
-    vector<depot> get_depots();
+    vector<point> get_depots();
 };
 
 

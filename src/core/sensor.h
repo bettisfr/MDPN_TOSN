@@ -22,7 +22,7 @@ public:
 
     pair<double, double> get_position();
     double get_data_size() const;
-    vector<double> get_radius_doi() const;
+    double get_radius_doi(int) const;
 };
 
 

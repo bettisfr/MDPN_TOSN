@@ -1,5 +1,7 @@
 #include "algorithms.h"
 
+#include <utility>
+
 algorithms::algorithms(deployment *dep) {
     num_sensors = dep->get_num_sensors();
     sensor_radius = dep->get_sensor_radius();
@@ -8,31 +10,59 @@ algorithms::algorithms(deployment *dep) {
     depots = dep->get_depots();
 }
 
-double algorithms::get_distance(sensor s1, sensor s2) {
-    pair<double, double> pos_s1 = s1.get_position();
-    pair<double, double> pos_s2 = s2.get_position();
-    return get_distance(pos_s1, pos_s2);
-}
-
-double algorithms::get_distance(depot d, sensor s) {
-    pair<double, double> pos_s = s.get_position();
-    return get_distance(d, pos_s);
-}
-
-double algorithms::get_distance(point p1, point p2) {
-    double x1 = get<0>(p1);
-    double y1 = get<1>(p1);
-    double x2 = get<0>(p2);
-    double y2 = get<1>(p2);
-    return sqrt(pow(x1-x2, 2) + pow(y1-y2, 2));
-}
-
 void algorithms::algorithm_1() {
     cout << "alg1" << endl;
-    cout << "distance s0-s1=" << get_distance(sensors[0], sensors[1]) << endl;
 }
 
 void algorithms::algorithm_2() {
     cout << "alg2" << endl;
-    cout << "distance depot0-s5=" << get_distance(depots[0], sensors[5]) << endl;
+}
+
+double algorithms::get_distance(sensor s, point p) {
+    point pos_s = s.get_position();
+
+    double x1, y1, x2, y2;
+    tie(x1, y1) = p;
+    tie(x2, y2) = pos_s;
+
+    double delta_x = x2 - x1;
+    double delta_y = y2 - y1;
+
+    return sqrt(delta_x * delta_x + delta_y * delta_y);
+}
+
+int algorithms::get_angle(sensor s, point p) {
+    point pos_s = s.get_position();
+
+    double x1, y1, x2, y2;
+    tie(x1, y1) = p;
+    tie(x2, y2) = pos_s;
+
+    double delta_x = x2 - x1;
+    double delta_y = y2 - y1;
+
+    double angle_rad = atan2(delta_y, delta_x);
+    double angle_deg = angle_rad * (180.0 / M_PI);
+
+    int rounded_angle = static_cast<int>(round(angle_deg));
+
+    if (rounded_angle < 0) {
+        rounded_angle += 360;
+    }
+
+    return rounded_angle;
+}
+
+bool algorithms::are_within_radius(const sensor& s, point p) {
+    double dist = get_distance(s, p);
+    return (dist <= sensor_radius);
+}
+
+bool algorithms::are_within_radius_doi(const sensor& s, point p) {
+    double dist = get_distance(s, p);
+
+    int angle = get_angle(s, p);
+    double actual_radius = s.get_radius_doi(angle);
+
+    return (dist <= actual_radius);
 }
