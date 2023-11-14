@@ -16,6 +16,8 @@ void run_experiment(input &par) {
     // Deployment creation with respect to the input parameters
     deployment dep(par);
 
+    cout << dep << endl;
+
     // Algorithms creation and invocation
     algorithms alg(&dep);
     alg.algorithm_1();

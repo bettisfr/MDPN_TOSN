@@ -12,6 +12,9 @@ using namespace std;
 typedef tuple<double, double> point;
 
 class deployment {
+
+    friend ostream &operator<<(ostream &os, const deployment &s);
+
 private:
     int num_sensors;
     int num_depots;

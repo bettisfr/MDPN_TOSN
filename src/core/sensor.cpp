@@ -22,8 +22,8 @@ double sensor::get_radius_doi(int angle) const {
 }
 
 ostream &operator<<(ostream &os, const sensor &s) {
-    cout << "pos=(" << s.pos_x << "," << s.pos_y << ")" << endl;
-    cout << "data_size=" << s.data_size << endl;
+    cout << "pos=(" << s.pos_x << "," << s.pos_y << "); ";
+    cout << "data_size=" << s.data_size;
 
     return os;
 }

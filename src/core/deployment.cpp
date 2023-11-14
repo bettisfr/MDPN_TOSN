@@ -66,3 +66,14 @@ vector<point> deployment::get_depots() {
     return depots;
 }
 
+ostream &operator<<(ostream &os, const deployment &d) {
+    for (int i = 0; i < d.sensors.size(); i++) {
+        sensor s = d.sensors[i];
+        cout << i << ": " << s << endl;
+    }
+
+    return os;
+}
+
+
+

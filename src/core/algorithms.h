@@ -5,6 +5,8 @@
 #include <vector>
 #include <cmath>
 
+#include "tsp/tsp.h"
+
 #include "deployment.h"
 #include "../input.h"
 
