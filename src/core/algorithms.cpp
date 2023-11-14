@@ -13,24 +13,19 @@ algorithms::algorithms(deployment *dep) {
 void algorithms::algorithm_1() {
     cout << "alg1" << endl;
 
-    vector<TSP_Point> points;
+    vector<point_3d> points;
     for (auto s : sensors) {
         auto pos = s.get_position();
-        TSP_Point newPoint = {pos.first, pos.second, 0};
+        point_3d newPoint = {pos.first, pos.second, 0};
         points.push_back(newPoint);
     }
 
-    // Create new tsp object
     TSP tsp(points);
-    tsp.Solve();
-    cout << endl << "R E S U L T"  << endl;
-    tsp.printResult();
+    tsp.solve();
 
-    cout << endl << "P A T H"  << endl;
+    // TODO: return the path + cost
+//    tsp.printResult();
     tsp.printPath();
-
-//    cout << endl << "A D J   L I S T"  << endl;
-//    tsp.printAdjList();
 }
 
 void algorithms::algorithm_2() {

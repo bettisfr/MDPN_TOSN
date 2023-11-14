@@ -12,11 +12,13 @@
 #include <queue>
 #include <stack>
 #include <string>
-#include <stdio.h>
+#include <cstdio>
 #include <vector>
 #include <limits>
 
-struct TSP_Point {
+using namespace std;
+
+struct point_3d {
     double x;
     double y;
     double z;
@@ -47,7 +49,7 @@ protected:
     double **graph;
 
     // Point list
-    std::vector<TSP_Point> points;
+    std::vector<point_3d> points;
 
     // -
     void findOdds();
@@ -61,24 +63,24 @@ protected:
     //Find Hamiltonian path
     void make_hamiltonian(std::vector<int> &path, double &pathCost);
 
-    double get_distance(struct TSP_Point c1, struct TSP_Point c2);
+    double get_distance(struct point_3d c1, struct point_3d c2);
 
-    //T get_distance(struct TSP_Point c1, struct TSP_Point c2);
+    //T get_distance(struct point_3d c1, struct point_3d c2);
 
     void findMST();
 
-    int getMinIndex(double key[], bool mst[]);
+    int getMinIndex(const double key[], const bool mst[]);
 
     void fillMatrix();
 
     double findBestPath(int start);
 
 public:
-    TSP(std::vector<TSP_Point> aPointList);
+    TSP(std::vector<point_3d> aPointList);
 
     ~TSP();
 
-    void Solve();
+    void solve();
 
     void printResult();
 
