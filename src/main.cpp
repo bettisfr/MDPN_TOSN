@@ -21,7 +21,7 @@ void run_experiment(input &par) {
     // Algorithms creation and invocation
     algorithms alg(&dep);
     alg.algorithm_1();
-    alg.algorithm_2();
+//    alg.algorithm_2();
 }
 
 int main(int argc, char **argv) {

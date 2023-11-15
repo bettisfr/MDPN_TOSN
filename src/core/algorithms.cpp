@@ -23,9 +23,15 @@ void algorithms::algorithm_1() {
     TSP tsp(points);
     tsp.solve();
 
-    // TODO: return the path + cost
-//    tsp.printResult();
-    tsp.printPath();
+    vector<int> res = tsp.get_path();
+    cout << "TSP path: ";
+    for (auto p : res) {
+        cout << p << ", ";
+    }
+    cout << endl;
+
+    double len = tsp.get_length();
+    cout << "TSP len: " << len << endl;
 }
 
 void algorithms::algorithm_2() {

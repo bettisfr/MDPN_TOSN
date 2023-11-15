@@ -31,64 +31,63 @@ public:
 
 protected:
     // List of odd nodes
-    std::vector<int> odds;
+    vector<int> odds;
 
     //Adjacency list
-    std::vector<int> *adjlist;
+    vector<int> *adj_list;
 
     // Number of points
     int n;
 
     //Shortest path length
-    double pathLength;
+    double path_length;
 
     //euler circuit
-    std::vector<int> circuit;
+    vector<int> circuit;
 
     // n x n, pairwise distances between points
     double **graph;
 
     // Point list
-    std::vector<point_3d> points;
+    vector<point_3d> points;
 
     // -
-    void findOdds();
+    void find_odds();
 
     //Find perfect matching
-    void perfectMatching();
+    void perfect_matching();
 
     //Find Euler tour
-    void euler_tour(int start, std::vector<int> &path);
+    void euler_tour(int start, vector<int> &path);
 
     //Find Hamiltonian path
-    void make_hamiltonian(std::vector<int> &path, double &pathCost);
+    void make_hamiltonian(vector<int> &path, double &pathCost);
 
     double get_distance(struct point_3d c1, struct point_3d c2);
 
     //T get_distance(struct point_3d c1, struct point_3d c2);
 
-    void findMST();
+    void find_MST();
 
-    int getMinIndex(const double key[], const bool mst[]);
+    int get_min_index(const double key[], const bool mst[]);
 
-    void fillMatrix();
+    void fill_matrix();
 
-    double findBestPath(int start);
+    double find_best_path(int start);
 
 public:
-    TSP(std::vector<point_3d> aPointList);
+    TSP(vector<point_3d> aPointList);
 
     ~TSP();
 
     void solve();
 
-    void printResult();
+    vector<int> get_path();
+    double get_length();
 
-    void printPath();
-
-    void printAdjList();
-
-    std::vector<int> getResult();
+    void print_result();
+    void print_path();
+    void print_adj_list();
 };
 
 #endif

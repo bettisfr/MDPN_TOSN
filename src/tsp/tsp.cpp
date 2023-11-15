@@ -1,6 +1,6 @@
 #include "tsp.h"
 
-//---------------------------------------------------------------------------
+
 //Constructor
 TSP::TSP(vector<point_3d> aPointList) : points(aPointList) {
     n = points.size();
@@ -13,10 +13,10 @@ TSP::TSP(vector<point_3d> aPointList) : points(aPointList) {
         }
     }
 
-    adjlist = new vector<int>[n];
+    adj_list = new vector<int>[n];
 }
 
-//---------------------------------------------------------------------------
+
 //Destructor
 TSP::~TSP() {
     for (int i = 0; i < n; i++) {
@@ -24,21 +24,21 @@ TSP::~TSP() {
     }
 
     delete[] graph;
-    delete[] adjlist;
+    delete[] adj_list;
 }
 
-//---------------------------------------------------------------------------
-void TSP::solve() {
-    fillMatrix();
-    findMST();
 
-    perfectMatching();
+void TSP::solve() {
+    fill_matrix();
+    find_MST();
+
+    perfect_matching();
 
     // Loop through each index and find shortest path
     double best = numeric_limits<double>::max();
     int bestIndex;
     for (long t = 0; t < n; t++) {
-        double result = findBestPath(t);
+        double result = find_best_path(t);
         if (result < best) {
             bestIndex = t;
             best = result;
@@ -47,27 +47,26 @@ void TSP::solve() {
 
     //Create path for best tour
     euler_tour(bestIndex, circuit);
-    make_hamiltonian(circuit, pathLength);
+    make_hamiltonian(circuit, path_length);
 }
 
-//---------------------------------------------------------------------------
 
-vector<int> TSP::getResult() {
-    return circuit;
+
+vector<int> TSP::get_path() {
+    vector<int> tmp;
+
+    for (auto p : circuit) {
+        tmp.push_back(p);
+    }
+    // Also the first one
+    tmp.push_back(circuit[0]);
+
+    return tmp;
 }
 
-//---------------------------------------------------------------------------
-//Special care for integers
-
-//double TSP::get_distance(struct point_3d c1, struct point_3d c2) {
-//    double dx = pow((double) (c1.x - c2.x), 2);
-//    double dy = pow((double) (c1.y - c2.y), 2);
-//    double dz = pow((double) (c1.z - c2.z), 2);
-//
-//    return floor(sqrt(dx + dy + dz) + 0.5);
-//}
-
-//---------------------------------------------------------------------------
+double TSP::get_length() {
+    return path_length;
+}
 
 double TSP::get_distance(struct point_3d c1, struct point_3d c2) {
     double dx = pow(c1.x - c2.x, 2);
@@ -77,9 +76,7 @@ double TSP::get_distance(struct point_3d c1, struct point_3d c2) {
     return sqrt(dx + dy + dz);
 }
 
-//---------------------------------------------------------------------------
-
-void TSP::fillMatrix() {
+void TSP::fill_matrix() {
     for (int i = 0; i < n; i++) {
         for (int j = 0; j < n; j++) {
             graph[i][j] = graph[j][i] = get_distance(points[i], points[j]);
@@ -92,7 +89,7 @@ void TSP::fillMatrix() {
     the graph
 ******************************************************************************/
 
-void TSP::findMST() {
+void TSP::find_MST() {
     auto *key = new double[n];
     bool *included = new bool[n];
     int *parent = new int[n];
@@ -114,7 +111,7 @@ void TSP::findMST() {
     for (int i = 0; i < n - 1; i++) {
 
         // find closes vertex not already in tree
-        int k = getMinIndex(key, included);
+        int k = get_min_index(key, included);
 
         // set included to true for this vertex
         included[k] = true;
@@ -142,8 +139,8 @@ void TSP::findMST() {
     for (int i = 0; i < n; i++) {
         int j = parent[i];
         if (j != -1) {
-            adjlist[i].push_back(j);
-            adjlist[j].push_back(i);
+            adj_list[i].push_back(j);
+            adj_list[j].push_back(i);
         }
     }
 
@@ -154,7 +151,7 @@ void TSP::findMST() {
   find the index of the closest unexamined node
 ******************************************************************************/
 
-int TSP::getMinIndex(const double key[], const bool mst[]) {
+int TSP::get_min_index(const double key[], const bool mst[]) {
     // initialize min and min_index
     double min = numeric_limits<double>::max();
     int min_index;
@@ -177,11 +174,11 @@ int TSP::getMinIndex(const double key[], const bool mst[]) {
   find all vertices of odd degree in the MST. Store them in an subgraph O
 ******************************************************************************/
 
-void TSP::findOdds() {
+void TSP::find_odds() {
     for (int i = 0; i < n; i++) {
 
         // if degree of vertex i is odd
-        if ((adjlist[i].size() % 2) != 0) {
+        if ((adj_list[i].size() % 2) != 0) {
 
             // push vertex to odds, which is a representation of subgraph O
             odds.push_back(i);
@@ -189,9 +186,7 @@ void TSP::findOdds() {
     }
 }
 
-//---------------------------------------------------------------------------
-
-void TSP::perfectMatching() {
+void TSP::perfect_matching() {
     /************************************************************************************
      find a perfect matching M in the subgraph O using greedy algorithm but not minimum
     *************************************************************************************/
@@ -200,7 +195,7 @@ void TSP::perfectMatching() {
     vector<int>::iterator tmp, first;
 
     // Find nodes with odd degrees in double to get subgraph O
-    findOdds();
+    find_odds();
 
     // for each odd node
     while (!odds.empty()) {
@@ -216,22 +211,20 @@ void TSP::perfectMatching() {
                 tmp = it;
             }
         } // two nodes are matched, end of list reached
-        adjlist[*first].push_back(closest);
-        adjlist[closest].push_back(*first);
+        adj_list[*first].push_back(closest);
+        adj_list[closest].push_back(*first);
         odds.erase(tmp);
         odds.erase(first);
     }
 }
 
-//---------------------------------------------------------------------------
 //find an euler circuit
-
 void TSP::euler_tour(int start, vector<int> &path) {
     //Create copy of adj. list
     vector<vector<int> > tempList;
 
     for (int i = 0; i < n; i++) {
-        tempList.push_back(adjlist[i]);
+        tempList.push_back(adj_list[i]);
     }
 
     stack<int> stack;
@@ -266,9 +259,7 @@ void TSP::euler_tour(int start, vector<int> &path) {
     path.push_back(pos);
 }
 
-//---------------------------------------------------------------------------
 //Make euler tour Hamiltonian
-
 void TSP::make_hamiltonian(vector<int> &path, double &pathCost) {
     //remove visited nodes from Euler tour
     bool *visited = new bool[n];
@@ -302,9 +293,7 @@ void TSP::make_hamiltonian(vector<int> &path, double &pathCost) {
     pathCost += graph[*cur][*iter];
 }
 
-//---------------------------------------------------------------------------
-
-double TSP::findBestPath(int start) {
+double TSP::find_best_path(int start) {
     vector<int> path;
     euler_tour(start, path);
 
@@ -314,17 +303,13 @@ double TSP::findBestPath(int start) {
     return length;
 }
 
-//---------------------------------------------------------------------------
-
-void TSP::printResult() {
+void TSP::print_result() {
     for (int & it : circuit) {
         cout << it << endl;
     }
 }
 
-//---------------------------------------------------------------------------
-
-void TSP::printPath() {
+void TSP::print_path() {
     cout << endl;
     for (auto it = circuit.begin(); it != circuit.end() - 1; ++it) {
         cout << *it << "->" << *(it + 1) << " ";
@@ -336,18 +321,17 @@ void TSP::printPath() {
     cout << lastVertex << "->" << firstVertex << " ";
     cout << graph[lastVertex][firstVertex] << endl;
 
-    cout << "\nLength: " << pathLength << endl << endl;
+    cout << "\nLength: " << path_length << endl << endl;
 }
 
-//---------------------------------------------------------------------------
-
-void TSP::printAdjList() {
+void TSP::print_adj_list() {
     for (int i = 0; i < n; i++) {
         cout << i << ": "; //print which vertex's edge list follows
-        for (unsigned int j = 0; j < adjlist[i].size(); j++) {
-            cout << adjlist[i][j] << " "; //print each item in edge list
+        for (unsigned int j = 0; j < adj_list[i].size(); j++) {
+            cout << adj_list[i][j] << " "; //print each item in edge list
         }
         cout << endl;
     }
 }
-//---------------------------------------------------------------------------
+
+
