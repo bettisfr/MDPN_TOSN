@@ -9,7 +9,7 @@ sensor::sensor(double x, double y, double data, vector<double> r_doi) {
     radius_doi = std::move(r_doi);
 }
 
-pair<double, double> sensor::get_position() {
+pair<double, double> sensor::get_position() const {
     return make_pair(pos_x, pos_y);
 }
 

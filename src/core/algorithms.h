@@ -15,10 +15,13 @@ using namespace std;
 class algorithms {
 
 private:
-    int num_sensors;
+    int area_length;
+    int area_width;
     double sensor_radius;
     vector<sensor> sensors;
     vector<point> depots;
+
+    vector<int> tsp_result;
 
 public:
     explicit algorithms(deployment*);
@@ -34,6 +37,8 @@ public:
     // TODO: random names now
     void algorithm_1();
     void algorithm_2();
+
+    void draw_result();
 };
 
 

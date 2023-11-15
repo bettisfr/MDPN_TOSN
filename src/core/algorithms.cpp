@@ -3,7 +3,8 @@
 #include <utility>
 
 algorithms::algorithms(deployment *dep) {
-    num_sensors = dep->get_num_sensors();
+    area_length = dep->get_area_length();
+    area_width = dep->get_area_width();
     sensor_radius = dep->get_sensor_radius();
 
     sensors = dep->get_sensors();
@@ -95,9 +96,9 @@ void algorithms::tsp_neighbors() {
     TSP tsp(points);
     tsp.solve();
 
-    vector<int> res = tsp.get_path();
+    tsp_result = tsp.get_path();
     cout << "TSP path: ";
-    for (auto p : res) {
+    for (auto p : tsp_result) {
         cout << p << ", ";
     }
     cout << endl;
@@ -154,3 +155,83 @@ vector<point> algorithms::get_intersection_points(point pa, point pb) {
 
     return int_points;
 }
+
+void algorithms::draw_result() {
+    ofstream htmlFile("output/sensor_deployment.html");
+
+    htmlFile << "<!DOCTYPE html>\n<html>\n<head>\n";
+    htmlFile << "<title>Sensor Deployment</title>\n";
+    htmlFile << "</head>\n<body>\n";
+
+    htmlFile << "<script>\n";
+    htmlFile << "function drawSensorsAndDepots() {\n";
+    htmlFile << "var canvas = document.getElementById('sensorCanvas');\n";
+    htmlFile << "var ctx = canvas.getContext('2d');\n";
+
+    // Draw sensors and depots as before
+    for (size_t i = 0; i < sensors.size(); ++i) {
+        auto s = sensors[i];
+        auto pos = s.get_position();
+
+        // Draw sensor circle
+        htmlFile << "ctx.beginPath();\n";
+        htmlFile << "ctx.arc(" << get<0>(pos) << ", " << get<1>(pos) << ", " << sensor_radius << ", 0, 2 * Math.PI);\n";
+        htmlFile << "ctx.fillStyle = 'rgba(0, 0, 255, 0.25)';\n";
+        htmlFile << "ctx.fill();\n";
+        htmlFile << "ctx.stroke();\n";
+
+        // Draw sensor center dot
+        htmlFile << "ctx.beginPath();\n";
+        htmlFile << "ctx.arc(" << get<0>(pos) << ", " << get<1>(pos) << ", 2, 0, 2 * Math.PI);\n";
+        htmlFile << "ctx.fillStyle = 'black';\n";
+        htmlFile << "ctx.fill();\n";
+        htmlFile << "ctx.stroke();\n";
+
+        // Draw sensor label
+        htmlFile << "ctx.fillStyle = 'black';\n";
+        htmlFile << "ctx.font = '15px Arial';\n";
+        htmlFile << "ctx.fillText('" << i << "', " << get<0>(pos) + 10 << ", " << get<1>(pos) + 10 << ");\n";
+    }
+
+    for (size_t i = 0; i < depots.size(); ++i) {
+        auto d = depots[i];
+        auto pos = d;
+
+        // Draw depot square
+        htmlFile << "ctx.fillStyle = 'brown';\n";
+        htmlFile << "ctx.fillRect(" << get<0>(pos) << ", " << get<1>(pos) << ", 15, 15);\n";
+
+        // Draw depot label
+        htmlFile << "ctx.fillStyle = 'black';\n";
+        htmlFile << "ctx.font = '15px Arial';\n";
+        htmlFile << "ctx.fillText('D" << i << "', " << get<0>(pos) + 10 << ", " << get<1>(pos) + 10 << ");\n";
+    }
+
+    // Draw TSP circuit connecting sensors in the order specified by tsp_result
+    htmlFile << "ctx.strokeStyle = 'red';\n";
+    htmlFile << "ctx.lineWidth = 2;\n";
+    htmlFile << "ctx.beginPath();\n";
+    htmlFile << "ctx.moveTo(" << get<0>(sensors[tsp_result[0]].get_position()) << ", " << get<1>(sensors[tsp_result[0]].get_position()) << ");\n";
+    for (size_t i = 1; i < tsp_result.size(); ++i) {
+        auto currentSensor = sensors[tsp_result[i]].get_position();
+        htmlFile << "ctx.lineTo(" << get<0>(currentSensor) << ", " << get<1>(currentSensor) << ");\n";
+    }
+    htmlFile << "ctx.lineTo(" << get<0>(sensors[tsp_result[0]].get_position()) << ", " << get<1>(sensors[tsp_result[0]].get_position()) << ");\n";
+    htmlFile << "ctx.stroke();\n";
+
+    htmlFile << "}\n";
+    htmlFile << "</script>\n";
+
+    htmlFile << "<canvas id='sensorCanvas' width='" << area_length << "' height='" << area_width << "' style='border:1px solid #000;'></canvas>\n";
+
+    htmlFile << "<script>\n";
+    htmlFile << "drawSensorsAndDepots();\n";
+    htmlFile << "</script>\n";
+
+    htmlFile << "</body>\n</html>";
+
+    htmlFile.close();
+}
+
+
+
