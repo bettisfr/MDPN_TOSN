@@ -3,7 +3,7 @@
 void print_parameters(const input &par) {
     cout << "Seed=" << par.seed << endl;
     cout << "Experiment name=" << par.exp_name << endl;
-    cout << "Number of scenarios=" << par.scenarios << endl;
+//    cout << "Number of scenarios=" << par.scenarios << endl;
 
     map<int, string> exp_str = {
             {0, "Default parameters"},
@@ -19,6 +19,11 @@ void print_parameters(const input &par) {
     cout << "Radius of sensor=" << par.sensor_radius << endl;
     cout << "DOI=" << par.doi << endl;
     cout << "Max data=" << par.max_data << "MB" << endl;
+    cout << "Energy budget=" << par.energy_budget << "kJ" << endl;
+    cout << "Energy consumption for flying=" << par.energy_cons_fly << "J/m" << endl;
+    cout << "Energy consumption for hovering=" << par.energy_cons_hover << "J/s" << endl;
+    cout << "Maximum data transfer rate=" << par.data_transfer_rate << "MB/s" << endl;
+    cout << "Epsilon (budget violation)=" << par.epsilon << endl;
 
     cout << endl << endl;
 }
@@ -36,6 +41,11 @@ void save_parameters(const input &par) {
     file_cfg << "sensor_radius=" << par.sensor_radius << endl;
     file_cfg << "doi=" << par.doi << endl;
     file_cfg << "max_data=" << par.max_data << endl;
+    file_cfg << "energy_budget=" << par.energy_budget << endl;
+    file_cfg << "energy_cons_fly=" << par.energy_cons_fly << endl;
+    file_cfg << "energy_cons_hover=" << par.energy_cons_hover << endl;
+    file_cfg << "data_transfer_rate=" << par.data_transfer_rate << endl;
+    file_cfg << "epsilon=" << par.epsilon << endl;
 
     file_cfg << endl;
 
@@ -71,8 +81,17 @@ input load_parameters(input &par) {
                 par.doi = stod(value);
             } else if (key == "max_data") {
                 par.max_data = stoi(value);
+            } else if (key == "energy_budget") {
+                par.energy_budget = stoi(value);
+            } else if (key == "energy_cons_fly") {
+                par.energy_cons_fly = stod(value);
+            } else if (key == "energy_cons_hover") {
+                par.energy_cons_hover = stod(value);
+            } else if (key == "data_transfer_rate") {
+                par.data_transfer_rate = stod(value);
+            } else if (key == "epsilon") {
+                par.epsilon = stod(value);
             }
-
         }
     }
 
