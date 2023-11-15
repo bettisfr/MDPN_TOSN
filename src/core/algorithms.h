@@ -28,6 +28,9 @@ public:
     bool is_within_radius(const sensor&, point);
     bool is_within_radius_doi(const sensor&, point);
 
+    vector<point> get_intersection_points(point, point);
+    void tsp_neighbors();
+
     // TODO: random names now
     void algorithm_1();
     void algorithm_2();

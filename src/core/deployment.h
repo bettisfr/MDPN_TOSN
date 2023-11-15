@@ -28,7 +28,7 @@ private:
     vector<point> depots;
 
 public:
-    deployment(const input &);
+    explicit deployment(const input &);
 
     int get_num_sensors() const;
     int get_area_length() const;

@@ -63,7 +63,7 @@ struct input {
     double data_transfer_rate = 9.0;
 
     // Budget violation constant (1 + \epsilon)
-    // Impacts the performance of the algorithm: 0 slow (no violation), 1 fast (2x budget required)
+    // Impacts the performance of the algorithm: > 0 slow (no violation), 1 <= fast (2x budget required)
     double epsilon = 0.5;
 
 };

@@ -34,7 +34,7 @@ void TSP::solve() {
 
     perfect_matching();
 
-    // Loop through each index and find shortest path
+    // Loop through each index and find the shortest path
     double best = numeric_limits<double>::max();
     int bestIndex;
     for (long t = 0; t < n; t++) {
@@ -273,14 +273,14 @@ void TSP::make_hamiltonian(vector<int> &path, double &pathCost) {
     int root = path.front();
     auto cur = path.begin();
     auto iter = path.begin() + 1;
-    visited[root] = 1;
+    visited[root] = true;
 
     //iterate through circuit
     while (iter != path.end()) {
         if (!visited[*iter]) {
             pathCost += graph[*cur][*iter];
             cur = iter;
-            visited[*cur] = 1;
+            visited[*cur] = true;
             iter = cur + 1;
         } else {
             iter = path.erase(iter);
@@ -327,8 +327,8 @@ void TSP::print_path() {
 void TSP::print_adj_list() {
     for (int i = 0; i < n; i++) {
         cout << i << ": "; //print which vertex's edge list follows
-        for (unsigned int j = 0; j < adj_list[i].size(); j++) {
-            cout << adj_list[i][j] << " "; //print each item in edge list
+        for (int j : adj_list[i]) {
+            cout << j << " "; //print each item in edge list
         }
         cout << endl;
     }
