@@ -89,16 +89,22 @@ void algorithms::tsp_neighbors() {
     // it would be a subset of "sensors"
     for (auto s : sensors) {
         auto pos = s.get_position();
-        point_3d newPoint = {pos.first, pos.second, 0};
-        points.push_back(newPoint);
+        point_3d new_point = {get<0>(pos), get<1>(pos), 0};
+        points.push_back(new_point);
     }
+
+    // Also depot is inserted
+    auto pos_depot = depots[0];
+    point_3d depot = {get<0>(pos_depot), get<1>(pos_depot), 0};
+    points.push_back(depot);
 
     TSP tsp(points);
     tsp.solve();
 
+    tsp_result_id = tsp.get_path_id();
     tsp_result = tsp.get_path();
     cout << "TSP path: ";
-    for (auto p : tsp_result) {
+    for (auto p : tsp_result_id) {
         cout << p << ", ";
     }
     cout << endl;
@@ -199,7 +205,7 @@ void algorithms::draw_result() {
 
         // Draw depot square
         htmlFile << "ctx.fillStyle = 'brown';\n";
-        htmlFile << "ctx.fillRect(" << get<0>(pos) << ", " << get<1>(pos) << ", 15, 15);\n";
+        htmlFile << "ctx.fillRect(" << get<0>(pos) - 7.5 << ", " << get<1>(pos) - 7.5 << ", 15, 15);\n";
 
         // Draw depot label
         htmlFile << "ctx.fillStyle = 'black';\n";
@@ -207,17 +213,17 @@ void algorithms::draw_result() {
         htmlFile << "ctx.fillText('D" << i << "', " << get<0>(pos) + 10 << ", " << get<1>(pos) + 10 << ");\n";
     }
 
-    // Draw TSP circuit connecting sensors in the order specified by tsp_result
+    // Draw TSP circuit connecting points in the order specified by tsp_result
     htmlFile << "ctx.strokeStyle = 'red';\n";
     htmlFile << "ctx.lineWidth = 2;\n";
     htmlFile << "ctx.beginPath();\n";
-    htmlFile << "ctx.moveTo(" << get<0>(sensors[tsp_result[0]].get_position()) << ", " << get<1>(sensors[tsp_result[0]].get_position()) << ");\n";
-    for (size_t i = 1; i < tsp_result.size(); ++i) {
-        auto currentSensor = sensors[tsp_result[i]].get_position();
-        htmlFile << "ctx.lineTo(" << get<0>(currentSensor) << ", " << get<1>(currentSensor) << ");\n";
+    htmlFile << "ctx.moveTo(" << tsp_result[0].x << ", " << tsp_result[0].y << ");\n";
+    for (size_t i = 0; i < tsp_result.size(); ++i) {
+        htmlFile << "ctx.lineTo(" << tsp_result[i].x << ", " << tsp_result[i].y << ");\n";
     }
-    htmlFile << "ctx.lineTo(" << get<0>(sensors[tsp_result[0]].get_position()) << ", " << get<1>(sensors[tsp_result[0]].get_position()) << ");\n";
+    htmlFile << "ctx.lineTo(" << tsp_result[0].x << ", " << tsp_result[0].y << ");\n";
     htmlFile << "ctx.stroke();\n";
+
 
     htmlFile << "}\n";
     htmlFile << "</script>\n";

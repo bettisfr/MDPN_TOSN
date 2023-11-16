@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <vector>
+#include <tuple>
 #include <cmath>
 
 #include "tsp/tsp.h"
@@ -21,7 +22,8 @@ private:
     vector<sensor> sensors;
     vector<point> depots;
 
-    vector<int> tsp_result;
+    vector<int> tsp_result_id;
+    vector<point_3d> tsp_result;
 
 public:
     explicit algorithms(deployment*);

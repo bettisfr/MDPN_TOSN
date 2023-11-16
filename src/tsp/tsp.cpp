@@ -50,20 +50,6 @@ void TSP::solve() {
     make_hamiltonian(circuit, path_length);
 }
 
-
-
-vector<int> TSP::get_path() {
-    vector<int> tmp;
-
-    for (auto p : circuit) {
-        tmp.push_back(p);
-    }
-    // Also the first one
-    tmp.push_back(circuit[0]);
-
-    return tmp;
-}
-
 double TSP::get_length() {
     return path_length;
 }
@@ -324,6 +310,30 @@ void TSP::print_path() {
     cout << "\nLength: " << path_length << endl << endl;
 }
 
+vector<int> TSP::get_path_id() {
+    vector<int> tmp;
+
+    for (auto p : circuit) {
+        tmp.push_back(p);
+    }
+    // Also the first one
+    tmp.push_back(circuit[0]);
+
+    return tmp;
+}
+
+vector<point_3d> TSP::get_path() {
+    vector<point_3d> path;
+
+    for (auto i : circuit) {
+        path.push_back(points[i]);
+    }
+    // Also the first one
+    path.push_back(points[circuit[0]]);
+
+    return path;
+}
+
 void TSP::print_adj_list() {
     for (int i = 0; i < n; i++) {
         cout << i << ": "; //print which vertex's edge list follows
@@ -333,5 +343,3 @@ void TSP::print_adj_list() {
         cout << endl;
     }
 }
-
-

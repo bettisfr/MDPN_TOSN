@@ -4,6 +4,7 @@
 #include <iostream>
 #include <utility>
 #include <vector>
+#include <tuple>
 
 using namespace std;
 
@@ -20,7 +21,7 @@ private:
 public:
     sensor(double, double, double, vector<double>);
 
-    pair<double, double> get_position() const;
+    tuple<double, double> get_position() const;
     double get_data_size() const;
     double get_radius_doi(int) const;
 };
