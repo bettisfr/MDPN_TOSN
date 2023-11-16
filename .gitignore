@@ -61,4 +61,4 @@ cmake*/*
 
 *.bin
 
-
+*.html
