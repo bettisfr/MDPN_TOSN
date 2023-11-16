@@ -3,6 +3,8 @@
 
 #include <iostream>
 #include <vector>
+#include <random>
+#include <numeric>
 
 #include "../input.h"
 #include "sensor.h"
@@ -23,6 +25,11 @@ private:
     int max_data;
     double sensor_radius;
     double doi;
+
+    const double c = 0.3e+9;
+    const double f_c = 6.5e+9;
+    const double shape = 0.67;
+    const double scale = 0.16;
 
     vector<sensor> sensors;
     vector<point> depots;

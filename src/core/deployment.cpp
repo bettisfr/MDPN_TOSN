@@ -15,6 +15,11 @@ deployment::deployment(const input &par) {
     uniform_real_distribution<double> width_rand(0, area_width);
     uniform_int_distribution<int> data_rand(0, max_data);
 
+    // Radio parameters used in my paper
+    double P_Rx = -100.0;
+    double P_Tx = P_Rx + 20 * log10(4 * M_PI * f_c * sensor_radius / c);
+    double FSPL = abs(P_Rx) + P_Tx;
+
     // Sensors creation
     for (int i = 0; i < num_sensors; i++) {
         double x = length_rand(re);
@@ -24,10 +29,23 @@ deployment::deployment(const input &par) {
         // Suitably fix this according to Degree of Irregularity (DOI)
         // https://www.sciencedirect.com/science/article/pii/S1574119218305406 (Section 4)
         // DOI=0 sphere, DOI>0 irregularities
+        weibull_distribution<double> weibull_dist(shape, scale);
+
+        vector<double> values(360);
+        values[0] = -10; // dummy value for the next "while", so it enters for sure
+        while (abs(values.back() - values.front()) > doi) {
+            values[0] = 0; // fixed to 0
+            for (int j = 1; j < 360; ++j) {
+                values[j] = weibull_dist(re);
+                uniform_int_distribution<int> sgn_dist(0, 1);  // Range [0, 1]
+                int sgn = (sgn_dist(re) == 0) ? -1 : 1;
+                values[j] = sgn * values[j] * doi;
+            }
+        }
+
         vector<double> r_doi(360);
         for (int angle = 0; angle < 360; angle++) {
-            // FIXME
-            r_doi[angle] = sensor_radius;
+            r_doi[angle] = sensor_radius * pow(10, (values[angle] * FSPL / 20.0));
         }
 
         sensors.emplace_back(x, y, data, r_doi);
@@ -74,6 +92,8 @@ ostream &operator<<(ostream &os, const deployment &d) {
 
     return os;
 }
+
+
 
 
 
