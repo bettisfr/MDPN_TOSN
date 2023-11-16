@@ -186,6 +186,24 @@ void algorithms::draw_result() {
         htmlFile << "ctx.fill();\n";
         htmlFile << "ctx.stroke();\n";
 
+//        // Draw sensor shape based on radius_doi
+//        htmlFile << "ctx.beginPath();\n";
+//        for (int angle = 0; angle < 360; ++angle) {
+//            double radius = s.get_radius_doi(angle);
+//            double x = get<0>(pos) + radius * std::cos(angle * M_PI / 180.0);
+//            double y = get<1>(pos) + radius * std::sin(angle * M_PI / 180.0);
+//
+//            if (angle == 0) {
+//                htmlFile << "ctx.moveTo(" << x << ", " << y << ");\n";
+//            } else {
+//                htmlFile << "ctx.lineTo(" << x << ", " << y << ");\n";
+//            }
+//        }
+//        htmlFile << "ctx.closePath();\n";
+//        htmlFile << "ctx.fillStyle = 'rgba(0, 0, 255, 0.25)';\n";
+//        htmlFile << "ctx.fill();\n";
+//        htmlFile << "ctx.stroke();\n";
+
         // Draw sensor center dot
         htmlFile << "ctx.beginPath();\n";
         htmlFile << "ctx.arc(" << get<0>(pos) << ", " << get<1>(pos) << ", 2, 0, 2 * Math.PI);\n";
