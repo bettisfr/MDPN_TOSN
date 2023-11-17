@@ -60,7 +60,7 @@ struct input {
     double energy_cons_hover = 700;
 
     // Maximum data transfer rate between drone and sensors (in MB/s)
-    double data_transfer_rate = 9.0;
+//    double data_transfer_rate = 9.0;
 
     // Budget violation constant (1 + \epsilon)
     // Impacts the performance of the algorithm: > 0 slow (no violation), 1 <= fast (2x budget required)

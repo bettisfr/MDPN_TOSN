@@ -15,10 +15,7 @@ deployment::deployment(const input &par) {
     uniform_real_distribution<double> width_rand(0, area_width);
     uniform_int_distribution<int> data_rand(0, max_data);
 
-    // Radio parameters used in my paper
-    double P_Rx = -100.0;
-    double P_Tx = P_Rx + 20 * log10(4 * M_PI * f_c * sensor_radius / c);
-    double FSPL = abs(P_Rx) + P_Tx;
+    double FSPL = get_FSPL();
 
     // Sensors creation
     for (int i = 0; i < num_sensors; i++) {
@@ -91,6 +88,21 @@ ostream &operator<<(ostream &os, const deployment &d) {
     }
 
     return os;
+}
+
+double deployment::get_FSPL() {
+    double min_P_Rx = -100.0;
+    double min_P_Tx = min_P_Rx + 20 * log10(4 * M_PI * f_c * sensor_radius / c);
+    double FSPL = min_P_Tx - min_P_Rx;
+    return FSPL;
+}
+
+double deployment::get_DTR(double distance) {
+    double P_Rx = P_Tx + 20 * log10(c / (4 * M_PI * f_c * distance));
+    double P_Rx_W = pow(10, P_Rx / 10.0);  // Convert dB to watts
+    double C = B * log2(1 + P_Rx_W / N);
+    double C_MBps = C / 8e6;  // Convert bps to MB/s
+    return C_MBps;
 }
 
 
