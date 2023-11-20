@@ -216,48 +216,6 @@ void algorithms::tsp_neighbors() {
         cout << "(" << get<0>(p) << ", "<< get<1>(p) << ")" << " ; " ;
     }
 
-    ////////////////////////////////
-    ////////////////////////////////
-
-    // point p1 = {0, 0};
-    // point p2 = {10, 10};
-    // vector<point> aaa = get_intersection_points(p1, p2);
-    // for (point p : aaa) {
-    //     cout << get<0>(p) << ", " << get<1>(p) << endl;
-    // }
-    // cout << endl;
-
-    // // create independent set
-
-    // // run TSP on the previous set
-
-    // vector<point_3d> points;
-
-    // // it would be a subset of "sensors"
-    // for (auto s : sensors) {
-    //     auto pos = s.get_position();
-    //     point_3d new_point = {get<0>(pos), get<1>(pos), 0};
-    //     points.push_back(new_point);
-    // }
-
-    // // Also depot is inserted
-    // auto pos_depot = depots[0];
-    // point_3d depot = {get<0>(pos_depot), get<1>(pos_depot), 0};
-    // points.push_back(depot);
-
-    // TSP tsp(points);
-    // tsp.solve();
-
-    // tsp_result_id = tsp.get_path_id();
-    // tsp_result = tsp.get_path();
-    // cout << "TSP path: ";
-    // for (auto p : tsp_result_id) {
-    //     cout << p << ", ";
-    // }
-    // cout << endl;
-
-    // double len = tsp.get_length();
-    // cout << "TSP len: " << len << endl;
 }
 
 
