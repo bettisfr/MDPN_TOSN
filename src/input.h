@@ -26,19 +26,19 @@ struct input {
     string exp_name = "default";
 
     // Number of sensors
-    int num_sensors = 100;
+    int num_sensors = 10;
 
     // Number of depots
     int num_depots = 1;
 
     // Length of the area (in meters)
-    int area_length = 1000;
+    int area_length = 100;
 
     // Width of the area (in meters)
-    int area_width = 1000;
+    int area_width = 100;
 
     // Radius of the sensors (in case of no DOI)
-    double sensor_radius = 150;
+    double sensor_radius = 20;
 
     // Degree of Irregularity (DOI)
     // -> https://www.sciencedirect.com/science/article/pii/S1574119218305406 (Section 4)
