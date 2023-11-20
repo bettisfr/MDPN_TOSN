@@ -81,6 +81,7 @@ void algorithms::tsp_neighbors() {
     // sort sensors based on x-coordinates
     sort(sorted_sensors.begin(), sorted_sensors.end());
     int s = sorted_sensors.size();
+    cout << "sensors : " << endl;
     for(int i = 0; i < s; i++){
         cout << get<0>(sorted_sensors[i])<< ", " << get<1>(sorted_sensors[i]) << endl;
     }
@@ -209,7 +210,9 @@ void algorithms::tsp_neighbors() {
         }        
     }
 
+    cout << "tsp : " << endl;
     for (auto p : tsp_points){
+        
         cout << "(" << get<0>(p) << ", "<< get<1>(p) << ")" << " ; " ;
     }
 
