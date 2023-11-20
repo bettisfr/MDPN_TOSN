@@ -73,9 +73,9 @@ bool algorithms::is_within_radius_doi(const sensor& s, point p) {
 void algorithms::tsp_neighbors() {
 
     vector<tuple<double, double, double, double>> sorted_sensors;
-    for (int i = 0; i < sensors.size(); i++){
-        auto pos = sensors[i].get_position();
-        sorted_sensors.push_back(make_tuple(get<0>(pos), get<1>(pos), 0, 0));
+    for (const auto & sensor : sensors){
+        auto pos = sensor.get_position();
+        sorted_sensors.emplace_back(get<0>(pos), get<1>(pos), 0, 0);
     }
     
     // sort sensors based on x-coordinates
@@ -99,7 +99,7 @@ void algorithms::tsp_neighbors() {
                     // find intersec of i and j
                     point p2 = {get<0>(sorted_sensors[j]), get<1>(sorted_sensors[j])};
                     vector<point> intersec_points = get_intersection_points(p1, p2);
-                    if (intersec_points.size() > 0){
+                    if (!intersec_points.empty()){
                         intersections[i][j] = intersec_points;
                         intersec = 1; 
                         checked_sensors[j] = 1;
@@ -126,10 +126,10 @@ void algorithms::tsp_neighbors() {
     //     cout << "_________" << endl;
     // }
     
-    // get the keys of map (independant set) and compute tsp
+    // get the keys of map (independent set) and compute tsp
     vector<point_3d> points;
     vector<int> I;
-    for (auto p: intersections){
+    for (const auto& p: intersections){
         I.push_back(p.first);
         point_3d new_point = {get<0>(sorted_sensors[p.first]), get<1>(sorted_sensors[p.first]), 0};
         points.push_back(new_point);
@@ -146,17 +146,17 @@ void algorithms::tsp_neighbors() {
     // }
     // cout << endl;
 
-    vector<tuple<double, double>> tsp_points;
+//    vector<tuple<double, double>> tspn_result;
     int counter = 0;
     for (int i = 0 ; i < tsp_result_id.size() ; i++){
         // use points to access sorted_node and then intersections
         counter++;
         if (counter == tsp_result_id.size()){
-            tsp_points.push_back(make_tuple(points[tsp_result_id[tsp_result_id.size()-1]].x, points[tsp_result_id[tsp_result_id.size()-1]].y));
+            tspn_result.push_back(make_tuple(points[tsp_result_id[tsp_result_id.size() - 1]].x, points[tsp_result_id[tsp_result_id.size() - 1]].y));
             break;
         }
         
-        tsp_points.push_back(make_tuple(points[tsp_result_id[i]].x, points[tsp_result_id[i]].y));
+        tspn_result.push_back(make_tuple(points[tsp_result_id[i]].x, points[tsp_result_id[i]].y));
 
         tuple<double, double, double, double> sensor1;
         tuple<double, double, double, double> sensor2;
@@ -198,11 +198,11 @@ void algorithms::tsp_neighbors() {
                     double dist2 = get<1>(points_dist[1]);
 
                     if (dist1 >= dist2){
-                        tsp_points.push_back(get<0>(points_dist[1]));
+                        tspn_result.push_back(get<0>(points_dist[1]));
                         point pos = get<0>(points_dist[1]);
                         sensor1 = sensor1 = make_tuple(get<0>(pos), get<1>(pos), 0, 0);
                     } else {
-                        tsp_points.push_back(get<0>(points_dist[0]));
+                        tspn_result.push_back(get<0>(points_dist[0]));
                         point pos = get<0>(points_dist[0]);
                         sensor1 = sensor1 = make_tuple(get<0>(pos), get<1>(pos), 0, 0);
                     }
@@ -212,10 +212,12 @@ void algorithms::tsp_neighbors() {
     }
 
     cout << "tsp : " << endl;
-    for (auto p : tsp_points){
+    for (auto p : tspn_result){
         
         cout << "(" << get<0>(p) << ", "<< get<1>(p) << ")" << " ; " ;
     }
+
+    draw_result();
 
 }
 
@@ -401,11 +403,11 @@ void algorithms::draw_result() {
     htmlFile << "ctx.strokeStyle = 'red';\n";
     htmlFile << "ctx.lineWidth = 2;\n";
     htmlFile << "ctx.beginPath();\n";
-    htmlFile << "ctx.moveTo(" << tsp_result[0].x << ", " << tsp_result[0].y << ");\n";
-    for (size_t i = 0; i < tsp_result.size(); ++i) {
-        htmlFile << "ctx.lineTo(" << tsp_result[i].x << ", " << tsp_result[i].y << ");\n";
+    htmlFile << "ctx.moveTo(" << get<0>(tspn_result[0]) << ", " << get<1>(tspn_result[0]) << ");\n";
+    for (auto & i : tspn_result) {
+        htmlFile << "ctx.lineTo(" << get<0>(i) << ", " << get<1>(i) << ");\n";
     }
-    htmlFile << "ctx.lineTo(" << tsp_result[0].x << ", " << tsp_result[0].y << ");\n";
+    htmlFile << "ctx.lineTo(" << get<0>(tspn_result[0]) << ", " << get<1>(tspn_result[0]) << ");\n";
     htmlFile << "ctx.stroke();\n";
 
 

@@ -24,6 +24,7 @@ private:
 
     vector<int> tsp_result_id;
     vector<point_3d> tsp_result;
+    vector<point> tspn_result;
 
 public:
     explicit algorithms(deployment*);
