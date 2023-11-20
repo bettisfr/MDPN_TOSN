@@ -148,7 +148,7 @@ void algorithms::tsp_neighbors() {
 
     vector<tuple<double, double>> tsp_points;
     int counter = 0;
-    for (int i = 0 ; i < tsp_result_id.size(); i++){
+    for (int i = 0 ; i < tsp_result_id.size() ; i++){
         // use points to access sorted_node and then intersections
         counter++;
         if (counter == tsp_result_id.size()){
@@ -163,7 +163,7 @@ void algorithms::tsp_neighbors() {
 
         sensor1 = make_tuple(points[tsp_result_id[i]].x, points[tsp_result_id[i]].y, 0, 0);
         sensor2 = make_tuple(points[tsp_result_id[i+1]].x, points[tsp_result_id[i+1]].y, 0, 0);
-        //cout << points[i].x << points[i].y << endl;
+
         auto it = find_if(sorted_sensors.begin(), sorted_sensors.end(),
                    [&sensor1](const auto& element) { return element == sensor1; });
 
@@ -173,6 +173,7 @@ void algorithms::tsp_neighbors() {
             int skip = 0;
             vector<tuple<point, double>> points_dist;
             for (point p : j_intersecs.second){  // at most 2 points
+
                 if (get<0>(p) == -1){
                     skip = 1;
                 } else {
@@ -189,7 +190,7 @@ void algorithms::tsp_neighbors() {
                 break;
             } else {
                 // select the one that has the minimum distance
-                if (tsp_points.size() == 1){
+                if (points_dist.size() == 1){                      
                     point pos = get<0>(points_dist[0]);
                     sensor1 = sensor1 = make_tuple(get<0>(pos), get<1>(pos), 0, 0);
                 } else {
