@@ -26,8 +26,13 @@ private:
     double sensor_radius;
     double doi;
 
-    const double c = 0.3e+9;
-    const double f_c = 6.5e+9;
+    const double f_c = 2.4e9;    // Frequency in Hz (for 2.4 GHz Wi-Fi)
+    const double c = 3e8;        // Speed of light in m/s
+    const double P_Tx = 20;      // Transmitting power in dBm
+    const double N = 1e-8;       // Noise power in watts
+    const double B = 20e6;       // 20 MHz
+
+    // Weibull parameters
     const double shape = 0.67;
     const double scale = 0.16;
 
@@ -36,6 +41,12 @@ private:
 
 public:
     explicit deployment(const input &);
+
+    // Free Space Path Loss
+    double get_FSPL();
+
+    // Data Transfer Rate
+    double get_DTR(double);
 
     int get_num_sensors() const;
     int get_area_length() const;
