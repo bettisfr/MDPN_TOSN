@@ -10,6 +10,11 @@ deployment::deployment(const input &par) {
     sensor_radius = par.sensor_radius;
     doi = par.doi;
 
+    energy_budget = par.energy_budget;
+    energy_cons_fly = par.energy_cons_fly;
+    energy_cons_hover = par.energy_cons_hover;
+    data_transfer_rate = par.data_transfer_rate;
+
     mt19937 re(par.seed);
     uniform_real_distribution<double> length_rand(0, area_length);
     uniform_real_distribution<double> width_rand(0, area_width);
@@ -105,7 +110,21 @@ double deployment::get_DTR(double distance) {
     return C_MBps;
 }
 
+int deployment::get_energy_budget() const {
+    return energy_budget;
+}
 
+int deployment::get_energy_cons_fly() const {
+    return energy_cons_fly;
+}
+
+int deployment::get_energy_cons_hover() const {
+    return energy_cons_hover;
+}
+
+double deployment::get_data_transfer_rate() const {
+    return data_transfer_rate;
+}
 
 
 

@@ -22,7 +22,9 @@ public:
     sensor(double, double, double, vector<double>);
 
     tuple<double, double> get_position() const;
+
     double get_data_size() const;
+
     double get_radius_doi(int) const;
 };
 

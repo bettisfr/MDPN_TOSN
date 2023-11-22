@@ -26,6 +26,11 @@ private:
     double sensor_radius;
     double doi;
 
+    double data_transfer_rate;
+    int energy_budget;
+    double energy_cons_fly;
+    double energy_cons_hover;
+
     const double f_c = 2.4e9;    // Frequency in Hz (for 2.4 GHz Wi-Fi)
     const double c = 3e8;        // Speed of light in m/s
     const double P_Tx = 20;      // Transmitting power in dBm
@@ -49,11 +54,24 @@ public:
     double get_DTR(double);
 
     int get_num_sensors() const;
+
     int get_area_length() const;
+
     int get_area_width() const;
+
     double get_sensor_radius() const;
+
     vector<sensor> get_sensors();
+
     vector<point> get_depots();
+
+    int get_energy_budget() const;
+
+    int get_energy_cons_fly() const;
+
+    int get_energy_cons_hover() const;
+
+    double get_data_transfer_rate() const;
 };
 
 

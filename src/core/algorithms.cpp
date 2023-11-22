@@ -2,13 +2,8 @@
 
 #include <utility>
 
-algorithms::algorithms(deployment *dep) {
-    area_length = dep->get_area_length();
-    area_width = dep->get_area_width();
-    sensor_radius = dep->get_sensor_radius();
-
-    sensors = dep->get_sensors();
-    depots = dep->get_depots();
+algorithms::algorithms(deployment *m_dep) {
+    dep = m_dep;
 }
 
 void algorithms::algorithm_1() {
@@ -55,12 +50,12 @@ int algorithms::get_angle(sensor s, point p) {
     return rounded_angle;
 }
 
-bool algorithms::is_within_radius(const sensor& s, point p) {
+bool algorithms::is_within_radius(const sensor &s, point p) {
     double dist = get_distance(s, p);
-    return (dist <= sensor_radius);
+    return (dist <= dep->get_sensor_radius());
 }
 
-bool algorithms::is_within_radius_doi(const sensor& s, point p) {
+bool algorithms::is_within_radius_doi(const sensor &s, point p) {
     double dist = get_distance(s, p);
 
     int angle = get_angle(s, p);
@@ -72,41 +67,41 @@ bool algorithms::is_within_radius_doi(const sensor& s, point p) {
 
 void algorithms::tsp_neighbors() {
     vector<tuple<double, double, double, double>> sorted_sensors;
-    for (const auto & sensor : sensors){
+    for (const auto &sensor: dep->get_sensors()) {
         auto pos = sensor.get_position();
         sorted_sensors.emplace_back(get<0>(pos), get<1>(pos), 0, 0);
     }
-    
+
     // sort sensors based on x-coordinates
     sort(sorted_sensors.begin(), sorted_sensors.end());
     int s = sorted_sensors.size();
     cout << "sensors : " << endl;
-    for(int i = 0; i < s; i++){
-        cout << get<0>(sorted_sensors[i])<< ", " << get<1>(sorted_sensors[i]) << endl;
+    for (int i = 0; i < s; i++) {
+        cout << get<0>(sorted_sensors[i]) << ", " << get<1>(sorted_sensors[i]) << endl;
     }
 
     map<int, map<int, vector<point>>> intersections;
     vector<int> checked_sensors(sorted_sensors.size());
 
-    for (int i = 0; i < sorted_sensors.size(); i++){
-        if (checked_sensors[i] == 0){
+    for (int i = 0; i < sorted_sensors.size(); i++) {
+        if (checked_sensors[i] == 0) {
             point p1 = {get<0>(sorted_sensors[i]), get<1>(sorted_sensors[i])};
-            int intersec = 0; 
-            for (int j = i+1; j < sorted_sensors.size(); j++){
-                if (checked_sensors[j] == 0){
+            int intersec = 0;
+            for (int j = i + 1; j < sorted_sensors.size(); j++) {
+                if (checked_sensors[j] == 0) {
                     // add another if to check whether the distance of i and j is less than 2R
                     // find intersec of i and j
                     point p2 = {get<0>(sorted_sensors[j]), get<1>(sorted_sensors[j])};
                     vector<point> intersec_points = get_intersection_points(p1, p2);
-                    if (!intersec_points.empty()){
+                    if (!intersec_points.empty()) {
                         intersections[i][j] = intersec_points;
-                        intersec = 1; 
+                        intersec = 1;
                         checked_sensors[j] = 1;
                     }
-                }  
+                }
             }
-            checked_sensors[i] = 1; 
-            if (intersec == 0){
+            checked_sensors[i] = 1;
+            if (intersec == 0) {
                 vector<point> intersec_points = {make_tuple(-1, -1)};
                 intersections[i][-1] = intersec_points;
             }
@@ -124,11 +119,11 @@ void algorithms::tsp_neighbors() {
     //     }
     //     cout << "_________" << endl;
     // }
-    
+
     // get the keys of map (independent set) and compute tsp
     vector<point_3d> points;
     vector<int> I;
-    for (const auto& p: intersections){
+    for (const auto &p: intersections) {
         I.push_back(p.first);
         point_3d new_point = {get<0>(sorted_sensors[p.first]), get<1>(sorted_sensors[p.first]), 0};
         points.push_back(new_point);
@@ -137,7 +132,7 @@ void algorithms::tsp_neighbors() {
     TSP tsp(points);
     tsp.solve();
 
-    tsp_result_id = tsp.get_path_id();
+    vector<int> tsp_result_id = tsp.get_path_id();
     // tsp_result = tsp.get_path();
     // cout << "TSP path: ";
     // for (auto p : tsp_result_id) {
@@ -145,42 +140,66 @@ void algorithms::tsp_neighbors() {
     // }
     // cout << endl;
 
+
+    // ####################
+    int energy_budget = dep->get_energy_budget();
+
+    int ecf = dep->get_energy_cons_fly(); // every meter (in J/m)
+    int ech = dep->get_energy_cons_hover(); // every second (in J/s)
+    double dtr = dep->get_data_transfer_rate(); // constant DTR (in MB/s)
+
+    sensor first_sensor = dep->get_sensors()[0];
+    double sensor_data = first_sensor.get_data_size();
+    double required_time = sensor_data / dtr; // total seconds
+    double energy_hovering = required_time * ech;
+
+    double test_distance = 100.0; // total meters
+    double energy_flying = test_distance * ecf;
+
+    double total_energy = energy_hovering + energy_flying;
+//    cout << ((total_energy <= energy_budget) ? ":)" : ":((") << endl;
+    // ####################
+
+
     // vector<tuple<double, double>> tspn_result;
     int counter = 0;
-    for (int i = 0 ; i < tsp_result_id.size() ; i++){
+    for (int i = 0; i < tsp_result_id.size(); i++) {
         // use points to access sorted_node and then intersections
         counter++;
-        if (counter == tsp_result_id.size()){
-            tspn_result.push_back(make_tuple(points[tsp_result_id[tsp_result_id.size() - 1]].x, points[tsp_result_id[tsp_result_id.size() - 1]].y));
+        if (counter == tsp_result_id.size()) {
+            tspn_result.push_back(make_tuple(points[tsp_result_id[tsp_result_id.size() - 1]].x,
+                                             points[tsp_result_id[tsp_result_id.size() - 1]].y));
             break;
         }
-        
+
         tspn_result.push_back(make_tuple(points[tsp_result_id[i]].x, points[tsp_result_id[i]].y));
 
         tuple<double, double, double, double> sensor1;
         tuple<double, double, double, double> sensor2;
 
         sensor1 = make_tuple(points[tsp_result_id[i]].x, points[tsp_result_id[i]].y, 0, 0);
-        sensor2 = make_tuple(points[tsp_result_id[i+1]].x, points[tsp_result_id[i+1]].y, 0, 0);
+        sensor2 = make_tuple(points[tsp_result_id[i + 1]].x, points[tsp_result_id[i + 1]].y, 0, 0);
 
         auto it = find_if(sorted_sensors.begin(), sorted_sensors.end(),
-                   [&sensor1](const auto& element) { return element == sensor1; });
+                          [&sensor1](const auto &element) { return element == sensor1; });
 
         int index1 = distance(sorted_sensors.begin(), it);
-        
-        for (auto j_intersecs : intersections[index1]){
+
+        for (auto j_intersecs: intersections[index1]) {
             int skip = 0;
             //vector<tuple<point, double>> points_dist;
             vector<tuple<double, point>> dist_points;
-            for (point p : j_intersecs.second){  // 2 points
-                if (get<0>(p) == -1){
+            for (point p: j_intersecs.second) {  // 2 points
+                if (get<0>(p) == -1) {
                     skip = 1;
                     break;
                 } else {
                     // compute the distance from sensor1 to p and from p to sensor2
-                    double dist_sen1_p = sqrt(pow(get<0>(p) - get<0>(sensor1), 2) + pow(get<1>(p) - get<1>(sensor1), 2));
-                    double dist_p_sen2 = sqrt(pow(get<0>(sensor2) - get<0>(p), 2) + pow(get<1>(sensor2) - get<1>(p), 2));
-                
+                    double dist_sen1_p = sqrt(
+                            pow(get<0>(p) - get<0>(sensor1), 2) + pow(get<1>(p) - get<1>(sensor1), 2));
+                    double dist_p_sen2 = sqrt(
+                            pow(get<0>(sensor2) - get<0>(p), 2) + pow(get<1>(sensor2) - get<1>(p), 2));
+
                     double distance = dist_sen1_p + dist_p_sen2;
                     dist_points.push_back(make_tuple(distance, p));
                 }
@@ -191,26 +210,26 @@ void algorithms::tsp_neighbors() {
 
             double dist_sen1_p = sqrt(pow(x_j - get<0>(sensor1), 2) + pow(y_j - get<1>(sensor1), 2));
             double dist_p_sen2 = sqrt(pow(get<0>(sensor2) - x_j, 2) + pow(get<1>(sensor2) - y_j, 2));
-                
+
             double distance = dist_sen1_p + dist_p_sen2;
             dist_points.push_back(make_tuple(distance, make_tuple(x_j, y_j)));
 
-            if (skip == 1){
+            if (skip == 1) {
                 break;
             } else {
                 // select the one that has the minimum distance
-                sort(dist_points.begin(), dist_points.end()); 
-                    point pos = get<1>(dist_points[0]);
-                    tspn_result.push_back(pos);
-                    sensor1 = sensor1 = make_tuple(get<0>(pos), get<1>(pos), 0, 0);
+                sort(dist_points.begin(), dist_points.end());
+                point pos = get<1>(dist_points[0]);
+                tspn_result.push_back(pos);
+                sensor1 = sensor1 = make_tuple(get<0>(pos), get<1>(pos), 0, 0);
             }
-        }        
+        }
     }
 
     cout << "tsp : " << endl;
-    for (auto p : tspn_result){
-        
-        cout << "(" << get<0>(p) << ", "<< get<1>(p) << ")" << " ; " ;
+    for (auto p: tspn_result) {
+
+        cout << "(" << get<0>(p) << ", " << get<1>(p) << ")" << " ; ";
     }
 
     draw_result();
@@ -278,19 +297,21 @@ vector<point> algorithms::get_intersection_points(point pa, point pb) {
     double distance = sqrt(pow(x2 - x1, 2) + pow(y2 - y1, 2));
 
     // Check if circles are too far apart or coincide
-    if (distance > 2 * sensor_radius || distance < fabs(sensor_radius - sensor_radius)) {
-    // cout << "No intersection points found." << endl;
+    if (distance > 2 * dep->get_sensor_radius() ||
+        distance < fabs(dep->get_sensor_radius() - dep->get_sensor_radius())) {
+        // cout << "No intersection points found." << endl;
         return int_points;
     }
 
     // Calculate the distance from the center of circle A to the line joining the intersection points
-    double a = (pow(sensor_radius, 2) - pow(sensor_radius, 2) + pow(distance, 2)) / (2 * distance);
+    double a =
+            (pow(dep->get_sensor_radius(), 2) - pow(dep->get_sensor_radius(), 2) + pow(distance, 2)) / (2 * distance);
 
     // Calculate the coordinates of the intersection points
     double x3 = x1 + a * (x2 - x1) / distance;
     double y3 = y1 + a * (y2 - y1) / distance;
 
-    double h = sqrt(pow(sensor_radius, 2) - pow(a, 2));
+    double h = sqrt(pow(dep->get_sensor_radius(), 2) - pow(a, 2));
 
     // Calculate the coordinates of the two intersection points
     double int_x1 = x3 + h * (y2 - y1) / distance;
@@ -302,7 +323,7 @@ vector<point> algorithms::get_intersection_points(point pa, point pb) {
     // Output the intersection points
     // cout << "Intersection Point 1: (" << int_x1 << ", " << int_y1 << ")" << endl;
     // cout << "Intersection Point 2: (" << int_x2 << ", " << int_y2 << ")" << endl;
-    
+
     int_ab_1 = {int_x1, int_y1};
     int_ab_2 = {int_x2, int_y2};
 
@@ -325,13 +346,14 @@ void algorithms::draw_result() {
     htmlFile << "var ctx = canvas.getContext('2d');\n";
 
     // Draw sensors and depots as before
-    for (size_t i = 0; i < sensors.size(); ++i) {
-        auto s = sensors[i];
+    for (size_t i = 0; i < dep->get_sensors().size(); ++i) {
+        auto s = dep->get_sensors()[i];
         auto pos = s.get_position();
 
         // Draw sensor circle
         htmlFile << "ctx.beginPath();\n";
-        htmlFile << "ctx.arc(" << get<0>(pos) << ", " << get<1>(pos) << ", " << sensor_radius << ", 0, 2 * Math.PI);\n";
+        htmlFile << "ctx.arc(" << get<0>(pos) << ", " << get<1>(pos) << ", " << dep->get_sensor_radius()
+                 << ", 0, 2 * Math.PI);\n";
         htmlFile << "ctx.fillStyle = 'rgba(0, 0, 255, 0.25)';\n";
         htmlFile << "ctx.fill();\n";
         htmlFile << "ctx.stroke();\n";
@@ -367,8 +389,8 @@ void algorithms::draw_result() {
         htmlFile << "ctx.fillText('" << i << "', " << get<0>(pos) + 10 << ", " << get<1>(pos) + 10 << ");\n";
     }
 
-    for (size_t i = 0; i < depots.size(); ++i) {
-        auto d = depots[i];
+    for (size_t i = 0; i < dep->get_depots().size(); ++i) {
+        auto d = dep->get_depots()[i];
         auto pos = d;
 
         // Draw depot square
@@ -386,7 +408,7 @@ void algorithms::draw_result() {
     htmlFile << "ctx.lineWidth = 2;\n";
     htmlFile << "ctx.beginPath();\n";
     htmlFile << "ctx.moveTo(" << get<0>(tspn_result[0]) << ", " << get<1>(tspn_result[0]) << ");\n";
-    for (auto & i : tspn_result) {
+    for (auto &i: tspn_result) {
         htmlFile << "ctx.lineTo(" << get<0>(i) << ", " << get<1>(i) << ");\n";
     }
     htmlFile << "ctx.lineTo(" << get<0>(tspn_result[0]) << ", " << get<1>(tspn_result[0]) << ");\n";
@@ -396,7 +418,8 @@ void algorithms::draw_result() {
     htmlFile << "}\n";
     htmlFile << "</script>\n";
 
-    htmlFile << "<canvas id='sensorCanvas' width='" << area_length << "' height='" << area_width << "' style='border:1px solid #000;'></canvas>\n";
+    htmlFile << "<canvas id='sensorCanvas' width='" << dep->get_area_length() << "' height='" << dep->get_area_width()
+             << "' style='border:1px solid #000;'></canvas>\n";
 
     htmlFile << "<script>\n";
     htmlFile << "drawSensorsAndDepots();\n";
