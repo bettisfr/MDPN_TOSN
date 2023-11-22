@@ -334,7 +334,7 @@ vector<point> algorithms::get_intersection_points(point pa, point pb) {
 }
 
 void algorithms::draw_result() {
-    ofstream htmlFile("../output/sensor_deployment.html");
+    ofstream htmlFile("output/sensor_deployment.html");
 
     htmlFile << "<!DOCTYPE html>\n<html>\n<head>\n";
     htmlFile << "<title>Sensor Deployment</title>\n";
@@ -345,6 +345,34 @@ void algorithms::draw_result() {
     htmlFile << "var canvas = document.getElementById('sensorCanvas');\n";
     htmlFile << "var ctx = canvas.getContext('2d');\n";
 
+    // Draw label for point (0, 0) with an offset of +15, +15
+    htmlFile << "ctx.font = 'bold 15px Arial';\n";
+    htmlFile << "ctx.fillText('(0, 0)', 15, " << dep->get_area_width() - 15 << ");\n";
+
+    // Draw (0, 0)
+    htmlFile << "ctx.beginPath();\n";
+    htmlFile << "ctx.arc(" << 0 << ", " << dep->get_area_width() << ", 5, 0, 2 * Math.PI);\n";
+    htmlFile << "ctx.fillStyle = 'black';\n";
+    htmlFile << "ctx.fill();\n";
+    htmlFile << "ctx.stroke();\n";
+
+    // Draw grid lines
+    htmlFile << "ctx.strokeStyle = 'rgba(0, 0, 0, 0.1)';\n";
+    htmlFile << "ctx.lineWidth = 1;\n";
+    for (int x = 100; x < dep->get_area_length(); x += 100) {
+        htmlFile << "ctx.beginPath();\n";
+        htmlFile << "ctx.moveTo(" << x << ", 0);\n";
+        htmlFile << "ctx.lineTo(" << x << ", " << dep->get_area_width() << ");\n";
+        htmlFile << "ctx.stroke();\n";
+    }
+
+    for (int y = 100; y < dep->get_area_width(); y += 100) {
+        htmlFile << "ctx.beginPath();\n";
+        htmlFile << "ctx.moveTo(0, " << y << ");\n";
+        htmlFile << "ctx.lineTo(" << dep->get_area_length() << ", " << y << ");\n";
+        htmlFile << "ctx.stroke();\n";
+    }
+
     // Draw sensors and depots as before
     for (size_t i = 0; i < dep->get_sensors().size(); ++i) {
         auto s = dep->get_sensors()[i];
@@ -352,7 +380,7 @@ void algorithms::draw_result() {
 
         // Draw sensor circle
         htmlFile << "ctx.beginPath();\n";
-        htmlFile << "ctx.arc(" << get<0>(pos) << ", " << get<1>(pos) << ", " << dep->get_sensor_radius()
+        htmlFile << "ctx.arc(" << get<0>(pos) << ", " << dep->get_area_width() - get<1>(pos) << ", " << dep->get_sensor_radius()
                  << ", 0, 2 * Math.PI);\n";
         htmlFile << "ctx.fillStyle = 'rgba(0, 0, 255, 0.25)';\n";
         htmlFile << "ctx.fill();\n";
@@ -362,8 +390,8 @@ void algorithms::draw_result() {
 //        htmlFile << "ctx.beginPath();\n";
 //        for (int angle = 0; angle < 360; ++angle) {
 //            double radius = s.get_radius_doi(angle);
-//            double x = get<0>(pos) + radius * std::cos(angle * M_PI / 180.0);
-//            double y = get<1>(pos) + radius * std::sin(angle * M_PI / 180.0);
+//            double x = get<0>(pos) + radius * cos(angle * M_PI / 180.0);
+//            double y = dep->get_area_width() - get<1>(pos) + radius * sin(angle * M_PI / 180.0);
 //
 //            if (angle == 0) {
 //                htmlFile << "ctx.moveTo(" << x << ", " << y << ");\n";
@@ -378,15 +406,16 @@ void algorithms::draw_result() {
 
         // Draw sensor center dot
         htmlFile << "ctx.beginPath();\n";
-        htmlFile << "ctx.arc(" << get<0>(pos) << ", " << get<1>(pos) << ", 2, 0, 2 * Math.PI);\n";
+        htmlFile << "ctx.arc(" << get<0>(pos) << ", " << dep->get_area_width() - get<1>(pos) << ", 2, 0, 2 * Math.PI);\n";
         htmlFile << "ctx.fillStyle = 'black';\n";
         htmlFile << "ctx.fill();\n";
         htmlFile << "ctx.stroke();\n";
 
-        // Draw sensor label
+        // Draw sensor label with coordinates (bold)
         htmlFile << "ctx.fillStyle = 'black';\n";
-        htmlFile << "ctx.font = '15px Arial';\n";
-        htmlFile << "ctx.fillText('" << i << "', " << get<0>(pos) + 10 << ", " << get<1>(pos) + 10 << ");\n";
+        htmlFile << "ctx.font = 'bold 15px Arial';\n";
+        htmlFile << "ctx.fillText('" << i << " (" << get<0>(pos) << ", " << get<1>(pos) << ")', "
+                 << get<0>(pos) + 10 << ", " << dep->get_area_width() - get<1>(pos) + 10 << ");\n";
     }
 
     for (size_t i = 0; i < dep->get_depots().size(); ++i) {
@@ -395,23 +424,24 @@ void algorithms::draw_result() {
 
         // Draw depot square
         htmlFile << "ctx.fillStyle = 'brown';\n";
-        htmlFile << "ctx.fillRect(" << get<0>(pos) - 7.5 << ", " << get<1>(pos) - 7.5 << ", 15, 15);\n";
+        htmlFile << "ctx.fillRect(" << get<0>(pos) - 7.5 << ", " << dep->get_area_width() - get<1>(pos) - 7.5 << ", 15, 15);\n";
 
-        // Draw depot label
+        // Draw depot label with coordinates
         htmlFile << "ctx.fillStyle = 'black';\n";
         htmlFile << "ctx.font = '15px Arial';\n";
-        htmlFile << "ctx.fillText('D" << i << "', " << get<0>(pos) + 10 << ", " << get<1>(pos) + 10 << ");\n";
+        htmlFile << "ctx.fillText('D" << i << " (" << get<0>(pos) << ", " << get<1>(pos) << ")', "
+                 << get<0>(pos) + 10 << ", " << dep->get_area_width() - get<1>(pos) + 10 << ");\n";
     }
 
     // Draw TSP circuit connecting points in the order specified by tsp_result
     htmlFile << "ctx.strokeStyle = 'red';\n";
     htmlFile << "ctx.lineWidth = 2;\n";
     htmlFile << "ctx.beginPath();\n";
-    htmlFile << "ctx.moveTo(" << get<0>(tspn_result[0]) << ", " << get<1>(tspn_result[0]) << ");\n";
+    htmlFile << "ctx.moveTo(" << get<0>(tspn_result[0]) << ", " << dep->get_area_width() - get<1>(tspn_result[0]) << ");\n";
     for (auto &i: tspn_result) {
-        htmlFile << "ctx.lineTo(" << get<0>(i) << ", " << get<1>(i) << ");\n";
+        htmlFile << "ctx.lineTo(" << get<0>(i) << ", " << dep->get_area_width() - get<1>(i) << ");\n";
     }
-    htmlFile << "ctx.lineTo(" << get<0>(tspn_result[0]) << ", " << get<1>(tspn_result[0]) << ");\n";
+    htmlFile << "ctx.lineTo(" << get<0>(tspn_result[0]) << ", " << dep->get_area_width() - get<1>(tspn_result[0]) << ");\n";
     htmlFile << "ctx.stroke();\n";
 
 
