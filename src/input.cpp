@@ -44,7 +44,7 @@ void save_parameters(const input &par) {
     file_cfg << "energy_budget=" << par.energy_budget << endl;
     file_cfg << "energy_cons_fly=" << par.energy_cons_fly << endl;
     file_cfg << "energy_cons_hover=" << par.energy_cons_hover << endl;
-//    file_cfg << "data_transfer_rate=" << par.data_transfer_rate << endl;
+    // file_cfg << "data_transfer_rate=" << par.data_transfer_rate << endl;
     file_cfg << "epsilon=" << par.epsilon << endl;
 
     file_cfg << endl;
@@ -53,7 +53,7 @@ void save_parameters(const input &par) {
 }
 
 input load_parameters(input &par) {
-    string cfg_filename = "input/" + par.exp_name + ".cfg";
+    string cfg_filename = "../input/" + par.exp_name + ".cfg";
     ifstream file_cfg(cfg_filename);
 
     string line;
@@ -87,8 +87,8 @@ input load_parameters(input &par) {
                 par.energy_cons_fly = stod(value);
             } else if (key == "energy_cons_hover") {
                 par.energy_cons_hover = stod(value);
-//            } else if (key == "data_transfer_rate") {
-//                par.data_transfer_rate = stod(value);
+            // } else if (key == "data_transfer_rate") {
+            // par.data_transfer_rate = stod(value);
             } else if (key == "epsilon") {
                 par.epsilon = stod(value);
             }
