@@ -17,8 +17,8 @@ class algorithms {
 
 private:
     deployment *dep;
-
-    vector<point> tspn_result;
+    // change this in a way that you can also store the id of sensor
+    vector<tuple<double, double, int>> tspn_result;
 
 public:
     explicit algorithms(deployment *);
@@ -34,6 +34,8 @@ public:
     vector<point> get_intersection_points(point, point);
 
     void tsp_neighbors();
+
+    vector<tuple<double, double, double, double>> sorted_sensors;
 
     // TODO: random names now
     void algorithm_1();
