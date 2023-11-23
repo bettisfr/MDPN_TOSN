@@ -53,7 +53,7 @@ void save_parameters(const input &par) {
 }
 
 input load_parameters(input &par) {
-    string cfg_filename = "../input/" + par.exp_name + ".cfg";
+    string cfg_filename = "input/" + par.exp_name + ".cfg";
     ifstream file_cfg(cfg_filename);
 
     string line;
