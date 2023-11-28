@@ -43,6 +43,7 @@ scripts/__pycache__/
 data_size/graph/generated/
 
 # Visual Studio Code
+.vscode
 .vscode/*
 !.vscode/settings.json
 !.vscode/tasks.json

@@ -21,10 +21,11 @@ void run_experiment(input &par) {
     // Algorithms creation and invocation
     algorithms alg(&dep);
 
-    alg.tsp_neighbors();
+    //alg.tsp_neighbors();
+    alg.ApproxTSPN_S();
 
 
-    // alg.algorithm_1();
+
     // alg.draw_result();
 //    alg.algorithm_2();
 }

@@ -6,9 +6,11 @@ algorithms::algorithms(deployment *m_dep) {
     dep = m_dep;
 }
 
-void algorithms::algorithm_1() {
-    cout << "alg1" << endl;
+void algorithms::ApproxTSPN_S() {
+    cout << "ApproxTSPN_S " << endl;
     tsp_neighbors();
+    tsp_split();
+    draw_result();
 }
 
 void algorithms::algorithm_2() {
@@ -62,6 +64,37 @@ bool algorithms::is_within_radius_doi(const sensor &s, point p) {
     double actual_radius = s.get_radius_doi(angle);
 
     return (dist <= actual_radius);
+}
+
+double algorithms::tour_cost(vector<tuple<double, double, int>> T) {
+
+    int ecf = dep->get_energy_cons_fly(); // every meter (in J/m)
+    int ech = dep->get_energy_cons_hover(); // every second (in J/s)
+    double dtr = dep->get_data_transfer_rate(); // constant DTR (in MB/s)
+
+    double dist1 = sqrt(pow(get<0>(T[0]) - get<0>(T[1]), 2) + pow(get<1>(T[0]) - get<1>(T[1]), 2));
+    double energy1_flying = dist1 * ecf;
+
+    double sensor1_data = get<2>(sorted_sensors[get<2>(T[1])]);
+    double required1_time = sensor1_data / dtr; // total seconds
+    double energy1_hovering = required1_time * ech;
+
+    double dist2 = sqrt(pow(get<0>(T[0]) - get<0>(T[T.size()-2]), 2) + pow(get<1>(T[0]) - get<1>(T[T.size()-2]), 2));
+    double energy2_flying = dist2 * ecf;
+
+    double sensor2_data = get<2>(sorted_sensors[get<2>(T[T.size()-2])]);
+    double required2_time = sensor2_data / dtr; // total seconds
+    double energy2_hovering = required2_time * ech;
+
+    double cost_T_k = 0;
+
+    for (int p = 1; p < T.size()-2; p++){
+        cost_T_k = cost_T_k + tspn_cost[p-1];
+    }
+
+    cost_T_k = cost_T_k + energy1_flying + energy2_flying + energy1_hovering / 2 + energy2_hovering / 2;
+
+    return cost_T_k;
 }
 
 
@@ -141,31 +174,16 @@ void algorithms::tsp_neighbors() {
     // cout << endl;
 
 
-    // ####################
     int energy_budget = dep->get_energy_budget();
 
     int ecf = dep->get_energy_cons_fly(); // every meter (in J/m)
     int ech = dep->get_energy_cons_hover(); // every second (in J/s)
     double dtr = dep->get_data_transfer_rate(); // constant DTR (in MB/s)
 
-    //sensor first_sensor = dep->get_sensors()[0];
-    //double sensor_data = first_sensor.get_data_size();
-    //double required_time = sensor_data / dtr; // total seconds
-    //double energy_hovering = required_time * ech;
-
-    // double test_distance = 100.0; // total meters
-    // double energy_flying = test_distance * ecf;
-
-    // double total_energy = energy_hovering + energy_flying;
-    // cout << ((total_energy <= energy_budget) ? ":)" : ":((") << endl;
-    // ####################
-
-
-    vector<double> tspn_cost;
+    //vector<double> tspn_cost;
     int counter = 0;
     for (int i = 0; i < tsp_result_id.size(); i++) {
         // use points to access sorted_node and then intersections
-
         tuple<double, double, double, double> sensor1;
         tuple<double, double, double, double> sensor2;
 
@@ -177,17 +195,6 @@ void algorithms::tsp_neighbors() {
 
         counter++;
         if (counter == tsp_result_id.size()) {
-            // tspn_result.push_back(make_tuple(points[tsp_result_id[tsp_result_id.size() - 1]].x,
-            //                                  points[tsp_result_id[tsp_result_id.size() - 1]].y, get<2>(sorted_sensors[index1])));
-            /////////////////// add energy for this one
-            ///
-            ///
-            ///
-            ///
-            ///
-            //
-            ////
-            ////
             tspn_result.push_back(make_tuple(get<0>(sorted_sensors[index1]), get<1>(sorted_sensors[index1]), index1));
             break;
         }
@@ -200,8 +207,6 @@ void algorithms::tsp_neighbors() {
         int len_sen1 = intersections[index1].size();
         for (auto j_intersecs: intersections[index1]) {
             sen1_to_sen2++;
-
-            cout << "index1 " << index1 << endl;
 
             double sensor1_data = get<2>(sensor1);
             double required1_time = sensor1_data / dtr; // total seconds
@@ -217,9 +222,6 @@ void algorithms::tsp_neighbors() {
 
             double energy_hovering = energy1_hovering / 2 + energy_j_hovering + energy2_hovering / 2;
 
-            // cout << " j_intersecs " << j_intersecs.first << endl;
-            // cout << " energy_hovering " << energy_hovering << endl;
-
             int skip = 0;
             vector<tuple<double, point>> dist_points;
             for (point p: j_intersecs.second) {  // 2 points
@@ -227,11 +229,6 @@ void algorithms::tsp_neighbors() {
                     skip = 1;
                     break;
                 } else {
-
-                    //cout << " j_intersecs " << j_intersecs.first << endl;
-
-
-                    // compute the distance from sensor1 to p and from p to sensor2
                     double dist_sen1_p = sqrt(
                             pow(get<0>(p) - get<0>(sensor1), 2) + pow(get<1>(p) - get<1>(sensor1), 2));
                     double dist_p_sen2 = sqrt(
@@ -259,20 +256,13 @@ void algorithms::tsp_neighbors() {
             dist_points.push_back(make_tuple(total_energy, make_tuple(x_j, y_j)));
 
             if (skip == 1) {
-                cout << " j_intersecssssssss " << j_intersecs.first << endl;
-                double dist_sen1_sen2 = sqrt(pow(get<0>(sensor2) - get<0>(sensor1), 2) + pow(get<0>(sensor2) - get<1>(sensor1), 2));
+                double dist_sen1_sen2 = sqrt(pow(get<0>(sensor2) - get<0>(sensor1), 2) + pow(get<1>(sensor2) - get<1>(sensor1), 2));
                 double energy_flying = dist_sen1_sen2 * ecf;
-                double energy_hovering = (energy1_hovering + energy_j_hovering) / 2;
+                double energy_hovering = energy1_hovering / 2 + energy2_hovering / 2;
                 double total_energy = energy_hovering + energy_flying;
-                cout << " total energy  " << energy_flying + energy_hovering << endl;
-                cout << " -------- " << endl;
                 tspn_cost.push_back(total_energy);
-                 // fix thisssssssssssssssssssssss, cost is zero
                 break;
             } else {
-
-                cout << " j_intersecs " << j_intersecs.first << endl;
-
                 // select the one that has the minimum distance
                 sort(dist_points.begin(), dist_points.end());
                 point pos = get<1>(dist_points[0]);
@@ -281,12 +271,10 @@ void algorithms::tsp_neighbors() {
                 double dist_sen1_pos = sqrt(pow(get<0>(pos) - get<0>(sensor1), 2) + pow(get<1>(pos) - get<1>(sensor1), 2));
                 double energy_flying = dist_sen1_pos * ecf;
                 double energy_hovering = (energy1_hovering + energy_j_hovering) / 2;
-                cout << " total energy  " << energy_flying + energy_hovering << endl;
-                cout << " ------ " << endl;
                 double total_energy = energy_hovering + energy_flying;
                 tspn_cost.push_back(total_energy);
 
-                if (sen1_to_sen2 == len_sen1){
+                if (sen1_to_sen2 == len_sen1){   // or counter == tsp_result_id.size()-1
                     // energy from pos to sen2
                     double dist_pos_sen2 = sqrt(pow(get<0>(pos) - get<0>(sensor2), 2) + pow(get<1>(pos) - get<1>(sensor2), 2));
                     double energy_flying = dist_pos_sen2 * ecf;
@@ -294,25 +282,77 @@ void algorithms::tsp_neighbors() {
                     double total_energy = energy_hovering + energy_flying;
                     tspn_cost.push_back(total_energy);
                 }
-            
+
                 sensor1 = make_tuple(get<0>(pos), get<1>(pos), get<2>(sorted_sensors[j_intersecs.first]), 0);
 
             }
         }
     }
 
-    for (auto i:tspn_cost)
-    {
-        cout << " cost  " << i << endl;
-    }
+//    for (auto i:tspn_cost)
+//    {
+//        cout << " cost  " << i << endl;
+//    }
     
 
     cout << "tsp : " << endl;
     for (int i=0 ; i < tspn_result.size(); i++) {
-        cout << "(" << get<0>(tspn_result[i]) << ", " << get<1>(tspn_result[i]) << ")" << " : " << get<2>(tspn_result[i]) << " : " << tspn_cost[i] << " ; ";
+        cout << "(" << get<0>(tspn_result[i]) << ", " << get<1>(tspn_result[i]) << ")" << " : " << get<2>(tspn_result[i]) << " : " << tspn_cost[i] << endl;
+    }
+    cout << endl;
+}
+
+void algorithms::tsp_split() {
+    int energy_budget = dep->get_energy_budget();
+    energy_budget = energy_budget * 1000;
+
+    int i = 0;
+    int j = 0;
+    int n = sorted_sensors.size();
+    auto depot = dep->get_depots()[0]; 
+    
+    while (j <= n-1){
+        vector<tuple<double, double, int>> T_k; 
+        T_k.push_back(make_tuple(get<0>(depot), get<1>(depot), -1));
+        for (int p = i; p <= j; p++){
+            T_k.push_back(tspn_result[p]);
+        }
+        T_k.push_back(make_tuple(get<0>(depot), get<1>(depot), -1));
+
+        double cost = tour_cost(T_k);
+
+        // cout << "i : " << i << endl;
+        // cout << "j : " << j << endl;
+        // cout << "cost : " << cost << endl;
+        // cout << "----------" << endl;
+
+        if (cost <= energy_budget){
+            if (j == n-1){
+                tspn_tours.push_back(T_k);
+                break;
+            } else {
+                j = j + 1;
+            }
+        } else {
+            j = j - 1;
+            // remove j from T_k
+            T_k.erase(T_k.begin() + T_k.size()-2);
+            tspn_tours.push_back(T_k);
+            T_k.clear();
+
+            j = j+1;
+            i = j;
+        }
+    }
+    
+
+    for (int i = 0; i < tspn_tours.size(); i++){
+        for (auto j: tspn_tours[i]){
+            cout<< get<0>(j) << ", " << get<1>(j) << endl;
+        }
+        cout << "-------" << endl;
     }
 
-    draw_result();
 
 }
 
@@ -454,9 +494,13 @@ void algorithms::draw_result() {
     }
 
     // Draw sensors and depots as before
-    for (size_t i = 0; i < dep->get_sensors().size(); ++i) {
-        auto s = dep->get_sensors()[i];
-        auto pos = s.get_position();
+    // for (size_t i = 0; i < dep->get_sensors().size(); ++i) {
+    //     auto s = dep->get_sensors()[i];
+    //     auto pos = s.get_position();
+
+    for (size_t i = 0; i < sorted_sensors.size(); ++i) {
+        auto s = sorted_sensors[i];
+        auto pos = make_tuple(get<0>(s), get<1>(s));
 
         // Draw sensor circle
         htmlFile << "ctx.beginPath();\n";
@@ -513,17 +557,32 @@ void algorithms::draw_result() {
                  << get<0>(pos) + 10 << ", " << dep->get_area_width() - get<1>(pos) + 10 << ");\n";
     }
 
-    // Draw TSP circuit connecting points in the order specified by tsp_result
+    // // Draw TSP circuit connecting points in the order specified by tsp_result
+    // htmlFile << "ctx.strokeStyle = 'red';\n";
+    // htmlFile << "ctx.lineWidth = 2;\n";
+    // htmlFile << "ctx.beginPath();\n";
+    // htmlFile << "ctx.moveTo(" << get<0>(tspn_result[0]) << ", " << dep->get_area_width() - get<1>(tspn_result[0]) << ");\n";
+    // for (auto &i: tspn_result) {
+    //     htmlFile << "ctx.lineTo(" << get<0>(i) << ", " << dep->get_area_width() - get<1>(i) << ");\n";
+    // }
+    // htmlFile << "ctx.lineTo(" << get<0>(tspn_result[0]) << ", " << dep->get_area_width() - get<1>(tspn_result[0]) << ");\n";
+    // htmlFile << "ctx.stroke();\n";
+
+//////////////////////////////////
+    // Draw TSP circuit connecting points in the order specified by tspn_tours
     htmlFile << "ctx.strokeStyle = 'red';\n";
     htmlFile << "ctx.lineWidth = 2;\n";
     htmlFile << "ctx.beginPath();\n";
-    htmlFile << "ctx.moveTo(" << get<0>(tspn_result[0]) << ", " << dep->get_area_width() - get<1>(tspn_result[0]) << ");\n";
-    for (auto &i: tspn_result) {
-        htmlFile << "ctx.lineTo(" << get<0>(i) << ", " << dep->get_area_width() - get<1>(i) << ");\n";
+    htmlFile << "ctx.moveTo(" << get<0>(tspn_tours[0][0]) << ", " << dep->get_area_width() - get<1>(tspn_tours[0][0]) << ");\n";
+    for (int i = 0; i < tspn_tours.size(); i++){
+        for (auto j: tspn_tours[i]){
+            htmlFile << "ctx.lineTo(" << get<0>(j) << ", " << dep->get_area_width() - get<1>(j) << ");\n";
+        }
+        
     }
-    htmlFile << "ctx.lineTo(" << get<0>(tspn_result[0]) << ", " << dep->get_area_width() - get<1>(tspn_result[0]) << ");\n";
+    htmlFile << "ctx.lineTo(" << get<0>(tspn_tours[0][0]) << ", " << dep->get_area_width() - get<1>(tspn_tours[0][0]) << ");\n";
     htmlFile << "ctx.stroke();\n";
-
+////////////////////////////////////
 
     htmlFile << "}\n";
     htmlFile << "</script>\n";
