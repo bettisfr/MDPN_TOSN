@@ -5,6 +5,7 @@
 #include <vector>
 #include <tuple>
 #include <cmath>
+#include <unordered_set>
 
 #include "tsp/tsp.h"
 
@@ -35,15 +36,17 @@ public:
 
     vector<point> get_intersection_points(point, point);
 
-    double tour_cost(vector<tuple<double, double, int>>);
+    double tour_cost(vector<tuple<double, double, int>>, int);
 
-    void tsp_neighbors();
-    void tsp_split();
+    void tsp_neighbors(vector<sensor>);
+    void tsp_split(int, int);
+    void ApproxMPN();
+    vector<vector<tuple<double, double, int>>> approAlgNei(vector<tuple<double, double, double, double>>, int);
+    void DFS(int, unordered_set<int>&, unordered_set<int>&, vector<vector<int>>);
 
-    // TODO: random names now
     void ApproxTSPN_S();
 
-    void algorithm_2();
+    void ApproxMPN_S();
 
     void draw_result();
 };

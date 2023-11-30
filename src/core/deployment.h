@@ -25,6 +25,7 @@ private:
     int max_data;
     double sensor_radius;
     double doi;
+    double epsilon;
 
     double data_transfer_rate;
     int energy_budget;
@@ -60,6 +61,8 @@ public:
     int get_area_width() const;
 
     double get_sensor_radius() const;
+    
+    double get_epsilon() const;
 
     vector<sensor> get_sensors();
 

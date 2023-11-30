@@ -9,6 +9,7 @@ deployment::deployment(const input &par) {
     max_data = par.max_data;
     sensor_radius = par.sensor_radius;
     doi = par.doi;
+    epsilon = par.epsilon;
 
     energy_budget = par.energy_budget;
     energy_cons_fly = par.energy_cons_fly;
@@ -84,6 +85,10 @@ vector<sensor> deployment::get_sensors() {
 
 vector<point> deployment::get_depots() {
     return depots;
+}
+
+double deployment::get_epsilon() const{
+    return epsilon;
 }
 
 ostream &operator<<(ostream &os, const deployment &d) {

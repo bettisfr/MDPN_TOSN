@@ -22,12 +22,11 @@ void run_experiment(input &par) {
     algorithms alg(&dep);
 
     //alg.tsp_neighbors();
-    alg.ApproxTSPN_S();
-
-
+    //alg.ApproxTSPN_S();
+    alg.ApproxMPN_S();
 
     // alg.draw_result();
-//    alg.algorithm_2();
+
 }
 
 int main(int argc, char **argv) {
