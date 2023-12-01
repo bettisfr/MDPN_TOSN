@@ -159,7 +159,6 @@ void algorithms::ApproxMPN() {
         } else {
             V[j].push_back(s);
         }
-
     }
 
     // for (int i = 0; i < V.size(); i++){
@@ -182,21 +181,22 @@ void algorithms::ApproxMPN() {
         for (int j = 0 ; j < C.size(); j++){
             tours.push_back(C[j]);
         }
-
-                ///////////////////////////////////////////////////////////
-        // if (i==3){
-        //     break;
-        // }
-
     }
     tspn_tours.clear();
     tspn_tours = tours;
-    
-
 }
 
 
 vector<vector<tuple<double, double, int>>> algorithms::approAlgNei(vector<tuple<double, double, double, double>> V, int j) {
+    //////////////////
+    // solve it when V.size() == 1
+    //
+    //
+    //
+    //
+    //
+    //
+    ////////////////////////////////////////////////////////////////////////////////////////////////
     // for (auto  s:V){
     //     cout << "v v v v " << get<0>(s) << ", " << get<1>(s) << endl;
     // }
@@ -276,13 +276,6 @@ vector<vector<tuple<double, double, int>>> algorithms::approAlgNei(vector<tuple<
             adjacencyList.push_back(vector<int>());
         }
 
-        // adjacencyList[0].push_back(1);
-        // adjacencyList[0].push_back(2);
-        // adjacencyList[1].push_back(0);
-        // adjacencyList[2].push_back(0);
-        // adjacencyList[3].push_back(4);
-        // adjacencyList[4].push_back(3);
-
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < n; j++) {
                 if (G1[i][j] > 0){
@@ -290,7 +283,6 @@ vector<vector<tuple<double, double, int>>> algorithms::approAlgNei(vector<tuple<
                 }
             }
         }
-
 
         // for (int i = 0; i < n; i++) {
         //     cout << i << " : " ; 
@@ -337,7 +329,6 @@ vector<vector<tuple<double, double, int>>> algorithms::approAlgNei(vector<tuple<
         if (C1.size() < C.size()){
             C = C1;
         }
-        
     }    
     return C;
 }
@@ -352,12 +343,6 @@ void algorithms::DFS(int v, unordered_set<int>& visited, unordered_set<int>& con
         }
     }
 }
-
-
-
-
-
-
 
 
 void algorithms::tsp_neighbors(vector<sensor> sensors) {
@@ -628,15 +613,12 @@ void algorithms::tsp_split(int energy_budget, int with_depot) {
         }
     }
 
-    for (int i = 0; i < tspn_tours.size(); i++){
-        for (auto j: tspn_tours[i]){
-            cout<< get<0>(j) << ", " << get<1>(j) << endl;
-        }
-        cout << "-------" << endl;
-    }
-
-
-    //draw_result();
+    // for (int i = 0; i < tspn_tours.size(); i++){
+    //     for (auto j: tspn_tours[i]){
+    //         cout<< get<0>(j) << ", " << get<1>(j) << endl;
+    //     }
+    //     cout << "-------" << endl;
+    // }
 
 }
 
