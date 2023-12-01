@@ -16,16 +16,13 @@ void run_experiment(input &par) {
     // Deployment creation with respect to the input parameters
     deployment dep(par);
 
-//    cout << dep << endl;
+    // cout << dep << endl;
 
     // Algorithms creation and invocation
     algorithms alg(&dep);
 
-    //alg.tsp_neighbors();
     //alg.ApproxTSPN_S();
     alg.ApproxMPN_S();
-
-    // alg.draw_result();
 
 }
 

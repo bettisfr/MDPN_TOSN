@@ -36,7 +36,7 @@ public:
 
     vector<point> get_intersection_points(point, point);
 
-    double tour_cost(vector<tuple<double, double, int>>, int);
+    double tour_cost(vector<tuple<double, double, int>>, int, int, int);
 
     void tsp_neighbors(vector<sensor>);
     void tsp_split(int, int);
