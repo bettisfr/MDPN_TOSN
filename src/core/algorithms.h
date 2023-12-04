@@ -38,6 +38,8 @@ public:
 
     double tour_cost(vector<tuple<double, double, int>>, int, int, int);
 
+    double compute_energy_hovering(tuple<double, double, double, double>);
+
     void tsp_neighbors(vector<sensor>);
     void tsp_split(int, int);
     void ApproxMPN();

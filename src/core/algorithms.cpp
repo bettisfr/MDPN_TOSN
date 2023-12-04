@@ -8,14 +8,14 @@ algorithms::algorithms(deployment *m_dep) {
 }
 
 void algorithms::ApproxTSPN_S() {
-    cout << "ApproxTSPN_S " << endl;
+    cout << "ApproxTSPN_S: " << endl;
     tsp_neighbors(dep->get_sensors());
     tsp_split(dep->get_energy_budget(), 1);
     draw_result();
 }
 
 void algorithms::ApproxMPN_S() {
-    cout << "ApproxMPN_S" << endl;
+    cout << "ApproxMPN_S: " << endl;
     ApproxMPN();
     draw_result();
 }
@@ -69,6 +69,14 @@ bool algorithms::is_within_radius_doi(const sensor &s, point p) {
     return (dist <= actual_radius);
 }
 
+double algorithms::compute_energy_hovering(tuple<double, double, double, double>sensor) {
+    double dtr = dep->get_data_transfer_rate();
+    int ech = dep->get_energy_cons_hover(); 
+    double sensor_data = get<2>(sensor);
+    double required_time = sensor_data / dtr;
+    return required_time * ech;
+}
+
 double algorithms::tour_cost(vector<tuple<double, double, int>> T, int start, int end, int with_depot) {
     int ecf = dep->get_energy_cons_fly(); // every meter (in J/m)
     int ech = dep->get_energy_cons_hover(); // every second (in J/s)
@@ -77,19 +85,20 @@ double algorithms::tour_cost(vector<tuple<double, double, int>> T, int start, in
     double cost_T_k = 0;
 
     if (with_depot == 1){
+        tuple<double, double, double, double> sensor1;
+        tuple<double, double, double, double> sensor2;
+
         double dist1 = sqrt(pow(get<0>(T[0]) - get<0>(T[1]), 2) + pow(get<1>(T[0]) - get<1>(T[1]), 2));
         double energy1_flying = dist1 * ecf;
 
-        double sensor1_data = get<2>(sorted_sensors[get<2>(T[1])]);
-        double required1_time = sensor1_data / dtr; // total seconds
-        double energy1_hovering = required1_time * ech;
+        sensor1 = sorted_sensors[get<2>(T[1])];
+        double energy1_hovering = compute_energy_hovering(sensor1);
 
         double dist2 = sqrt(pow(get<0>(T[0]) - get<0>(T[T.size()-2]), 2) + pow(get<1>(T[0]) - get<1>(T[T.size()-2]), 2));
         double energy2_flying = dist2 * ecf;
 
-        double sensor2_data = get<2>(sorted_sensors[get<2>(T[T.size()-2])]);
-        double required2_time = sensor2_data / dtr; // total seconds
-        double energy2_hovering = required2_time * ech;
+        sensor2 = sorted_sensors[get<2>(T[T.size()-2])];
+        double energy2_hovering = compute_energy_hovering(sensor2);
 
         for (int p = start; p < end; p++){
             cost_T_k = cost_T_k + tspn_cost[p];
@@ -106,13 +115,14 @@ double algorithms::tour_cost(vector<tuple<double, double, int>> T, int start, in
 }
 
 void algorithms::ApproxMPN() {
+    sorted_sensors.clear();
     for (const auto &sensor: dep->get_sensors()) {
         auto pos = sensor.get_position();
         sorted_sensors.emplace_back(get<0>(pos), get<1>(pos), sensor.get_data_size(), 0);
     }
 
     // sort sensors based on x-coordinates
-    sort(sorted_sensors.begin(), sorted_sensors.end());
+    //sort(sorted_sensors.begin(), sorted_sensors.end());
 
     // get eps and compute t
     double epsilon = dep->get_epsilon();
@@ -135,23 +145,16 @@ void algorithms::ApproxMPN() {
        V.push_back(vector<tuple<double, double, double, double>>());
     }    
 
-    //cout << "t    " << t << endl;
-
     // for each s in sorted_sensors compute lambd_v,d and j
     for (auto s: sorted_sensors){
         double dist = sqrt(pow(get<0>(s) - get<0>(depot), 2) + pow(get<1>(s) - get<1>(depot), 2));
         double energy_flying = dist * ecf;
 
-        double sensor_data = get<2>(s);
-        double required_time = sensor_data / dtr; // total seconds
-        double energy_hovering = required_time * ech;
+        double energy_hovering = compute_energy_hovering(s);
 
         double lamdba = energy_flying + energy_hovering / 2 + R_0_f;
-        //cout << " lamdba   " << lamdba << endl;
 
         int j = floor(log2((energy_budget - 2 * lamdba) / (epsilon * energy_budget)) + 1);
-        //cout << " j   " << j << ", " << double((1-pow(2, j) * epsilon) * (energy_budget/2)) << " , " << double((1-pow(2, j-1) * epsilon) * (energy_budget/2)) << endl;
-        //cout << " ---------" << endl;
 
         // find V_0,..., V_t
         if (double((1-epsilon) * (energy_budget / 2)) < lamdba && lamdba <= double(energy_budget / 2)){
@@ -161,17 +164,11 @@ void algorithms::ApproxMPN() {
         }
     }
 
-    // for (int i = 0; i < V.size(); i++){
-    //     cout << " i   " << i << endl;
-    //     cout << " V size   " << V[i].size() << endl;
-    // }
-
     vector<vector<tuple<double, double, int>>> tours;
 
     for (int i = 0; i < V.size(); i++){
         // for each V[i], run Minimum UAV Deployment Problem with Neighborhoods with budget 2^{j-1} epsilon B
         vector<vector<tuple<double, double, int>>> C;
-        cout << "VVVVVVVVVV[iiii] " << V[i].size() << endl;
         C = approAlgNei(V[i], i);
 
         for (int j = 0 ; j < C.size(); j++){
@@ -184,23 +181,18 @@ void algorithms::ApproxMPN() {
     }
     tspn_tours.clear();
     tspn_tours = tours;
+
+    for (auto t : tspn_tours){
+        for (auto i : t){
+            cout << get<0>(i) << ", " << get<1>(i) << endl;
+        }
+        cout << "______________ " << endl;
+    }
+    
 }
 
 
-vector<vector<tuple<double, double, int>>> algorithms::approAlgNei(vector<tuple<double, double, double, double>> V, int j) {
-    //////////////////
-    // solve it when V.size() == 1
-    //
-    //
-    //
-    //
-    //
-    //
-    ////////////////////////////////////////////////////////////////////////////////////////////////
-    // for (auto  s:V){
-    //     cout << "v v v v " << get<0>(s) << ", " << get<1>(s) << endl;
-    // }
-    
+vector<vector<tuple<double, double, int>>> algorithms::approAlgNei(vector<tuple<double, double, double, double>> V, int j) {    
     int total_budget = dep->get_energy_budget();
     double epsilon = dep->get_epsilon();
     double energy_budget = pow(2, j-1) * epsilon * total_budget;
@@ -211,48 +203,40 @@ vector<vector<tuple<double, double, int>>> algorithms::approAlgNei(vector<tuple<
     double dtr = dep->get_data_transfer_rate(); // constant DTR (in MB/s)
     double radius = dep-> get_sensor_radius();
 
-    vector<vector<tuple<double, double, int>>> C;    
+    vector<vector<tuple<double, double, int>>> C;
     for (auto s: V){
         vector<tuple<double, double, int>> A;
-        A.push_back(make_tuple(get<0>(s), get<1>(s), -1));
-        C.push_back(A);
+        A.emplace_back(make_tuple(get<0>(s), get<1>(s), -1));
+        C.emplace_back(A);
     }
     
     sort(V.begin(), V.end());
     int n = V.size();
 
-    // G', n x n, pairwise distances between points
+    // G', n x n, pairwise weight between points
     double **G1;
     for (int i = 2; i <= n; i++){
-        double delta = energy_budget / 2;   // energy_budget / i;
-        // cout << " delta " << delta << endl;
-        // cout << " energy_bufget " << energy_budget << endl;
-
+        double delta = energy_budget / i;
         // Algorithm 4 in [27]
         G1 = new double *[n];
         for (int j = 0; j < n; j++) {
             G1[j] = new double[n];
             tuple<double, double, double, double> sensor_j;
             sensor_j = V[j];
-            double sensor_j_data = get<2>(sensor_j);
-            double required_j_time = sensor_j_data / dtr; // total seconds
-            double energy_j_hovering = required_j_time * ech;
+            double energy_j_hovering = compute_energy_hovering(sensor_j);
 
             for (int k = 0; k < n; k++) {
-                // compute c(j, k)
+                // compute C(j, k)
                 tuple<double, double, double, double> sensor_k;
                 sensor_k = V[k];
                 double dist = sqrt(pow(get<0>(sensor_j) - get<0>(sensor_k), 2) + pow(get<1>(sensor_j) - get<1>(sensor_k), 2));
 
-                double sensor_k_data = get<2>(sensor_k);
-                double required_k_time = sensor_k_data / dtr; // total seconds
-                double energy_k_hovering = required_k_time * ech;
+                double energy_k_hovering = compute_energy_hovering(sensor_k);
 
                 if (dist <= 2 * radius){   // R_0
                     double w1 = energy_j_hovering + energy_k_hovering;
                     // G''
                     if (w1 <= delta){
-                        // << "w1 " << w1 << endl;
                         G1[j][k] = w1;
                     } else {
                         G1[j][k] = 0.;
@@ -262,7 +246,6 @@ vector<vector<tuple<double, double, int>>> algorithms::approAlgNei(vector<tuple<
                     // G''
                     if (w2 <= delta){
                         G1[j][k] = w2;
-                        //cout << "w2 " << w2 << endl;
                     } else {
                         G1[j][k] = 0.;
                     }
@@ -284,14 +267,6 @@ vector<vector<tuple<double, double, int>>> algorithms::approAlgNei(vector<tuple<
             }
         }
 
-        // for (int i = 0; i < n; i++) {
-        //     cout << i << " : " ; 
-        //     for (int j : adjacencyList[i]) {
-        //        cout << j << ", " ;
-        //     }
-        //     cout << "-------" << endl;
-        // }
-
         vector<vector<tuple<double, double, double, double>>> components;
         unordered_set<int> visited;
         int p = 0;
@@ -299,25 +274,19 @@ vector<vector<tuple<double, double, int>>> algorithms::approAlgNei(vector<tuple<
             if (visited.find(v) == visited.end()) {
                 unordered_set<int> connectedComponent;
                 DFS(v, visited, connectedComponent, adjacencyList);
-                // Print the connected component
                 components.push_back(vector<tuple<double, double, double, double>>());
-                //cout << "Connected Component: ";
                 for (int u : connectedComponent) {
-                    //cout << u << " ";
                     components[p].push_back(V[u]);
                 }
-                //cout << endl;
                 p++;
             }
         }
 
-        //cout << "w w w w w " << endl;
         vector<vector<tuple<double, double, int>>> C1;
         // for each component[1] run tspn
         for (int j = 0; j < components.size(); j++){
             vector<sensor> comp_sensors;
             for (auto s : components[j]){
-                //cout << "comp v v v v " << get<0>(s) << ", " <<  get<1>(s) << endl;
                 comp_sensors.emplace_back(get<0>(s), get<1>(s), get<2>(s), vector<double>());
             }
             tsp_neighbors(comp_sensors);
@@ -336,7 +305,6 @@ vector<vector<tuple<double, double, int>>> algorithms::approAlgNei(vector<tuple<
 void algorithms::DFS(int v, unordered_set<int>& visited, unordered_set<int>& connectedComponent, vector<vector<int>> adjacencyList) {
     visited.insert(v);
     connectedComponent.insert(v);
-
     for (int neighbor : adjacencyList[v]) {
         if (visited.find(neighbor) == visited.end()) {
             DFS(neighbor, visited, connectedComponent, adjacencyList);
@@ -358,11 +326,11 @@ void algorithms::tsp_neighbors(vector<sensor> sensors) {
 
     // sort sensors based on x-coordinates
     sort(sorted_sensors.begin(), sorted_sensors.end());
-    cout << "sensors : " << endl;
-    for (int i = 0; i < sorted_sensors.size(); i++) {
-        cout << get<0>(sorted_sensors[i]) << ", " << get<1>(sorted_sensors[i]) << endl;
-    }
-    cout << "**********" << endl;
+    // cout << "sensors : " << endl;
+    // for (int i = 0; i < sorted_sensors.size(); i++) {
+    //     cout << get<0>(sorted_sensors[i]) << ", " << get<1>(sorted_sensors[i]) << endl;
+    // }
+    // cout << "**********" << endl;
 
     map<int, map<int, vector<point>>> intersections;
     vector<int> checked_sensors(sorted_sensors.size());
@@ -378,7 +346,6 @@ void algorithms::tsp_neighbors(vector<sensor> sensors) {
                     point p2 = {get<0>(sorted_sensors[j]), get<1>(sorted_sensors[j])};
                     vector<point> intersec_points = get_intersection_points(p1, p2);
                     if (!intersec_points.empty()) {
-                        //cout << " 11 1 " << endl;
                         intersections[i][j] = intersec_points;
                         intersec = 1;
                         checked_sensors[j] = 1;
@@ -407,9 +374,9 @@ void algorithms::tsp_neighbors(vector<sensor> sensors) {
 
     // get the keys of map (independent set) and compute tsp
     vector<point_3d> points;
-    vector<int> I;
+    //vector<int> I;
     for (const auto &p: intersections) {
-        I.push_back(p.first);
+        //I.push_back(p.first);
         point_3d new_point = {get<0>(sorted_sensors[p.first]), get<1>(sorted_sensors[p.first]), get<2>(sorted_sensors[p.first])};
         points.push_back(new_point);
     }
@@ -457,18 +424,9 @@ void algorithms::tsp_neighbors(vector<sensor> sensors) {
         for (auto j_intersecs: intersections[index1]) {
             sen1_to_sen2++;
 
-            double sensor1_data = get<2>(sensor1);
-            double required1_time = sensor1_data / dtr; // total seconds
-            double energy1_hovering = required1_time * ech;
-
-            double sensor2_data = get<2>(sensor2);
-            double required2_time = sensor2_data / dtr;
-            double energy2_hovering = required2_time * ech;
-
-            double sensor_j_data = get<2>(sorted_sensors[j_intersecs.first]);
-            double required_j_time = sensor_j_data / dtr;
-            double energy_j_hovering = required_j_time * ech;
-
+            double energy1_hovering = compute_energy_hovering(sensor1);
+            double energy2_hovering = compute_energy_hovering(sensor2);
+            double energy_j_hovering = compute_energy_hovering(sorted_sensors[j_intersecs.first]);
             double energy_hovering = energy1_hovering / 2 + energy_j_hovering + energy2_hovering / 2;
 
             int skip = 0;
@@ -536,13 +494,7 @@ void algorithms::tsp_neighbors(vector<sensor> sensors) {
 
             }
         }
-    }
-
-//    for (auto i:tspn_cost)
-//    {
-//        cout << " cost  " << i << endl;
-//    }
-    
+    }   
 
     // cout << "tsp : " << endl;
     // for (int i=0 ; i < tspn_result.size(); i++) {
@@ -565,9 +517,7 @@ void algorithms::tsp_split(int energy_budget, int with_depot) {
     int j = 0;
     int n = sorted_sensors.size();
     point depot;
-    //if (with_depot == 1){
     depot = dep->get_depots()[0];
-    //} 
     
     while (j <= n-1){
         vector<tuple<double, double, int>> T_k; 
@@ -582,12 +532,6 @@ void algorithms::tsp_split(int energy_budget, int with_depot) {
         }
 
         double cost = tour_cost(T_k, i, j, with_depot);
-        //cout << " tour_cost  " << cost << endl;
-
-        // cout << "i : " << i << endl;
-        // cout << "j : " << j << endl;
-        // cout << "cost : " << cost << endl;
-        // cout << "----------" << endl;
 
         if (cost <= energy_budget){
             if (j == n-1){
