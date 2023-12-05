@@ -36,19 +36,21 @@ public:
 
     vector<point> get_intersection_points(point, point);
 
-    double tour_cost(vector<tuple<double, double, int>>, int, int, int);
+    double tour_cost(vector<tuple<double, double, int>>, int, int, point);
 
     double compute_energy_hovering(tuple<double, double, double, double>);
 
     void tsp_neighbors(vector<sensor>);
-    void tsp_split(int, int);
-    void ApproxMPN();
+    void tsp_split(int, point);
+    void ApproxMPN(point);
     vector<vector<tuple<double, double, int>>> approAlgNei(vector<tuple<double, double, double, double>>, int);
     void DFS(int, unordered_set<int>&, unordered_set<int>&, vector<vector<int>>);
 
     void ApproxTSPN_S();
-
     void ApproxMPN_S();
+
+    void ApproxTSPN_M();
+    void ApproxMPN_M();
 
     void draw_result();
 };

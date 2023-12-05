@@ -10,15 +10,83 @@ algorithms::algorithms(deployment *m_dep) {
 void algorithms::ApproxTSPN_S() {
     cout << "ApproxTSPN_S: " << endl;
     tsp_neighbors(dep->get_sensors());
-    tsp_split(dep->get_energy_budget(), 1);
+    point depot;
+    depot = dep->get_depots()[0];
+    tsp_split(dep->get_energy_budget(), depot);
+    cout << "Number of drones: " << tspn_tours.size() << endl;
     draw_result();
 }
 
 void algorithms::ApproxMPN_S() {
     cout << "ApproxMPN_S: " << endl;
-    ApproxMPN();
+    point depot;
+    depot = dep->get_depots()[0];
+    ApproxMPN(depot);
+    cout << "Number of drones: " << tspn_tours.size() << endl;
     draw_result();
 }
+
+void algorithms::ApproxTSPN_M() {
+    cout << "ApproxTSPN_M: " << endl;
+    int ecf = dep->get_energy_cons_fly();
+    double radius = dep-> get_sensor_radius();
+    double R_0_f = radius * ecf; 
+    vector<point> depots = dep->get_depots();
+    point depot;
+    double A;
+    vector<double> A_d(depots.size(), 0.0);
+    // find the depot
+    for (int i = 0; i < depots.size(); i++){
+        for (const auto &sensor: dep->get_sensors()){
+            double dist = get_distance(sensor, depots[i]);
+            auto pos = sensor.get_position();
+            double energy_hovering = compute_energy_hovering(make_tuple(get<0>(pos), get<1>(pos), sensor.get_data_size(), 0));
+            if (dist <= radius){
+                if (energy_hovering > A_d[i]){
+                    A_d[i] = energy_hovering;
+                }
+            } else {
+                double a = 2 * (dist * ecf + (energy_hovering / 2) + R_0_f);
+                if (a > A_d[i]){
+                    A_d[i] = a;
+                }
+            }
+        } 
+    }
+    int indesx = distance(A_d.begin(), min_element(A_d.begin(), A_d.end()));
+    depot = depots[indesx];
+
+    tsp_neighbors(dep->get_sensors());
+    tsp_split(dep->get_energy_budget(), depot);
+    cout << "Number of drones: " << tspn_tours.size() << endl;
+    draw_result();
+}
+
+void algorithms::ApproxMPN_M() {
+    cout << "ApproxMPN_M: " << endl;
+    vector<point> depots = dep->get_depots();
+    vector<sensor> sensors = dep->get_sensors();
+    vector<vector<tuple<double, double, int>>> tours;
+    vector<tuple<double, double, int>> vec;
+    vec.push_back(make_tuple(0.0, 0.0, 0));
+
+    for (int i = 0; i < 2 * sensors.size(); i++){
+        tours.push_back(vec);
+    }
+    
+    for (auto depot : depots){
+        ApproxMPN(depot);
+        if (tspn_tours.size() < tours.size()){
+            tours = tspn_tours;
+        }
+    }
+
+    tspn_tours = tours;
+    cout << "Number of drones: " << tspn_tours.size() << endl;
+    draw_result();
+    
+}
+
 
 double algorithms::get_distance(sensor s, point p) {
     point pos_s = s.get_position();
@@ -77,14 +145,14 @@ double algorithms::compute_energy_hovering(tuple<double, double, double, double>
     return required_time * ech;
 }
 
-double algorithms::tour_cost(vector<tuple<double, double, int>> T, int start, int end, int with_depot) {
+double algorithms::tour_cost(vector<tuple<double, double, int>> T, int start, int end, point depot) {
     int ecf = dep->get_energy_cons_fly(); // every meter (in J/m)
     int ech = dep->get_energy_cons_hover(); // every second (in J/s)
     double dtr = dep->get_data_transfer_rate(); // constant DTR (in MB/s)
 
     double cost_T_k = 0;
 
-    if (with_depot == 1){
+    if (get<0>(depot) != -1){
         tuple<double, double, double, double> sensor1;
         tuple<double, double, double, double> sensor2;
 
@@ -114,22 +182,17 @@ double algorithms::tour_cost(vector<tuple<double, double, int>> T, int start, in
     return cost_T_k;
 }
 
-void algorithms::ApproxMPN() {
+void algorithms::ApproxMPN(point depot) {
     sorted_sensors.clear();
-    for (const auto &sensor: dep->get_sensors()) {
+    for (const auto &sensor: dep->get_sensors()) {       // it can be removed
         auto pos = sensor.get_position();
         sorted_sensors.emplace_back(get<0>(pos), get<1>(pos), sensor.get_data_size(), 0);
     }
-
-    // sort sensors based on x-coordinates
-    //sort(sorted_sensors.begin(), sorted_sensors.end());
 
     // get eps and compute t
     double epsilon = dep->get_epsilon();
     int t = ceil(log2(1/epsilon));
 
-    // get the depot 
-    auto depot = dep->get_depots()[0];
 
     int energy_budget = dep->get_energy_budget();
     energy_budget = energy_budget * 1000;
@@ -165,7 +228,6 @@ void algorithms::ApproxMPN() {
     }
 
     vector<vector<tuple<double, double, int>>> tours;
-
     for (int i = 0; i < V.size(); i++){
         // for each V[i], run Minimum UAV Deployment Problem with Neighborhoods with budget 2^{j-1} epsilon B
         vector<vector<tuple<double, double, int>>> C;
@@ -182,12 +244,12 @@ void algorithms::ApproxMPN() {
     tspn_tours.clear();
     tspn_tours = tours;
 
-    for (auto t : tspn_tours){
-        for (auto i : t){
-            cout << get<0>(i) << ", " << get<1>(i) << endl;
-        }
-        cout << "______________ " << endl;
-    }
+    // for (auto t : tspn_tours){
+    //     for (auto i : t){
+    //         cout << get<0>(i) << ", " << get<1>(i) << endl;
+    //     }
+    //     cout << "______________ " << endl;
+    // }
     
 }
 
@@ -283,14 +345,14 @@ vector<vector<tuple<double, double, int>>> algorithms::approAlgNei(vector<tuple<
         }
 
         vector<vector<tuple<double, double, int>>> C1;
-        // for each component[1] run tspn
+        // for each component run tspn
         for (int j = 0; j < components.size(); j++){
             vector<sensor> comp_sensors;
             for (auto s : components[j]){
                 comp_sensors.emplace_back(get<0>(s), get<1>(s), get<2>(s), vector<double>());
             }
             tsp_neighbors(comp_sensors);
-            tsp_split(energy_budget / 1000, 0); 
+            tsp_split(energy_budget / 1000, make_tuple(-1, -1));
             for (int i = 0; i < tspn_tours.size(); i++){
                 C1.push_back(tspn_tours[i]);                
             }            
@@ -341,7 +403,7 @@ void algorithms::tsp_neighbors(vector<sensor> sensors) {
             int intersec = 0;
             for (int j = i + 1; j < sorted_sensors.size(); j++) {
                 if (checked_sensors[j] == 0) {
-                    // add another if to check whether the distance of i and j is less than 2R
+                    // add another if to check whether the distance between i and j is less than 2R
                     // find intersec of i and j
                     point p2 = {get<0>(sorted_sensors[j]), get<1>(sorted_sensors[j])};
                     vector<point> intersec_points = get_intersection_points(p1, p2);
@@ -454,7 +516,6 @@ void algorithms::tsp_neighbors(vector<sensor> sensors) {
 
             double dist_sen1_p = sqrt(pow(x_j - get<0>(sensor1), 2) + pow(y_j - get<1>(sensor1), 2));
             double dist_p_sen2 = sqrt(pow(get<0>(sensor2) - x_j, 2) + pow(get<1>(sensor2) - y_j, 2));
-
             double distance = dist_sen1_p + dist_p_sen2;
             double energy_flying = distance * ecf;
 
@@ -504,34 +565,27 @@ void algorithms::tsp_neighbors(vector<sensor> sensors) {
 }
 
 
-void algorithms::tsp_split(int energy_budget, int with_depot) {
+void algorithms::tsp_split(int energy_budget, point depot) {
     tspn_tours.clear();                   
-    //int energy_budget = dep->get_energy_budget();
     energy_budget = energy_budget * 1000;
-
-    // for (auto i:tspn_cost){
-    //     cout << " cost " << i << endl;
-    // }
 
     int i = 0;
     int j = 0;
     int n = sorted_sensors.size();
-    point depot;
-    depot = dep->get_depots()[0];
     
     while (j <= n-1){
         vector<tuple<double, double, int>> T_k; 
-        if (with_depot == 1){
+        if (get<0>(depot) != -1){
             T_k.push_back(make_tuple(get<0>(depot), get<1>(depot), -1));
         }
         for (int p = i; p <= j; p++){
             T_k.push_back(tspn_result[p]);
         }
-        if (with_depot == 1){
+        if (get<0>(depot) != -1){
             T_k.push_back(make_tuple(get<0>(depot), get<1>(depot), -1));
         }
 
-        double cost = tour_cost(T_k, i, j, with_depot);
+        double cost = tour_cost(T_k, i, j, depot);
 
         if (cost <= energy_budget){
             if (j == n-1){
@@ -543,7 +597,7 @@ void algorithms::tsp_split(int energy_budget, int with_depot) {
         } else {
             j--;
             // remove j from T_k
-            if (with_depot == 1){
+            if (get<0>(depot) != -1){
                 T_k.erase(T_k.begin() + T_k.size()-2);
             } else {
                 T_k.erase(T_k.begin() + T_k.size()-1);

@@ -22,8 +22,9 @@ void run_experiment(input &par) {
     algorithms alg(&dep);
 
     //alg.ApproxTSPN_S();
-    alg.ApproxMPN_S();
-
+    //alg.ApproxMPN_S();
+    //alg.ApproxTSPN_M();
+    alg.ApproxMPN_M();
 }
 
 int main(int argc, char **argv) {
