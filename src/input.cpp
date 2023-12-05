@@ -19,7 +19,7 @@ void print_parameters(const input &par) {
     cout << "Radius of sensor=" << par.sensor_radius << endl;
     cout << "DOI=" << par.doi << endl;
     cout << "Max data=" << par.max_data << "MB" << endl;
-    cout << "Energy budget=" << par.energy_budget << "kJ" << endl;
+    cout << "Energy budget=" << par.energy_budget << "J" << endl;
     cout << "Energy consumption for flying=" << par.energy_cons_fly << "J/m" << endl;
     cout << "Energy consumption for hovering=" << par.energy_cons_hover << "J/s" << endl;
     cout << "Maximum data transfer rate=" << par.data_transfer_rate << "MB/s" << endl;
@@ -87,8 +87,8 @@ input load_parameters(input &par) {
                 par.energy_cons_fly = stod(value);
             } else if (key == "energy_cons_hover") {
                 par.energy_cons_hover = stod(value);
-             } else if (key == "data_transfer_rate") {
-             par.data_transfer_rate = stod(value);
+            } else if (key == "data_transfer_rate") {
+                par.data_transfer_rate = stod(value);
             } else if (key == "epsilon") {
                 par.epsilon = stod(value);
             }

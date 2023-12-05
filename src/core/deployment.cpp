@@ -1,4 +1,5 @@
 #include <random>
+
 #include "deployment.h"
 
 deployment::deployment(const input &par) {
@@ -87,7 +88,7 @@ vector<point> deployment::get_depots() {
     return depots;
 }
 
-double deployment::get_epsilon() const{
+double deployment::get_epsilon() const {
     return epsilon;
 }
 
@@ -100,14 +101,14 @@ ostream &operator<<(ostream &os, const deployment &d) {
     return os;
 }
 
-double deployment::get_FSPL() {
+double deployment::get_FSPL() const {
     double min_P_Rx = -100.0;
     double min_P_Tx = min_P_Rx + 20 * log10(4 * M_PI * f_c * sensor_radius / c);
     double FSPL = min_P_Tx - min_P_Rx;
     return FSPL;
 }
 
-double deployment::get_DTR(double distance) {
+double deployment::get_DTR(double distance) const {
     double P_Rx = P_Tx + 20 * log10(c / (4 * M_PI * f_c * distance));
     double P_Rx_W = pow(10, P_Rx / 10.0);  // Convert dB to watts
     double C = B * log2(1 + P_Rx_W / N);
@@ -115,15 +116,15 @@ double deployment::get_DTR(double distance) {
     return C_MBps;
 }
 
-int deployment::get_energy_budget() const {
+double deployment::get_energy_budget() const {
     return energy_budget;
 }
 
-int deployment::get_energy_cons_fly() const {
+double deployment::get_energy_cons_fly() const {
     return energy_cons_fly;
 }
 
-int deployment::get_energy_cons_hover() const {
+double deployment::get_energy_cons_hover() const {
     return energy_cons_hover;
 }
 

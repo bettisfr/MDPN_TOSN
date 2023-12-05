@@ -26,13 +26,13 @@ private:
 public:
     explicit algorithms(deployment *);
 
-    double get_distance(sensor, point);
+    static double get_distance(const sensor&, point);
 
-    int get_angle(sensor, point);
+    static int get_angle(const sensor&, point);
 
     bool is_within_radius(const sensor &, point);
 
-    bool is_within_radius_doi(const sensor &, point);
+    static bool is_within_radius_doi(const sensor &, point);
 
     vector<point> get_intersection_points(point, point);
 
@@ -40,20 +40,25 @@ public:
 
     double compute_energy_hovering(tuple<double, double, double, double>);
 
-    void tsp_neighbors(vector<sensor>);
-    void tsp_split(int, point);
-    void ApproxMPN(point);
+    void tsp_neighbors(const vector<sensor>&);
+
+    void tsp_split(double, point);
+
+    void approxMPN(point depot);
+
     vector<vector<tuple<double, double, int>>> approAlgNei(vector<tuple<double, double, double, double>>, int);
-    void DFS(int, unordered_set<int>&, unordered_set<int>&, vector<vector<int>>);
 
-    void ApproxTSPN_S();
-    void ApproxMPN_S();
+    void DFS(int, unordered_set<int> &, unordered_set<int> &, vector<vector<int>>);
 
-    void ApproxTSPN_M();
-    void ApproxMPN_M();
+    void approxTSPN_S();
+
+    void approxMPN_S();
+
+    void approxTSPN_M();
+
+    void approxMPN_M();
 
     void draw_result();
 };
-
 
 #endif //TOSN_ALGORITHMS_H
