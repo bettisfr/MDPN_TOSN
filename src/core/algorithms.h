@@ -18,7 +18,7 @@ class algorithms {
 
 private:
     deployment *dep;
-    vector<tuple<double, double, int>> tspn_result;
+//    vector<tuple<double, double, int>> tspn_result;
     vector<tuple<double, double, double, double>> sorted_sensors;
     vector<double> tspn_cost;
     vector<vector<tuple<double, double, int>>> tspn_tours;
@@ -46,9 +46,9 @@ public:
 
     double compute_energy_hovering(sensor);
 
-    void tsp_neighbors(const vector<sensor>&);
+    vector<tuple<double, double, int>> tsp_neighbors(const vector<sensor>&);
 
-    void tsp_split(double, point);
+    void tsp_split(vector<tuple<double, double, int>>, double, point);
 
     void approxMPN(point depot);
 
