@@ -8,7 +8,7 @@ algorithms::algorithms(deployment *m_dep) {
 
 void algorithms::approxTSPN_S() {
     cout << "approxTSPN_S: " << endl;
-    vector<tuple<double, double, int>> tspn_result = tsp_neighbors(dep->get_sensors());
+    vector<tuple<point, int>> tspn_result = tsp_neighbors(dep->get_sensors());
     point depot = dep->get_depots()[0];
     tsp_split(tspn_result, dep->get_energy_budget(), depot);
     cout << "Number of drones: " << tspn_tours.size() << endl << endl;
@@ -180,7 +180,7 @@ double algorithms::compute_energy_hovering(sensor s) {
     return required_time * ech;
 }
 
-double algorithms::tour_cost(vector<tuple<double, double, int>> T, int start, int end, point depot) {
+double algorithms::tour_cost(vector<tuple<point, int>> T, int start, int end, point depot) {
     vector<sensor> deployed_sensors = dep->get_sensors();
 
     double ecf = dep->get_energy_cons_fly(); // every meter (in J/m)
@@ -192,20 +192,20 @@ double algorithms::tour_cost(vector<tuple<double, double, int>> T, int start, in
     if (get<0>(depot) != -1) {
         auto lastIndex = T.size() - 2;
 
-        point p0 = make_tuple(get<0>(T[0]), get<1>(T[0]));
-        point p1 = make_tuple(get<0>(T[1]), get<1>(T[1]));
-        point pLast = make_tuple(get<0>(T[lastIndex]), get<1>(T[lastIndex]));
+        point p0 = get<0>(T[0]);
+        point p1 = get<0>(T[1]);
+        point pLast = get<0>(T[lastIndex]);
 
         double dist1 = get_distance(p0, p1);
         double energy1_flying = dist1 * ecf;
 
-        sensor sensor1 = deployed_sensors[get<2>(T[1])];
+        sensor sensor1 = deployed_sensors[get<1>(T[1])];
         double energy1_hovering = compute_energy_hovering(sensor1);
 
         double dist2 = get_distance(p0, pLast);
         double energy2_flying = dist2 * ecf;
 
-        sensor sensor2 = deployed_sensors[get<2>(T[lastIndex])];
+        sensor sensor2 = deployed_sensors[get<1>(T[lastIndex])];
         double energy2_hovering = compute_energy_hovering(sensor2);
 
         for (int p = start; p < end; p++) {
@@ -403,8 +403,8 @@ void algorithms::DFS(int v, unordered_set<int> &visited, unordered_set<int> &con
     }
 }
 
-vector<tuple<double, double, int>> algorithms::tsp_neighbors(const vector<sensor>& sensors) {
-    vector<tuple<double, double, int>> tspn_result;
+vector<tuple<point, int>> algorithms::tsp_neighbors(const vector<sensor>& sensors) {
+    vector<tuple<point, int>> tspn_result;
 
     tspn_cost.clear();
     tspn_tours.clear();
@@ -480,11 +480,11 @@ vector<tuple<double, double, int>> algorithms::tsp_neighbors(const vector<sensor
 
         counter++;
         if (counter == tsp_result_id.size()) {
-            tspn_result.emplace_back(s1.get_pos_x(), s1.get_pos_y(), id);
+            tspn_result.emplace_back(make_tuple(s1.get_pos_x(), s1.get_pos_y()), id);
             break;
         }
 
-        tspn_result.emplace_back(s1.get_pos_x(), s1.get_pos_y(), id);
+        tspn_result.emplace_back(make_tuple(s1.get_pos_x(), s1.get_pos_y()), id);
 
         int next_id = sensor_ids[tsp_result_id[i+1]];
         sensor s2 = deployed_sensors[next_id];
@@ -540,7 +540,7 @@ vector<tuple<double, double, int>> algorithms::tsp_neighbors(const vector<sensor
                 // select the one that has the minimum distance
                 sort(dist_points.begin(), dist_points.end());
                 point pos = get<1>(dist_points[0]);
-                tspn_result.emplace_back(get<0>(pos), get<1>(pos), j_intersects.first);
+                tspn_result.emplace_back(pos, j_intersects.first);
 
                 double dist_s1_pos = get_distance(s1, pos);
                 energy_flying = dist_s1_pos * ecf;
@@ -564,17 +564,18 @@ vector<tuple<double, double, int>> algorithms::tsp_neighbors(const vector<sensor
         }
     }
 
-     cout << "tsp : " << endl;
-     for (int i = 0; i < tspn_result.size(); i++) {
-         cout << "(" << get<0>(tspn_result[i]) << ", " << get<1>(tspn_result[i]) << ")" << " : " << get<2>(tspn_result[i]) << " : " << tspn_cost[i] << endl;
-     }
-     cout << endl;
+    cout << "tsp : " << endl;
+    for (int i = 0; i < tspn_result.size(); i++) {
+        auto [x, y] = get<0>(tspn_result[i]);  // Structured binding
+        cout << "(" << x << ", " << y << ")" << " : " << get<1>(tspn_result[i]) << " : " << tspn_cost[i] << endl;
+    }
+    cout << endl;
 
-     return tspn_result;
+    return tspn_result;
 }
 
 
-void algorithms::tsp_split(vector<tuple<double, double, int>> tspn_result, double energy_budget, point depot) {
+void algorithms::tsp_split(vector<tuple<point, int>> tspn_result, double energy_budget, point depot) {
     tspn_tours.clear();
 
     vector<sensor> deployed_sensors = dep->get_sensors();
@@ -584,21 +585,21 @@ void algorithms::tsp_split(vector<tuple<double, double, int>> tspn_result, doubl
     auto n = deployed_sensors.size();
 
     while (j <= n - 1) {
-        vector<tuple<double, double, int>> T_k;
+        vector<tuple<point, int>> T_k;
         if (get<0>(depot) != -1) {
-            T_k.emplace_back(get<0>(depot), get<1>(depot), -1);
+            T_k.emplace_back(depot, -1);
         }
         for (int p = i; p <= j; p++) {
             T_k.push_back(tspn_result[p]);
         }
         if (get<0>(depot) != -1) {
-            T_k.emplace_back(get<0>(depot), get<1>(depot), -1);
+            T_k.emplace_back(depot, -1);
         }
 
         double cost = tour_cost(T_k, i, j, depot);
 
         if (cost <= energy_budget) {
-            cout << "Cost ok!: " << cost << endl;
+//            cout << "Cost ok!: " << cost << endl;
             if (j == n - 1) {
                 tspn_tours.push_back(T_k);
                 break;
@@ -606,7 +607,7 @@ void algorithms::tsp_split(vector<tuple<double, double, int>> tspn_result, doubl
                 j++;
             }
         } else {
-            cout << "Cost KO: " << cost << endl;
+//            cout << "Cost KO: " << cost << endl;
             j--;
             // remove j from T_k
             if (get<0>(depot) != -1) {
@@ -851,16 +852,15 @@ void algorithms::draw_result() {
     htmlFile << "ctx.strokeStyle = 'red';\n";
     htmlFile << "ctx.lineWidth = 2;\n";
     htmlFile << "ctx.beginPath();\n";
-    htmlFile << "ctx.moveTo(" << get<0>(tspn_tours[0][0]) << ", " << dep->get_area_width() - get<1>(tspn_tours[0][0])
-             << ");\n";
+    htmlFile << "ctx.moveTo(" << get<0>(get<0>(tspn_tours[0][0])) << ", " << dep->get_area_width() - get<1>(get<0>(tspn_tours[0][0])) << ");\n";
     for (auto & tspn_tour : tspn_tours) {
         for (auto j: tspn_tour) {
-            htmlFile << "ctx.lineTo(" << get<0>(j) << ", " << dep->get_area_width() - get<1>(j) << ");\n";
+            htmlFile << "ctx.lineTo(" << get<0>(get<0>(j)) << ", " << dep->get_area_width() - get<1>(get<0>(j)) << ");\n";
         }
 
     }
-    htmlFile << "ctx.lineTo(" << get<0>(tspn_tours[0][0]) << ", " << dep->get_area_width() - get<1>(tspn_tours[0][0])
-             << ");\n";
+    htmlFile << "ctx.lineTo(" << get<0>(get<0>(tspn_tours[0][0])) << ", " << dep->get_area_width() - get<1>(get<0>(tspn_tours[0][0])) << ");\n";
+
     htmlFile << "ctx.stroke();\n";
 ////////////////////////////////////
 
