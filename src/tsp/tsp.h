@@ -40,7 +40,7 @@ protected:
     int n;
 
     //Shortest path length
-    double path_length;
+    double path_length{};
 
     //euler circuit
     vector<int> circuit;

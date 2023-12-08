@@ -1,8 +1,10 @@
 #include "tsp.h"
 
+#include <utility>
+
 
 //Constructor
-TSP::TSP(vector<point_3d> aPointList) : points(aPointList) {
+TSP::TSP(vector<point_3d> aPointList) : points(std::move(aPointList)) {
     n = points.size();
 
     graph = new double *[n];

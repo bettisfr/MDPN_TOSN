@@ -26,7 +26,11 @@ private:
 public:
     explicit algorithms(deployment *);
 
+    static double get_distance(point, point);
+
     static double get_distance(const sensor&, point);
+
+    static double get_distance(const sensor&, const sensor&);
 
     static int get_angle(const sensor&, point);
 
@@ -39,6 +43,8 @@ public:
     double tour_cost(vector<tuple<double, double, int>>, int, int, point);
 
     double compute_energy_hovering(tuple<double, double, double, double>);
+
+    double compute_energy_hovering(sensor);
 
     void tsp_neighbors(const vector<sensor>&);
 

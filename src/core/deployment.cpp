@@ -61,6 +61,10 @@ deployment::deployment(const input &par) {
         return a.get_pos_x() < b.get_pos_x();
     });
 
+    for (int i = 0; i < num_sensors; i++) {
+        sensors[i].set_id(i);
+    }
+
     // Depots creation
     for (int i = 0; i < num_depots; i++) {
         double x = length_rand(re);
