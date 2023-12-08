@@ -27,12 +27,11 @@ void algorithms::approxMPN_S() {
 
 void algorithms::approxTSPN_M() {
     cout << "approxTSPN_M: " << endl;
-    int ecf = dep->get_energy_cons_fly();
+    double ecf = dep->get_energy_cons_fly();
     double radius = dep->get_sensor_radius();
     double R_0_f = radius * ecf;
     vector<point> depots = dep->get_depots();
-    point depot;
-    double A;
+
     vector<double> A_d(depots.size(), 0.0);
 
     // find the depot
@@ -40,8 +39,7 @@ void algorithms::approxTSPN_M() {
         for (const auto &sensor: dep->get_sensors()) {
             double dist = get_distance(sensor, depots[i]);
             auto pos = sensor.get_position();
-            double energy_hovering = compute_energy_hovering(
-                    make_tuple(get<0>(pos), get<1>(pos), sensor.get_data_size(), 0));
+            double energy_hovering = compute_energy_hovering(make_tuple(get<0>(pos), get<1>(pos), sensor.get_data_size(), 0));
             if (dist <= radius) {
                 if (energy_hovering > A_d[i]) {
                     A_d[i] = energy_hovering;
@@ -56,7 +54,7 @@ void algorithms::approxTSPN_M() {
     }
 
     auto index = distance(A_d.begin(), min_element(A_d.begin(), A_d.end()));
-    depot = depots[index];
+    point depot = depots[index];
 
     tsp_neighbors(dep->get_sensors());
     tsp_split(dep->get_energy_budget(), depot);
@@ -247,14 +245,13 @@ void algorithms::approxMPN(point depot) {
     // }
 }
 
-vector<vector<tuple<double, double, int>>>
-algorithms::approAlgNei(vector<tuple<double, double, double, double>> V, int jth) {
-    int total_budget = dep->get_energy_budget();
+vector<vector<tuple<double, double, int>>> algorithms::approAlgNei(vector<tuple<double, double, double, double>> V, int jth) {
+    double total_budget = dep->get_energy_budget();
     double epsilon = dep->get_epsilon();
     double energy_budget = pow(2, jth - 1) * epsilon * total_budget;
 
-    int ecf = dep->get_energy_cons_fly(); // every meter (in J/m)
-    int ech = dep->get_energy_cons_hover(); // every second (in J/s)
+    double ecf = dep->get_energy_cons_fly(); // every meter (in J/m)
+    double ech = dep->get_energy_cons_hover(); // every second (in J/s)
     double dtr = dep->get_data_transfer_rate(); // constant DTR (in MB/s)
     double radius = dep->get_sensor_radius();
 
@@ -283,8 +280,7 @@ algorithms::approAlgNei(vector<tuple<double, double, double, double>> V, int jth
                 // compute C(j, k)
                 tuple<double, double, double, double> sensor_k;
                 sensor_k = V[k];
-                double dist = sqrt(
-                        pow(get<0>(sensor_j) - get<0>(sensor_k), 2) + pow(get<1>(sensor_j) - get<1>(sensor_k), 2));
+                double dist = sqrt(pow(get<0>(sensor_j) - get<0>(sensor_k), 2) + pow(get<1>(sensor_j) - get<1>(sensor_k), 2));
 
                 double energy_k_hovering = compute_energy_hovering(sensor_k);
 
@@ -352,6 +348,7 @@ algorithms::approAlgNei(vector<tuple<double, double, double, double>> V, int jth
             C = C1;
         }
     }
+
     return C;
 }
 
@@ -555,46 +552,45 @@ void algorithms::tsp_neighbors(const vector<sensor>& sensors) {
 
 void algorithms::tsp_split(double energy_budget, point depot) {
     tspn_tours.clear();
-    energy_budget = energy_budget;
 
     int i = 0;
     int j = 0;
     auto n = sorted_sensors.size();
 
     while (j <= n - 1) {
-        vector<tuple<double, double, int>> T_k;
+        vector<tuple<double, double, int>> T;
         if (get<0>(depot) != -1) {
-            T_k.emplace_back(get<0>(depot), get<1>(depot), -1);
+            T.emplace_back(get<0>(depot), get<1>(depot), -1);
         }
         for (int p = i; p <= j; p++) {
-            T_k.push_back(tspn_result[p]);
+            T.push_back(tspn_result[p]);
         }
         if (get<0>(depot) != -1) {
-            T_k.emplace_back(get<0>(depot), get<1>(depot), -1);
+            T.emplace_back(get<0>(depot), get<1>(depot), -1);
         }
 
-        double cost = tour_cost(T_k, i, j, depot);
+        double cost = tour_cost(T, i, j, depot);
 
         if (cost <= energy_budget) {
             if (j == n - 1) {
-                tspn_tours.push_back(T_k);
+                tspn_tours.push_back(T);
                 break;
             } else {
                 j++;
             }
         } else {
             j--;
-            // remove j from T_k
+            // remove j from T
             if (get<0>(depot) != -1) {
-//                T_k.erase(T_k.begin() + T_k.size() - 2);
-                T_k.erase(T_k.end() - 2);  // Remove the second-to-last element
+//                T.erase(T.begin() + T.size() - 2);
+                T.erase(T.end() - 2);  // Remove the second-to-last element
             } else {
-//                T_k.erase(T_k.begin() + T_k.size() - 1);
-                T_k.pop_back();  // Remove the last element
+//                T.erase(T.begin() + T.size() - 1);
+                T.pop_back();  // Remove the last element
             }
 
-            tspn_tours.push_back(T_k);
-            T_k.clear();
+            tspn_tours.push_back(T);
+            T.clear();
 
             j++;
             i = j;
