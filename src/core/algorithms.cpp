@@ -7,20 +7,22 @@ algorithms::algorithms(deployment *m_dep) {
 }
 
 void algorithms::approxTSPN_S() {
-    cout << "approxTSPN_S: " << endl;
+    cout << "approxTSPN_S: " << endl << endl;
 
-    auto [tspn_result, tspn_cost] = tsp_neighbors(dep->get_sensors());
+    auto [tspn_tour, tspn_cost] = tsp_neighbors(dep->get_sensors());
     point depot = dep->get_depots()[0];
-    auto our_tours = tsp_split(tspn_result, tspn_cost, dep->get_energy_budget(), depot);
+    auto [sol_tours, sol_costs] = tsp_split(tspn_tour, tspn_cost, depot);
 
-    cout << "Number of drones: " << our_tours.size() << endl << endl;
-//    for (const auto& r : our_tours) {
-//        for (auto azz : r) {
-//            cout << get<0>(azz) << ", " << get<1>(azz) << ", " << get<2>(azz) << endl;
-//        }
-//        cout << endl;
-//    }
-    draw_result(our_tours);
+    cout << "Number of drones: " << sol_tours.size() << endl;
+    for (int i = 0; i < sol_tours.size(); i++){
+        for (auto j: sol_tours[i]){
+            cout << "(" << get<0>(get<0>(j)) << ", " << get<1>(get<0>(j)) << ") - ID=" << get<1>(j) << endl;
+        }
+        cout << "Cost: " << sol_costs[i] << endl;
+        cout << "-------" << endl;
+    }
+
+    draw_result(sol_tours);
 }
 
 /*void algorithms::approxMPN_S() {
@@ -564,25 +566,26 @@ tuple<vector<tuple<point, int>>, vector<double>> algorithms::tsp_neighbors(const
         }
     }
 
-    cout << "tsp : " << endl;
-    for (int i = 0; i < tspn_result.size(); i++) {
-        auto [x, y] = get<0>(tspn_result[i]);  // Structured binding
-        cout << "(" << x << ", " << y << ")" << " : " << get<1>(tspn_result[i]) << " : " << tspn_cost[i] << endl;
-    }
-    cout << endl;
+//    cout << "tsp : " << endl;
+//    for (int i = 0; i < tspn_result.size(); i++) {
+//        auto [x, y] = get<0>(tspn_result[i]);  // Structured binding
+//        cout << "(" << x << ", " << y << ")" << " : " << get<1>(tspn_result[i]) << " : " << tspn_cost[i] << endl;
+//    }
+//    cout << endl;
 
     return make_tuple(tspn_result, tspn_cost);
 }
 
-vector<vector<tuple<point, int>>> algorithms::tsp_split(vector<tuple<point, int>> tspn_result, vector<double> tspn_cost, double energy_budget, point depot) {
-    vector<vector<tuple<point, int>>> tspn_tours;
-
-    vector<sensor> deployed_sensors = dep->get_sensors();
+tuple<vector<vector<tuple<point, int>>>, vector<double>> algorithms::tsp_split(vector<tuple<point, int>> tspn_result, const vector<double>& tspn_cost, point depot) {
+    vector<vector<tuple<point, int>>> sol_tours;
+    vector<double> sol_costs;
+    double energy_budget = dep->get_energy_budget();
 
     int i = 0;
     int j = 0;
-    auto n = deployed_sensors.size();
+    auto n = dep->get_sensors().size();
 
+    double within_budget = -1;
     while (j <= n - 1) {
         vector<tuple<point, int>> T_k;
 
@@ -599,41 +602,34 @@ vector<vector<tuple<point, int>>> algorithms::tsp_split(vector<tuple<point, int>
         double cost = tour_cost(T_k, tspn_cost, i, j, depot);
 
         if (cost <= energy_budget) {
-//            cout << "Cost ok!: " << cost << endl;
+            within_budget = cost;
             if (j == n - 1) {
-                tspn_tours.push_back(T_k);
+                sol_tours.push_back(T_k);
+                sol_costs.push_back(within_budget);
                 break;
             } else {
                 j++;
             }
         } else {
-//            cout << "Cost KO: " << cost << endl;
             j--;
             // remove j from T_k
             if (get<0>(depot) != -1) {
-//                T_k.erase(T_k.begin() + T_k.size() - 2);
                 T_k.erase(T_k.end() - 2);  // Remove the second-to-last element
             } else {
-//                T_k.erase(T_k.begin() + T_k.size() - 1);
                 T_k.pop_back();  // Remove the last element
             }
 
-            tspn_tours.push_back(T_k);
+            sol_tours.push_back(T_k);
+            sol_costs.push_back(within_budget);
             T_k.clear();
 
             j++;
             i = j;
+            within_budget = -1;
         }
     }
 
-//     for (int i = 0; i < tspn_tours.size(); i++){
-//         for (auto j: tspn_tours[i]){
-//             cout<< get<0>(j) << ", " << get<1>(j) << endl;
-//         }
-//         cout << "-------" << endl;
-//     }
-
-    return tspn_tours;
+    return make_tuple(sol_tours, sol_costs);
 }
 
 

@@ -44,7 +44,7 @@ public:
 
     tuple<vector<tuple<point, int>>, vector<double>> tsp_neighbors(const vector<sensor>&);
 
-    vector<vector<tuple<point, int>>> tsp_split(vector<tuple<point, int>>, vector<double>, double, point);
+    tuple<vector<vector<tuple<point, int>>>, vector<double>> tsp_split(vector<tuple<point, int>>, const vector<double>&, point);
 
     void approxMPN(point depot);
 
