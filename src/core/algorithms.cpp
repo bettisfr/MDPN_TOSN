@@ -9,8 +9,7 @@ algorithms::algorithms(deployment *m_dep) {
 void algorithms::approxTSPN_S() {
     cout << "approxTSPN_S: " << endl;
     tsp_neighbors(dep->get_sensors());
-    point depot;
-    depot = dep->get_depots()[0];
+    point depot = dep->get_depots()[0];
     tsp_split(dep->get_energy_budget(), depot);
     cout << "Number of drones: " << tspn_tours.size() << endl;
     draw_result();
@@ -18,8 +17,7 @@ void algorithms::approxTSPN_S() {
 
 void algorithms::approxMPN_S() {
     cout << "approxMPN_S: " << endl;
-    point depot;
-    depot = dep->get_depots()[0];
+    point depot = dep->get_depots()[0];
     approxMPN(depot);
     cout << "Number of drones: " << tspn_tours.size() << endl;
     draw_result();
@@ -27,12 +25,10 @@ void algorithms::approxMPN_S() {
 
 void algorithms::approxTSPN_M() {
     cout << "approxTSPN_M: " << endl;
-    int ecf = dep->get_energy_cons_fly();
+    double ecf = dep->get_energy_cons_fly();
     double radius = dep->get_sensor_radius();
     double R_0_f = radius * ecf;
     vector<point> depots = dep->get_depots();
-    point depot;
-    double A;
     vector<double> A_d(depots.size(), 0.0);
 
     // find the depot
@@ -56,7 +52,7 @@ void algorithms::approxTSPN_M() {
     }
 
     auto index = distance(A_d.begin(), min_element(A_d.begin(), A_d.end()));
-    depot = depots[index];
+    point depot = depots[index];
 
     tsp_neighbors(dep->get_sensors());
     tsp_split(dep->get_energy_budget(), depot);

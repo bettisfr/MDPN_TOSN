@@ -23,10 +23,13 @@ public:
 
     tuple<double, double> get_position() const;
 
+    double get_pos_x() const;
+
+    double get_pos_y() const;
+
     double get_data_size() const;
 
     double get_radius_doi(int) const;
 };
-
 
 #endif //TOSN_SENSOR_H

@@ -1,4 +1,5 @@
 #include <random>
+#include <algorithm>
 
 #include "deployment.h"
 
@@ -54,6 +55,11 @@ deployment::deployment(const input &par) {
 
         sensors.emplace_back(x, y, data, r_doi);
     }
+
+    // Sort sensors by x-coordinate
+    sort(sensors.begin(), sensors.end(), [](const sensor& a, const sensor& b) {
+        return a.get_pos_x() < b.get_pos_x();
+    });
 
     // Depots creation
     for (int i = 0; i < num_depots; i++) {

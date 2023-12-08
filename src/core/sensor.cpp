@@ -30,3 +30,11 @@ ostream &operator<<(ostream &os, const sensor &s) {
 
     return os;
 }
+
+double sensor::get_pos_x() const {
+    return pos_x;
+}
+
+double sensor::get_pos_y() const {
+    return pos_y;
+}
