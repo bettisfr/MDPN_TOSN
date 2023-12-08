@@ -19,10 +19,6 @@ class algorithms {
 private:
     deployment *dep;
 
-//    vector<tuple<double, double, double, double>> sorted_sensors;
-    vector<double> tspn_cost;
-    vector<vector<tuple<point, int>>> tspn_tours;
-
 public:
     explicit algorithms(deployment *);
 
@@ -40,15 +36,15 @@ public:
 
     vector<point> get_intersection_points(point, point);
 
-    double tour_cost(vector<tuple<point, int>>, int, int, point);
+    double tour_cost(vector<tuple<point, int>>, vector<double>, int, int, point);
 
     double compute_energy_hovering(tuple<double, double, double, double>);
 
     double compute_energy_hovering(sensor);
 
-    vector<tuple<point, int>> tsp_neighbors(const vector<sensor>&);
+    tuple<vector<tuple<point, int>>, vector<double>> tsp_neighbors(const vector<sensor>&);
 
-    void tsp_split(vector<tuple<point, int>>, double, point);
+    vector<vector<tuple<point, int>>> tsp_split(vector<tuple<point, int>>, vector<double>, double, point);
 
     void approxMPN(point depot);
 
@@ -64,7 +60,7 @@ public:
 
     void approxMPN_M();
 
-    void draw_result();
+    void draw_result(vector<vector<tuple<point, int>>>);
 };
 
 #endif //TOSN_ALGORITHMS_H
