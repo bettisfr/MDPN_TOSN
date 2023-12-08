@@ -22,7 +22,7 @@ void algorithms::approxTSPN_S() {
         cout << "-------" << endl;
     }
 
-    draw_result(sol_tours);
+    draw_result(sol_tours, true);
 }
 
 /*void algorithms::approxMPN_S() {
@@ -166,14 +166,6 @@ bool algorithms::is_within_radius_doi(const sensor &s, point p) {
     double actual_radius = s.get_radius_doi(angle);
 
     return (dist <= actual_radius);
-}
-
-double algorithms::compute_energy_hovering(tuple<double, double, double, double> sensor) {
-    double dtr = dep->get_data_transfer_rate();
-    double ech = dep->get_energy_cons_hover();
-    double sensor_data = get<2>(sensor);
-    double required_time = sensor_data / dtr;
-    return required_time * ech;
 }
 
 double algorithms::compute_energy_hovering(sensor s) {
@@ -727,7 +719,7 @@ vector<point> algorithms::get_intersection_points(point pa, point pb) {
     return int_points;
 }
 
-void algorithms::draw_result(vector<vector<tuple<point, int>>> tspn_tours) {
+void algorithms::draw_result(vector<vector<tuple<point, int>>> tspn_tours, bool single) {
     ofstream htmlFile("output/sensor_deployment.html");
 
     htmlFile << "<!DOCTYPE html>\n<html>\n<head>\n";
@@ -823,7 +815,7 @@ void algorithms::draw_result(vector<vector<tuple<point, int>>> tspn_tours) {
         auto pos = d;
 
         // Draw depot square
-        htmlFile << "ctx.fillStyle = 'brown';\n";
+        htmlFile << "ctx.fillStyle = 'green';\n";
         htmlFile << "ctx.fillRect(" << get<0>(pos) - 7.5 << ", " << dep->get_area_width() - get<1>(pos) - 7.5
                  << ", 15, 15);\n";
 
@@ -832,6 +824,10 @@ void algorithms::draw_result(vector<vector<tuple<point, int>>> tspn_tours) {
         htmlFile << "ctx.font = '15px Arial';\n";
         htmlFile << "ctx.fillText('D" << i << " (" << get<0>(pos) << ", " << get<1>(pos) << ")', "
                  << get<0>(pos) + 10 << ", " << dep->get_area_width() - get<1>(pos) + 10 << ");\n";
+
+        if (single) {
+            break;
+        }
     }
 
     // // Draw TSP circuit connecting points in the order specified by tsp_result

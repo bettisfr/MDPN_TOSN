@@ -22,6 +22,24 @@ private:
 public:
     explicit algorithms(deployment *);
 
+    void approxTSPN_S();
+
+    void approxMPN_S();
+
+    void approxTSPN_M();
+
+    void approxMPN_M();
+
+    tuple<vector<tuple<point, int>>, vector<double>> tsp_neighbors(const vector<sensor>&);
+
+    tuple<vector<vector<tuple<point, int>>>, vector<double>> tsp_split(vector<tuple<point, int>>, const vector<double>&, point);
+
+    void approxMPN(point depot);
+
+    vector<vector<tuple<double, double, int>>> approAlgNei(vector<tuple<double, double, double, double>>, int);
+
+    void DFS(int, unordered_set<int> &, unordered_set<int> &, vector<vector<int>>);
+
     static double get_distance(point, point);
 
     static double get_distance(const sensor&, point);
@@ -38,29 +56,9 @@ public:
 
     double tour_cost(vector<tuple<point, int>>, vector<double>, int, int, point);
 
-    double compute_energy_hovering(tuple<double, double, double, double>);
-
     double compute_energy_hovering(sensor);
 
-    tuple<vector<tuple<point, int>>, vector<double>> tsp_neighbors(const vector<sensor>&);
-
-    tuple<vector<vector<tuple<point, int>>>, vector<double>> tsp_split(vector<tuple<point, int>>, const vector<double>&, point);
-
-    void approxMPN(point depot);
-
-    vector<vector<tuple<double, double, int>>> approAlgNei(vector<tuple<double, double, double, double>>, int);
-
-    void DFS(int, unordered_set<int> &, unordered_set<int> &, vector<vector<int>>);
-
-    void approxTSPN_S();
-
-    void approxMPN_S();
-
-    void approxTSPN_M();
-
-    void approxMPN_M();
-
-    void draw_result(vector<vector<tuple<point, int>>>);
+    void draw_result(vector<vector<tuple<point, int>>>, bool);
 };
 
 #endif //TOSN_ALGORITHMS_H
