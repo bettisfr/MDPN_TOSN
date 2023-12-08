@@ -11,7 +11,13 @@ void algorithms::approxTSPN_S() {
     tsp_neighbors(dep->get_sensors());
     point depot = dep->get_depots()[0];
     tsp_split(dep->get_energy_budget(), depot);
-    cout << "Number of drones: " << tspn_tours.size() << endl;
+    cout << "Number of drones: " << tspn_tours.size() << endl << endl;
+    for (const auto& r : tspn_tours) {
+        for (auto azz : r) {
+            cout << get<0>(azz) << ", " << get<1>(azz) << ", " << get<2>(azz) << endl;
+        }
+        cout << endl;
+    }
     draw_result();
 }
 
@@ -367,18 +373,11 @@ void algorithms::tsp_neighbors(const vector<sensor>& sensors) {
     sorted_sensors.clear();
     tspn_tours.clear();
 
-    for (const auto &sensor: sensors) {      // dep->get_sensors()     
+    // already sorted, not needed
+    for (const auto &sensor: sensors) {
         auto pos = sensor.get_position();
         sorted_sensors.emplace_back(get<0>(pos), get<1>(pos), sensor.get_data_size(), 0);
     }
-
-    // sort sensors based on x-coordinates
-    sort(sorted_sensors.begin(), sorted_sensors.end());
-    // cout << "sensors : " << endl;
-    // for (int i = 0; i < sorted_sensors.size(); i++) {
-    //     cout << get<0>(sorted_sensors[i]) << ", " << get<1>(sorted_sensors[i]) << endl;
-    // }
-    // cout << "**********" << endl;
 
     map<int, map<int, vector<point>>> intersections;
     vector<int> checked_sensors(sorted_sensors.size());
@@ -441,8 +440,8 @@ void algorithms::tsp_neighbors(const vector<sensor>& sensors) {
     // }
     // cout << endl;
 
-    int ecf = dep->get_energy_cons_fly(); // every meter (in J/m)
-    int ech = dep->get_energy_cons_hover(); // every second (in J/s)
+    double ecf = dep->get_energy_cons_fly(); // every meter (in J/m)
+    double ech = dep->get_energy_cons_hover(); // every second (in J/s)
     double dtr = dep->get_data_transfer_rate(); // constant DTR (in MB/s)
 
     //vector<double> tspn_cost;
@@ -541,17 +540,16 @@ void algorithms::tsp_neighbors(const vector<sensor>& sensors) {
         }
     }
 
-    // cout << "tsp : " << endl;
-    // for (int i=0 ; i < tspn_result.size(); i++) {
-    //     cout << "(" << get<0>(tspn_result[i]) << ", " << get<1>(tspn_result[i]) << ")" << " : " << get<2>(tspn_result[i]) << " : " << tspn_cost[i] << endl;
-    // }
-    // cout << endl;
+     cout << "tsp : " << endl;
+     for (int i=0 ; i < tspn_result.size(); i++) {
+         cout << "(" << get<0>(tspn_result[i]) << ", " << get<1>(tspn_result[i]) << ")" << " : " << get<2>(tspn_result[i]) << " : " << tspn_cost[i] << endl;
+     }
+     cout << endl;
 }
 
 
 void algorithms::tsp_split(double energy_budget, point depot) {
     tspn_tours.clear();
-    energy_budget = energy_budget;
 
     int i = 0;
     int j = 0;
@@ -572,6 +570,7 @@ void algorithms::tsp_split(double energy_budget, point depot) {
         double cost = tour_cost(T_k, i, j, depot);
 
         if (cost <= energy_budget) {
+            cout << "Cost ok!: " << cost << endl;
             if (j == n - 1) {
                 tspn_tours.push_back(T_k);
                 break;
@@ -579,6 +578,7 @@ void algorithms::tsp_split(double energy_budget, point depot) {
                 j++;
             }
         } else {
+            cout << "Cost KO: " << cost << endl;
             j--;
             // remove j from T_k
             if (get<0>(depot) != -1) {
@@ -597,12 +597,12 @@ void algorithms::tsp_split(double energy_budget, point depot) {
         }
     }
 
-    // for (int i = 0; i < tspn_tours.size(); i++){
-    //     for (auto j: tspn_tours[i]){
-    //         cout<< get<0>(j) << ", " << get<1>(j) << endl;
-    //     }
-    //     cout << "-------" << endl;
-    // }
+//     for (int i = 0; i < tspn_tours.size(); i++){
+//         for (auto j: tspn_tours[i]){
+//             cout<< get<0>(j) << ", " << get<1>(j) << endl;
+//         }
+//         cout << "-------" << endl;
+//     }
 }
 
 
