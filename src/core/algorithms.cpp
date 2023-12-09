@@ -871,4 +871,12 @@ void algorithms::draw_result(vector<vector<tuple<point, int>>> tspn_tours, bool 
     htmlFile << "</body>\n</html>";
 
     htmlFile.close();
+<<<<<<< HEAD
 }
+=======
+}
+
+
+
+
+>>>>>>> 1186a5e936c85eabdf1b918c8765c76cbd446f3f

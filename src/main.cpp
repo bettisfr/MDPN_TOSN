@@ -15,32 +15,40 @@ void run_experiment(input &par) {
 
     // Deployment creation with respect to the input parameters
     deployment dep(par);
-
     // cout << dep << endl;
 
     // Algorithms creation and invocation
     algorithms alg(&dep);
 
-    //alg.ApproxTSPN_S();
-    //alg.ApproxMPN_S();
-    //alg.ApproxTSPN_M();
-    alg.ApproxMPN_M();
+    alg.approxTSPN_S();
+//    alg.approxMPN_S();
+//    alg.approxTSPN_M();
+//    alg.approxMPN_M();
 }
 
-int main(int argc, char **argv) {
+int main(int argc, char** argv) {
 
     input par;
 
     if (argc >= 3) {
-        par.experiment = atoi(argv[1]);
+        try {
+            par.experiment = stoi(argv[1]);
+        } catch (const invalid_argument& e) {
+            cerr << "Error. Experiment number must be an integer." << endl;
+            exit(1);
+        } catch (const out_of_range& e) {
+            cerr << "Error. Experiment number is out of range." << endl;
+            exit(1);
+        }
+
         par.exp_name = argv[2];
     } else {
-        cerr << "Error. Use: executable 0|1 filename" << endl;
+        cerr << "Error. Use: " << argv[0] << " 0|1 filename" << endl;
         exit(1);
     }
 
     if (par.experiment != 0 && par.experiment != 1) {
-        cerr << "\n[ERROR main] experiment to run not present\n";
+        cerr << "\n[ERROR main] Experiment to run not present\n";
         exit(1);
     }
 

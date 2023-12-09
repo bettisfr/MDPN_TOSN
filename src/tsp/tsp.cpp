@@ -1,8 +1,10 @@
 #include "tsp.h"
 
+#include <utility>
+
 
 //Constructor
-TSP::TSP(vector<point_3d> aPointList) : points(aPointList) {
+TSP::TSP(vector<point_3d> aPointList) : points(std::move(aPointList)) {
     n = points.size();
 
     graph = new double *[n];
@@ -290,7 +292,7 @@ double TSP::find_best_path(int start) {
 }
 
 void TSP::print_result() {
-    for (int & it : circuit) {
+    for (int &it: circuit) {
         cout << it << endl;
     }
 }
@@ -313,7 +315,7 @@ void TSP::print_path() {
 vector<int> TSP::get_path_id() {
     vector<int> tmp;
 
-    for (auto p : circuit) {
+    for (auto p: circuit) {
         tmp.push_back(p);
     }
     // Also the first one
@@ -325,7 +327,7 @@ vector<int> TSP::get_path_id() {
 vector<point_3d> TSP::get_path() {
     vector<point_3d> path;
 
-    for (auto i : circuit) {
+    for (auto i: circuit) {
         path.push_back(points[i]);
     }
     // Also the first one
@@ -337,7 +339,7 @@ vector<point_3d> TSP::get_path() {
 void TSP::print_adj_list() {
     for (int i = 0; i < n; i++) {
         cout << i << ": "; //print which vertex's edge list follows
-        for (int j : adj_list[i]) {
+        for (int j: adj_list[i]) {
             cout << j << " "; //print each item in edge list
         }
         cout << endl;

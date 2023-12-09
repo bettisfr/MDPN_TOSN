@@ -40,7 +40,7 @@ protected:
     int n;
 
     //Shortest path length
-    double path_length;
+    double path_length{};
 
     //euler circuit
     vector<int> circuit;
@@ -83,11 +83,15 @@ public:
     void solve();
 
     vector<int> get_path_id();
+
     vector<point_3d> get_path();
+
     double get_length();
 
     void print_result();
+
     void print_path();
+
     void print_adj_list();
 };
 

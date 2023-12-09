@@ -49,10 +49,10 @@ public:
     explicit deployment(const input &);
 
     // Free Space Path Loss
-    double get_FSPL();
+    double get_FSPL() const;
 
     // Data Transfer Rate
-    double get_DTR(double);
+    double get_DTR(double) const;
 
     int get_num_sensors() const;
 
@@ -61,18 +61,18 @@ public:
     int get_area_width() const;
 
     double get_sensor_radius() const;
-    
+
     double get_epsilon() const;
 
     vector<sensor> get_sensors();
 
     vector<point> get_depots();
 
-    int get_energy_budget() const;
+    double get_energy_budget() const;
 
-    int get_energy_cons_fly() const;
+    double get_energy_cons_fly() const;
 
-    int get_energy_cons_hover() const;
+    double get_energy_cons_hover() const;
 
     double get_data_transfer_rate() const;
 };

@@ -61,4 +61,8 @@ public:
     void draw_result(vector<vector<tuple<point, int>>>, bool);
 };
 
+<<<<<<< HEAD
 #endif //TOSN_ALGORITHMS_H
+=======
+#endif //TOSN_ALGORITHMS_H
+>>>>>>> 1186a5e936c85eabdf1b918c8765c76cbd446f3f
