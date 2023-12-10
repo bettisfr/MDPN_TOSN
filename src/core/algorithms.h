@@ -32,11 +32,11 @@ public:
 
     tuple<vector<tuple<point, int>>, vector<double>> tsp_neighbors(const vector<sensor>&);
 
-    tuple<vector<vector<tuple<point, int>>>, vector<double>> tsp_split(vector<tuple<point, int>>, const vector<double>&, point);
+    tuple<vector<vector<tuple<point, int>>>, vector<double>> tsp_split(vector<tuple<point, int>>, const vector<double>&, point, const vector<sensor>&);
 
-    void approxMPN(point depot);
+    tuple<vector<vector<tuple<point, int>>>, vector<double>> approxMPN(point depot);
 
-    vector<vector<tuple<double, double, int>>> approAlgNei(vector<tuple<double, double, double, double>>, int);
+    tuple<vector<vector<tuple<point, int>>>, vector<double>> approAlgNei(vector<sensor>, int, point);
 
     void DFS(int, unordered_set<int> &, unordered_set<int> &, vector<vector<int>>);
 
@@ -54,15 +54,11 @@ public:
 
     vector<point> get_intersection_points(point, point);
 
-    double tour_cost(vector<tuple<point, int>>, vector<double>, int, int, point);
+    double tour_cost(vector<tuple<point, int>>, vector<double>, int, int, point, const vector<sensor>&);
 
     double compute_energy_hovering(sensor);
 
     void draw_result(vector<vector<tuple<point, int>>>, bool);
 };
 
-<<<<<<< HEAD
 #endif //TOSN_ALGORITHMS_H
-=======
-#endif //TOSN_ALGORITHMS_H
->>>>>>> 1186a5e936c85eabdf1b918c8765c76cbd446f3f

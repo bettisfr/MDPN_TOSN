@@ -20,8 +20,8 @@ void run_experiment(input &par) {
     // Algorithms creation and invocation
     algorithms alg(&dep);
 
-    alg.approxTSPN_S();
-//    alg.approxMPN_S();
+    //alg.approxTSPN_S();
+    alg.approxMPN_S();
 //    alg.approxTSPN_M();
 //    alg.approxMPN_M();
 }
