@@ -41,7 +41,7 @@ void algorithms::approxMPN_S() {
     draw_result(sol_tours, true);
 }
 
-/*void algorithms::approxTSPN_M() {
+void algorithms::approxTSPN_M() {
     cout << "approxTSPN_M: " << endl;
     double ecf = dep->get_energy_cons_fly();
     double radius = dep->get_sensor_radius();
@@ -53,15 +53,14 @@ void algorithms::approxMPN_S() {
     for (int i = 0; i < depots.size(); i++) {
         for (const auto &sensor: dep->get_sensors()) {
             double dist = get_distance(sensor, depots[i]);
-            auto pos = sensor.get_position();
-            double energy_hovering = compute_energy_hovering(
-                    make_tuple(get<0>(pos), get<1>(pos), sensor.get_data_size(), 0));
+            //auto pos = sensor.get_position();
+            double energy_hovering = compute_energy_hovering(sensor);
             if (dist <= radius) {
                 if (energy_hovering > A_d[i]) {
                     A_d[i] = energy_hovering;
                 }
             } else {
-                double a = 2 * (dist * ecf + (energy_hovering / 2) + R_0_f);
+                double a = 2 * (dist * ecf + (energy_hovering / 2.) + R_0_f);
                 if (a > A_d[i]) {
                     A_d[i] = a;
                 }
@@ -72,35 +71,52 @@ void algorithms::approxMPN_S() {
     auto index = distance(A_d.begin(), min_element(A_d.begin(), A_d.end()));
     point depot = depots[index];
 
-    tsp_neighbors(dep->get_sensors());
-    tsp_split(dep->get_energy_budget(), depot);
-    cout << "Number of drones: " << tspn_tours.size() << endl;
-    draw_result();
-}*/
+    auto [tspn_tour, tspn_cost] = tsp_neighbors(dep->get_sensors());
+    auto [sol_tours, sol_costs] = tsp_split(tspn_tour, tspn_cost, depot, dep->get_sensors());
 
-/*void algorithms::approxMPN_M() {
+    cout << "Number of drones: " << sol_tours.size() << endl;
+    for (int i = 0; i < sol_tours.size(); i++){
+        for (auto j: sol_tours[i]){
+            cout << "(" << get<0>(get<0>(j)) << ", " << get<1>(get<0>(j)) << ") - ID=" << get<1>(j) << endl;
+        }
+        cout << "Cost: " << sol_costs[i] << endl;
+        cout << "-------" << endl;
+    }
+
+    draw_result(sol_tours, true);
+}
+
+void algorithms::approxMPN_M() {
     cout << "approxMPN_M: " << endl;
     vector<point> depots = dep->get_depots();
-    vector<sensor> sensors = dep->get_sensors();
-    vector<vector<tuple<double, double, int>>> tours;
-    vector<tuple<double, double, int>> vec;
-    vec.emplace_back(0.0, 0.0, 0);
+    vector<vector<tuple<point, int>>> sol_tours;
+    vector<double> sol_costs;
+    vector<tuple<point, int>> vec;
+    vec.emplace_back(make_tuple(0.0, 0.0), 0);
 
-    for (int i = 0; i < 2 * sensors.size(); i++) {
-        tours.push_back(vec);
+    for (int i = 0; i < 2 * dep->get_sensors().size(); i++) {
+        sol_tours.push_back(vec);
     }
 
     for (auto depot: depots) {
-        approxMPN(depot);
-        if (tspn_tours.size() < tours.size()) {
-            tours = tspn_tours;
+        auto [tours, costs] = approxMPN(depot);
+        if (tours.size() < sol_tours.size()) {
+            sol_tours = tours;
+            sol_costs = costs;
         }
     }
 
-    tspn_tours = tours;
-    cout << "Number of drones: " << tspn_tours.size() << endl;
-    draw_result();
-}*/
+    cout << "Number of drones: " << sol_tours.size() << endl;
+    for (int i = 0; i < sol_tours.size(); i++){
+        for (auto j: sol_tours[i]){
+            cout << "(" << get<0>(get<0>(j)) << ", " << get<1>(get<0>(j)) << ") - ID=" << get<1>(j) << endl;
+        }
+        cout << "Cost: " << sol_costs[i] << endl;
+        cout << "-------" << endl;
+    }
+
+    draw_result(sol_tours, true);
+}
 
 double algorithms::get_distance(point p1, point p2) {
     double x1, y1, x2, y2;
@@ -297,7 +313,7 @@ tuple<vector<vector<tuple<point, int>>>, vector<double>> algorithms::approxMPN(p
             costs_temp = costs;
         }
          
-        for (int k = 0 ; k < tours_temp.size(); k++) {  /////// ????????? 
+        for (int k = 0 ; k < tours_temp.size(); k++) { 
             sol_tours.push_back(tours_temp[k]);
             sol_costs.push_back(costs_temp[k]);      
         }
