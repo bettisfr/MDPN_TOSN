@@ -83,7 +83,7 @@ void algorithms::approxTSPN_M() {
         cout << "-------" << endl;
     }
 
-    draw_result(sol_tours, true);
+    draw_result(sol_tours, false);
 }
 
 void algorithms::approxMPN_M() {
@@ -115,7 +115,7 @@ void algorithms::approxMPN_M() {
         cout << "-------" << endl;
     }
 
-    draw_result(sol_tours, true);
+    draw_result(sol_tours, false);
 }
 
 double algorithms::get_distance(point p1, point p2) {
@@ -209,35 +209,28 @@ double algorithms::tour_cost(vector<tuple<point, int>> T, vector<double> tspn_co
 
     double cost_T_k = 0;
 
-    if (get<0>(depot) != -1) {
-        auto lastIndex = T.size() - 2;
+    auto lastIndex = T.size() - 2;
 
-        point p0 = get<0>(T[0]);
-        point p1 = get<0>(T[1]);
-        point pLast = get<0>(T[lastIndex]);
+    point p0 = get<0>(T[0]);
+    point p1 = get<0>(T[1]);
+    point pLast = get<0>(T[lastIndex]);
 
-        double dist1 = get_distance(p0, p1);
-        double energy1_flying = dist1 * ecf;
+    double dist1 = get_distance(p0, p1);
+    double energy1_flying = dist1 * ecf;
 
-        sensor sensor1 = deployed_sensors[get<1>(T[1])];
-        double energy1_hovering = compute_energy_hovering(sensor1);
+    sensor sensor1 = deployed_sensors[get<1>(T[1])];
+    double energy1_hovering = compute_energy_hovering(sensor1);
 
-        double dist2 = get_distance(p0, pLast);
-        double energy2_flying = dist2 * ecf;
+    double dist2 = get_distance(p0, pLast);
+    double energy2_flying = dist2 * ecf;
 
-        sensor sensor2 = deployed_sensors[get<1>(T[lastIndex])];
-        double energy2_hovering = compute_energy_hovering(sensor2);
+    sensor sensor2 = deployed_sensors[get<1>(T[lastIndex])];
+    double energy2_hovering = compute_energy_hovering(sensor2);
 
-        for (int p = start; p < end; p++) {
-            cost_T_k = cost_T_k + tspn_cost[p];
-        }
-        cost_T_k = cost_T_k + energy1_flying + energy2_flying + energy1_hovering / 2 + energy2_hovering / 2;
-
-    } else {
-        for (int p = start; p < end; p++) {
-            cost_T_k += tspn_cost[p];
-        }
+    for (int p = start; p < end; p++) {
+        cost_T_k = cost_T_k + tspn_cost[p];
     }
+    cost_T_k = cost_T_k + energy1_flying + energy2_flying + energy1_hovering / 2 + energy2_hovering / 2;
 
     return cost_T_k;
 }
@@ -281,13 +274,10 @@ tuple<vector<vector<tuple<point, int>>>, vector<double>> algorithms::approxMPN(p
     vector<double> sol_costs;
     for (int i = 0; i < V.size(); i++) {
         // for each V[i], run Minimum UAV Deployment Problem with Neighborhoods with budget 2^{j-1} epsilon B
-        vector<vector<tuple<point, int>>> tours_temp;
-        vector<double> costs_temp;
+        vector<vector<tuple<point, int>>> tours;
+        vector<double> costs;
 
         if (V[i].size() == 1){
-            vector<vector<tuple<point, int>>> tours;
-            vector<double> costs;
-
             sensor s = V[i][0];
             double ecf = dep->get_energy_cons_fly(); // every meter (in J/m)
             double dist = get_distance(s, depot);
@@ -300,22 +290,18 @@ tuple<vector<vector<tuple<point, int>>>, vector<double>> algorithms::approxMPN(p
 
             vector<tuple<point, int>> vec;
             vec.push_back(make_tuple(depot, -1));            
-            vec.push_back(make_tuple(make_tuple(s.get_pos_x(), s.get_pos_y()), -1));           
+            vec.push_back(make_tuple(make_tuple(s.get_pos_x(), s.get_pos_y()), 0));           
             vec.push_back(make_tuple(depot, -1));
 
             tours.emplace_back(vec);
       
-            tours_temp = tours;
-            costs_temp = costs;
         } else {
-            auto [tours, costs] = approAlgNei(V[i], i, depot);
-            tours_temp = tours;
-            costs_temp = costs;
+            tie(tours, costs) = approAlgNei(V[i], i, depot);
         }
          
-        for (int k = 0 ; k < tours_temp.size(); k++) { 
-            sol_tours.push_back(tours_temp[k]);
-            sol_costs.push_back(costs_temp[k]);      
+        for (int k = 0 ; k < tours.size(); k++) { 
+            sol_tours.push_back(tours[k]);
+            sol_costs.push_back(costs[k]);      
         }
     }
 
@@ -402,22 +388,21 @@ tuple<vector<vector<tuple<point, int>>>, vector<double>> algorithms::approAlgNei
             }
         }
 
-        vector<vector<tuple<point, int>>> C1;
-        vector<double> costs;
+        vector<vector<tuple<point, int>>> tours1;
+        vector<double> costs1;
         // for each component run tspn
         for (auto & component : components) {
             auto [tspn_tour, tspn_cost] = tsp_neighbors(component);
             auto [tours_comp, costs_comp] = tsp_split(tspn_tour, tspn_cost, depot, component);
 
-            costs = costs_comp;
-
-            for (const auto & tour : tours_comp) {
-                C1.push_back(tour);
+            for (int w = 0; w < tours_comp.size(); w++) {
+                tours1.push_back(tours_comp[w]);
+                costs1.push_back(costs_comp[w]);
             }
         }
-        if (C1.size() < sol_tours.size()) {
-            sol_tours = C1;
-            sol_costs = costs;
+        if (tours1.size() < sol_tours.size()) {
+            sol_tours = tours1;
+            sol_costs = costs1;
         }
     }
     
@@ -625,15 +610,11 @@ tuple<vector<vector<tuple<point, int>>>, vector<double>> algorithms::tsp_split(v
     while (j <= n - 1) {
         vector<tuple<point, int>> T_k;
 
-        if (get<0>(depot) != -1) {
-            T_k.emplace_back(depot, -1);
-        }
+        T_k.emplace_back(depot, -1);
         for (int p = i; p <= j; p++) {
             T_k.push_back(tspn_result[p]);
         }
-        if (get<0>(depot) != -1) {
-            T_k.emplace_back(depot, -1);
-        }
+        T_k.emplace_back(depot, -1);
 
         double cost = tour_cost(T_k, tspn_cost, i, j, depot, sensors);
 
@@ -649,11 +630,7 @@ tuple<vector<vector<tuple<point, int>>>, vector<double>> algorithms::tsp_split(v
         } else {
             j--;
             // remove j from T_k
-            if (get<0>(depot) != -1) {
-                T_k.erase(T_k.end() - 2);  // Remove the second-to-last element
-            } else {
-                T_k.pop_back();  // Remove the last element
-            }
+            T_k.erase(T_k.end() - 2);  // Remove the second-to-last element
 
             sol_tours.push_back(T_k);
             sol_costs.push_back(within_budget);
@@ -807,10 +784,6 @@ void algorithms::draw_result(vector<vector<tuple<point, int>>> tspn_tours, bool 
     for (size_t i = 0; i < dep->get_sensors().size(); ++i) {
         auto s = dep->get_sensors()[i];
         auto pos = s.get_position();
-
-        // for (size_t i = 0; i < sorted_sensors.size(); ++i) {
-        //     auto s = sorted_sensors[i];
-        //     auto pos = make_tuple(get<0>(s), get<1>(s));
 
         // Draw sensor circle
         htmlFile << "ctx.beginPath();\n";

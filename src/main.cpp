@@ -21,9 +21,9 @@ void run_experiment(input &par) {
     algorithms alg(&dep);
 
     //alg.approxTSPN_S();
-    alg.approxMPN_S();
+    //alg.approxMPN_S();
     //alg.approxTSPN_M();
-    //alg.approxMPN_M();
+    alg.approxMPN_M();
 }
 
 int main(int argc, char** argv) {
