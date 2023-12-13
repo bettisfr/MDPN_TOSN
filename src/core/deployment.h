@@ -63,6 +63,7 @@ public:
     double get_sensor_radius() const;
 
     double get_epsilon() const;
+    double get_doi() const;
 
     vector<sensor> get_sensors();
 

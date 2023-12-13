@@ -30,9 +30,9 @@ public:
 
     void approxMPN_M();
 
-    tuple<vector<tuple<point, int>>, vector<double>> tsp_neighbors(const vector<sensor>&);
+    tuple<vector<tuple<point, int>>, vector<double>> tsp_neighbors(const vector<sensor>&, double);
 
-    tuple<vector<vector<tuple<point, int>>>, vector<double>> tsp_split(vector<tuple<point, int>>, const vector<double>&, point, const vector<sensor>&);
+    tuple<vector<vector<tuple<point, int>>>, vector<double>> tsp_split(vector<tuple<point, int>>, const vector<double>&, point, const vector<sensor>&, bool);
 
     tuple<vector<vector<tuple<point, int>>>, vector<double>> approxMPN(point depot);
 
@@ -52,11 +52,13 @@ public:
 
     static bool is_within_radius_doi(const sensor &, point);
 
-    vector<point> get_intersection_points(point, point);
+    vector<point> get_intersection_points(point, point, double);
 
     double tour_cost(vector<tuple<point, int>>, vector<double>, int, int, point, const vector<sensor>&);
 
     double compute_energy_hovering(sensor);
+
+    void approxTSPN_S_doi();
 
     void draw_result(vector<vector<tuple<point, int>>>, bool);
 };

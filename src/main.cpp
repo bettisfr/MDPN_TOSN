@@ -24,6 +24,10 @@ void run_experiment(input &par) {
     //alg.approxMPN_S();
     //alg.approxTSPN_M();
     alg.approxMPN_M();
+    
+    // with DOI
+    //alg.approxTSPN_S_doi();
+
 }
 
 int main(int argc, char** argv) {

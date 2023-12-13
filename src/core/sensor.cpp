@@ -58,3 +58,6 @@ void sensor::set_id(int new_id) {
 int sensor::get_id() const {
     return id;
 }
+
+
+

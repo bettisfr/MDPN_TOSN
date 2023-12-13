@@ -57,13 +57,13 @@ deployment::deployment(const input &par) {
     }
 
     // Sort sensors by x-coordinate
-    // sort(sensors.begin(), sensors.end(), [](const sensor& a, const sensor& b) {
-    //     return a.get_pos_x() < b.get_pos_x();
-    // });
-
-    // for (int i = 0; i < num_sensors; i++) {
-    //     sensors[i].set_id(i);
-    // }
+    sort(sensors.begin(), sensors.end(), [](const sensor& a, const sensor& b) {
+        return a.get_pos_x() < b.get_pos_x();
+    });
+    //////////
+    for (int i = 0; i < num_sensors; i++) {
+        sensors[i].set_id(i);
+    }
 
     // Depots creation
     for (int i = 0; i < num_depots; i++) {
@@ -100,6 +100,10 @@ vector<point> deployment::get_depots() {
 
 double deployment::get_epsilon() const {
     return epsilon;
+}
+
+double deployment::get_doi() const {
+    return doi;
 }
 
 ostream &operator<<(ostream &os, const deployment &d) {
