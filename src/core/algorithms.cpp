@@ -474,6 +474,157 @@ void algorithms::DFS(int v, unordered_set<int> &visited, unordered_set<int> &con
     }
 }
 
+
+tuple<vector<tuple<point, int>>, vector<double>> algorithms::improved_tsp_neighbors(const vector<sensor>& sensors, double radius_doi) {
+    vector<tuple<point, int>> tspn_result;
+    vector<double> tspn_cost;
+
+    vector<sensor> deployed_sensors = sensors;
+    
+    vector<sensor> orig_sensors = dep->get_sensors();
+    // Sort sensors by x-coordinate
+    sort(deployed_sensors.begin(), deployed_sensors.end(), [](const sensor& a, const sensor& b) {
+        return a.get_pos_x() < b.get_pos_x();
+    });
+       
+    map<int, map<int, vector<point>>> intersections;
+    map<int, int> checked_sensors;
+
+    for (int i = 0; i < deployed_sensors.size(); i++) {
+        if (checked_sensors[deployed_sensors[i].get_id()] == 0) {  
+            point p1 = deployed_sensors[i].get_position();
+            int intersect = 0;
+            for (int j = i + 1; j < deployed_sensors.size(); j++) {
+                if (checked_sensors[deployed_sensors[j].get_id()] == 0) {
+                    // find intersect of i and j
+                    point p2 = deployed_sensors[j].get_position();
+                    vector<point> intersec_points = get_intersection_points(p1, p2, radius_doi);
+                    if (!intersec_points.empty()) {
+                        intersections[deployed_sensors[i].get_id()][deployed_sensors[j].get_id()] = intersec_points;
+                        intersect = 1;
+                        checked_sensors[deployed_sensors[j].get_id()] = 1;
+                    }
+                }
+            }
+            checked_sensors[deployed_sensors[i].get_id()] = 1;
+            if (intersect == 0) {
+                vector<point> intersec_points = {make_tuple(-1, -1)};
+                intersections[deployed_sensors[i].get_id()][deployed_sensors[i].get_id()] = intersec_points;
+            }
+        }
+    }
+
+    // cout << "******* " << endl;
+    // for (auto t : intersections){
+    //     cout << t.first << endl;
+    //     for (auto p : t.second){
+    //         cout << p.first << " : " ;
+    //         for (auto q : p.second){
+    //             cout << get<0>(q) << " " << get<1>(q) << endl;
+    //         }
+    //     }
+    //     cout << "_________" << endl;
+    // }
+
+    // get the keys of map (independent set) and compute tsp
+    vector<point_3d> points;
+    for (const auto &p: intersections) {
+        point_3d new_point = {orig_sensors[p.first].get_pos_x(), orig_sensors[p.first].get_pos_y(), double(p.first)}; 
+        points.push_back(new_point);
+    }
+ 
+    TSP tsp(points);
+    tsp.solve();
+
+    vector<int> tsp_result_id = tsp.get_path_id();
+    //cout << "tsp_result_id " << tsp_result_id.size() << endl;
+    // tsp_result = tsp.get_path();
+    // cout << "TSP path: ";
+    // for (auto p : tsp_result_id) {
+    //     cout << p << ", ";
+    // }
+    // cout << endl;
+
+    // for each tsp_result_id, solve tsp for intersections[orig_sensprs[tsp_result_id[i]]]
+    // and create the final tour
+
+    int counter = 0;
+    for (int i = 0; i < tsp_result_id.size(); i++) {
+        int id = points[tsp_result_id[i]].z;
+        sensor s1 = orig_sensors[id];
+
+        counter++;
+        if (counter == tsp_result_id.size()) {
+            tspn_result.emplace_back(make_tuple(s1.get_pos_x(), s1.get_pos_y()), id);
+            break;
+        }
+
+        tspn_result.emplace_back(make_tuple(s1.get_pos_x(), s1.get_pos_y()), id);
+
+        int next_id = points[tsp_result_id[i+1]].z;
+        sensor s2 = orig_sensors[next_id];
+
+        // for intersection points in intersections[id] solve tsp
+        vector<point_3d> intersection_points;
+        for (const auto &p: intersections[id]) {
+            for (const auto &pp : p.second){
+                if (p.first != id){
+                    point_3d new_point = {get<0>(pp), get<1>(pp), double(p.first)}; 
+                    intersection_points.push_back(new_point);
+                }
+            }
+        }
+
+        if (intersection_points.size() != 0){
+            TSP tsp(intersection_points);
+            tsp.solve();
+
+            vector<int> tsp_result_id_intersection = tsp.get_path_id();
+
+            // add new points using tsp_result_id_intersection to tspn_result
+            map<int, int> checked_ids;
+            for (int j = 0; j < tsp_result_id_intersection.size(); j++){
+                point_3d p = intersection_points[tsp_result_id_intersection[j]];
+                if (checked_ids[p.z] == 0){
+                    tspn_result.emplace_back(make_tuple(p.x, p.y), p.z);
+                    checked_ids[p.z] = 1;
+                }
+            }
+        }
+    }
+
+    // cout << "tsp : " << endl;
+    // for (int i = 0; i < tspn_result.size(); i++) {
+    //     auto [x, y] = get<0>(tspn_result[i]);  // Structured binding
+    //     cout << "(" << x << ", " << y << ")" << " : " << get<1>(tspn_result[i]) << endl;
+    // }
+    // cout << endl;
+
+    // compute the cost
+    double ecf = dep->get_energy_cons_fly(); // every meter (in J/m)
+
+    for (int i = 0; i < tspn_result.size() - 1; i++){
+        sensor s1 = orig_sensors[get<1>(tspn_result[i])];
+        sensor s2 = orig_sensors[get<1>(tspn_result[i+1])];
+        double dist = get_distance(s1, s2);
+        double energy_flying = dist * ecf;
+        
+        double energy_hovering_s1 = compute_energy_hovering(s1);
+        double energy_hovering_s2 = compute_energy_hovering(s2);
+
+        double total_energy = energy_flying + energy_hovering_s1 / 2. + energy_hovering_s2 / 2.;
+        tspn_cost.push_back(total_energy);
+    }
+    
+    // vector<vector<tuple<point, int>>> tspn_tours;
+    // tspn_tours.push_back(tspn_result);
+    //draw_result(tspn_tours, true);
+
+    return make_tuple(tspn_result, tspn_cost);
+}
+
+
+
 tuple<vector<tuple<point, int>>, vector<double>> algorithms::tsp_neighbors(const vector<sensor>& sensors, double radius_doi) {
     vector<tuple<point, int>> tspn_result;
     vector<double> tspn_cost;
@@ -607,19 +758,19 @@ tuple<vector<tuple<point, int>>, vector<double>> algorithms::tsp_neighbors(const
 
             double dist_s1_p = get_distance(s1, p_j);
             double dist_p_s2 = get_distance(s2, p_j);
-            double distance = dist_s1_p + dist_p_s2;
-            double energy_flying = distance * ecf;
+            double dist = dist_s1_p + dist_p_s2;
+            double energy_flyingg = dist * ecf;
 
-            double total_energy = energy_hovering + energy_flying;
+            double total_energy = energy_hovering + energy_flyingg;
 
             dist_points.emplace_back(total_energy, p_j);
 
             if (skip == 1) {
                 double dist_s1_s2 = get_distance(s1, s2);
-                energy_flying = dist_s1_s2 * ecf;
-                energy_hovering = energy1_hovering / 2 + energy2_hovering / 2;
-                total_energy = energy_hovering + energy_flying;
-                tspn_cost.push_back(total_energy);
+                double energy_flyinggg = dist_s1_s2 * ecf;
+                double energy_hoveringg = energy1_hovering / 2. + energy2_hovering / 2.;
+                double total_energyy = energy_hoveringg + energy_flyinggg;
+                tspn_cost.push_back(total_energyy);
                 break;
             } else {
                 // select the one that has the minimum distance
@@ -628,18 +779,18 @@ tuple<vector<tuple<point, int>>, vector<double>> algorithms::tsp_neighbors(const
                 tspn_result.emplace_back(pos, j_intersects.first);
 
                 double dist_s1_pos = get_distance(s1, pos);
-                energy_flying = dist_s1_pos * ecf;
-                energy_hovering = (energy1_hovering + energy_j_hovering) / 2;
-                total_energy = energy_hovering + energy_flying;
-                tspn_cost.push_back(total_energy);
+                double energy_flyingggg = dist_s1_pos * ecf;
+                double energy_hoveringgg = (energy1_hovering + energy_j_hovering) / 2.;
+                double total_energyyy = energy_hoveringgg + energy_flyingggg;
+                tspn_cost.push_back(total_energyyy);
 
                 if (s1_to_s2 == len_sen1) {   // or counter == tsp_result_id.size()-1
                     // energy from pos to sen2
                     double dist_pos_s2 = get_distance(s2, pos);
-                    energy_flying = dist_pos_s2 * ecf;
-                    energy_hovering = (energy2_hovering + energy_j_hovering) / 2;
-                    total_energy = energy_hovering + energy_flying;
-                    tspn_cost.push_back(total_energy);
+                    double energy_flyinggggg = dist_pos_s2 * ecf;
+                    double energy_hoveringggg = (energy2_hovering + energy_j_hovering) / 2.;
+                    double total_energyyyy = energy_hoveringggg + energy_flyinggggg;
+                    tspn_cost.push_back(total_energyyyy);
                 }
 
                 // fake sensor to be replaced to s1 (only to compute distances and energy costs)
@@ -648,6 +799,28 @@ tuple<vector<tuple<point, int>>, vector<double>> algorithms::tsp_neighbors(const
             }
         }
     }
+
+    vector<double> tspn_cost_temp;
+    double total_cost_2;
+    for (int i = 0; i < tspn_result.size() - 1; i++){
+        sensor s1 = orig_sensors[get<1>(tspn_result[i])];
+        sensor s2 = orig_sensors[get<1>(tspn_result[i+1])];
+        double dist = get_distance(s1, s2);
+        double energy_flying = dist * ecf;
+        
+        double energy_hovering_s1 = compute_energy_hovering(s1);
+        double energy_hovering_s2 = compute_energy_hovering(s2);
+
+        double total_energy = energy_flying + energy_hovering_s1 / 2. + energy_hovering_s2 / 2.;
+        tspn_cost_temp.push_back(total_energy);
+        total_cost_2 += total_energy;
+    }
+    tspn_cost = tspn_cost_temp;
+    //cout << "total_cost_temp " << total_cost_2 << endl;
+
+    //vector<vector<tuple<point, int>>> tspn_tours;
+    //tspn_tours.push_back(tspn_result);
+    //draw_result(tspn_tours, true);
 
 //    cout << "tsp : " << endl;
 //    for (int i = 0; i < tspn_result.size(); i++) {
@@ -936,10 +1109,10 @@ void algorithms::draw_result(vector<vector<tuple<point, int>>> tspn_tours, bool 
             htmlFile << "ctx.lineTo(" << get<0>(get<0>(j)) << ", " << dep->get_area_width() - get<1>(get<0>(j)) << ");\n";
 
             // Draw sensor label with coordinates (bold)
-            htmlFile << "ctx.fillStyle = 'black';\n";
-            htmlFile << "ctx.font = 'bold 15px Arial';\n";
-            htmlFile << "ctx.fillText('" << get<1>(j) << " (" << get<0>(get<0>(j)) << ", " << get<1>(get<0>(j)) << ")', "
-                    << get<0>(get<0>(j)) + 10 << ", " << dep->get_area_width() - get<1>(get<0>(j)) + 10 << ");\n";
+            // htmlFile << "ctx.fillStyle = 'black';\n";
+            // htmlFile << "ctx.font = 'bold 15px Arial';\n";
+            // htmlFile << "ctx.fillText('" << get<1>(j) << " (" << get<0>(get<0>(j)) << ", " << get<1>(get<0>(j)) << ")', "
+            //         << get<0>(get<0>(j)) + 10 << ", " << dep->get_area_width() - get<1>(get<0>(j)) + 10 << ");\n";
         }
 
     }
