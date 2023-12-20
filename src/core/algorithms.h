@@ -23,11 +23,8 @@ public:
     explicit algorithms(deployment *);
 
     tuple<vector<vector<tuple<point, int>>>, vector<double>> approxTSPN_S(double);
-
     tuple<vector<vector<tuple<point, int>>>, vector<double>> approxMPN_S(double);
-
     tuple<vector<vector<tuple<point, int>>>, vector<double>> approxTSPN_M(double);
-
     tuple<vector<vector<tuple<point, int>>>, vector<double>> approxMPN_M(double);
 
     void approxMPN_S_doi();
@@ -35,9 +32,10 @@ public:
     void approxTSPN_M_doi();
     void approxMPN_M_doi();
 
+    void approxTSPN_S_xxx();
+
     //tuple<vector<tuple<point, int>>, vector<double>> tsp_neighbors(const vector<sensor>&, double);
     tuple<vector<tuple<point, int>>, vector<double>> improved_tsp_neighbors(const vector<sensor>&, double);
-
 
     tuple<vector<vector<tuple<point, int>>>, vector<double>> tsp_split(vector<tuple<point, int>>, const vector<double>&, point, const vector<sensor>&, bool);
 
@@ -64,6 +62,7 @@ public:
     double tour_cost(vector<tuple<point, int>>, vector<double>, int, int, point, const vector<sensor>&);
 
     double compute_energy_hovering(sensor);
+    double compute_hovering_time(sensor);
 
     void draw_result(vector<vector<tuple<point, int>>>, bool);
 };

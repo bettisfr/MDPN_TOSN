@@ -6,6 +6,33 @@ algorithms::algorithms(deployment *m_dep) {
     dep = m_dep;
 }
 
+void algorithms::approxTSPN_S_xxx() {
+    vector<sensor> sensors = dep->get_sensors();
+    double lost_data = 0.;
+    double total_data = 0.;
+
+    auto [sol_tours, sol_costs] = approxTSPN_S(dep->get_sensor_radius());
+    for (auto tour : sol_tours){
+        for (int i = 1; i < tour.size() - 1; i++) {
+            total_data += sensors[get<1>(tour[i])].get_data_size();
+            double hovering_time = compute_hovering_time(sensors[get<1>(tour[i])]);
+            //distance of the point from sensor
+            double dist = get_distance(sensors[get<1>(tour[i])], get<0>(tour[i]));
+            double collected_data = 0.;
+            double lost_data_i = 0.;
+            if (dist > 0){
+                double new_dtr = 0.7 * dep->get_data_transfer_rate();
+                collected_data = hovering_time * new_dtr;
+                lost_data_i = sensors[get<1>(tour[i])].get_data_size() - collected_data;
+            }
+            lost_data += lost_data_i;
+        }
+    }
+    cout << "Lost data : " << lost_data << "/" << total_data << endl;
+    
+}
+
+
 void algorithms::approxTSPN_S_doi() {
     cout << "approxTSPN_S_doi: " << endl << endl;
 
@@ -340,6 +367,14 @@ double algorithms::compute_energy_hovering(sensor s) {
     double required_time = sensor_data / dtr;
     return required_time * ech;
 }
+
+double algorithms::compute_hovering_time(sensor s) {
+    double dtr = dep->get_data_transfer_rate();
+    double ech = dep->get_energy_cons_hover();
+    double sensor_data = s.get_data_size();
+    return double(sensor_data / dtr);
+}
+
 
 double algorithms::tour_cost(vector<tuple<point, int>> T, vector<double> tspn_cost, int start, int end, point depot, const vector<sensor>& sensors) {
     vector<sensor> deployed_sensors = sensors; //dep->get_sensors();
