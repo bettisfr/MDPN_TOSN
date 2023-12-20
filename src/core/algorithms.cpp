@@ -13,7 +13,7 @@ void algorithms::approxTSPN_S_doi() {
 
     // compute with original radius
     point depot = dep->get_depots()[0];
-    auto [tspn_tour, tspn_cost] = tsp_neighbors(dep->get_sensors(), dep->get_sensor_radius());
+    auto [tspn_tour, tspn_cost] = improved_tsp_neighbors(dep->get_sensors(), dep->get_sensor_radius());
     auto [sol_tours, sol_costs] = tsp_split(tspn_tour, tspn_cost, depot, dep->get_sensors(), false);
     cout << "Number of drones: " << sol_tours.size() << endl;
     // for (int i = 0; i < sol_tours.size(); i++){
@@ -23,12 +23,18 @@ void algorithms::approxTSPN_S_doi() {
     //     cout << "Cost: " << sol_costs[i] << endl;
     //     cout << "-------" << endl;
     // }
+    double total_cost = 0.;
+    for (auto d : tspn_cost){
+        total_cost += d;
+    }
+    cout << "tspn_cost " << total_cost << endl;
+    cout << "------" << endl;
     
 
     // compute with doi
     double doi = dep->get_doi();
     double radius_doi = 0.9 * dep->get_sensor_radius();
-    auto [tspn_tour_doi, tspn_cost_doi] = tsp_neighbors(dep->get_sensors(), radius_doi);
+    auto [tspn_tour_doi, tspn_cost_doi] = improved_tsp_neighbors(dep->get_sensors(), radius_doi);
     auto [sol_tours_doi, sol_costs_doi] = tsp_split(tspn_tour_doi, tspn_cost_doi, depot, dep->get_sensors(), false);
     
     cout << "Number of drones_doi: " << sol_tours_doi.size() << endl;
@@ -40,6 +46,12 @@ void algorithms::approxTSPN_S_doi() {
     //     cout << "-------" << endl;
     // }
     //draw_result(sol_tours_doi, true);
+
+    double total_cost_doi = 0.;
+    for (auto c : tspn_cost_doi){
+        total_cost_doi += c;
+    }
+    cout << "tspn_cost_doi " << total_cost_doi << endl;
 
 
     // use sol_tours_doi and find uncovered sensors
@@ -618,7 +630,7 @@ tuple<vector<tuple<point, int>>, vector<double>> algorithms::improved_tsp_neighb
     
     // vector<vector<tuple<point, int>>> tspn_tours;
     // tspn_tours.push_back(tspn_result);
-    //draw_result(tspn_tours, true);
+    // draw_result(tspn_tours, true);
 
     return make_tuple(tspn_result, tspn_cost);
 }
@@ -818,9 +830,9 @@ tuple<vector<tuple<point, int>>, vector<double>> algorithms::tsp_neighbors(const
     tspn_cost = tspn_cost_temp;
     //cout << "total_cost_temp " << total_cost_2 << endl;
 
-    //vector<vector<tuple<point, int>>> tspn_tours;
-    //tspn_tours.push_back(tspn_result);
-    //draw_result(tspn_tours, true);
+    vector<vector<tuple<point, int>>> tspn_tours;
+    tspn_tours.push_back(tspn_result);
+    draw_result(tspn_tours, true);
 
 //    cout << "tsp : " << endl;
 //    for (int i = 0; i < tspn_result.size(); i++) {

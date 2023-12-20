@@ -27,25 +27,25 @@ void run_experiment(input &par) {
     // auto [tspn_tour_im, tspn_cost_im] = alg.improved_tsp_neighbors(sensors, dep.get_sensor_radius());
     // auto [tspn_tour, tspn_cost] = alg.tsp_neighbors(sensors, dep.get_sensor_radius());
 
-    // double total_cost_im;
+    // double total_cost_im = 0.;
     // for (auto c : tspn_cost_im){
     //     total_cost_im += c;
     // }
     // cout << "improve_tspn_cost " << total_cost_im << endl;
 
-    // double total_cost;
+    // double total_cost = 0.;
     // for (auto c : tspn_cost){
     //     total_cost += c;
     // }
     // cout << "tspn_cost " << total_cost << endl;
 
-    alg.approxTSPN_S();
+    //alg.approxTSPN_S();
     //alg.approxMPN_S();
     //alg.approxTSPN_M();
     //alg.approxMPN_M();
     
     // with DOI
-    //alg.approxTSPN_S_doi();
+    alg.approxTSPN_S_doi();
 
 }
 
