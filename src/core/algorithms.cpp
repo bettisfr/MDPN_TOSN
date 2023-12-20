@@ -11,8 +11,8 @@ void algorithms::approxTSPN_S_xxx() {
     double lost_data = 0.;
     double total_data = 0.;
 
-    auto [sol_tours, sol_costs] = approxTSPN_S(dep->get_sensor_radius());
-    for (auto tour : sol_tours){
+    solution sol = approxTSPN_S(dep->get_sensor_radius());
+    for (auto tour: sol.tours) {
         for (int i = 1; i < tour.size() - 1; i++) {
             total_data += sensors[get<1>(tour[i])].get_data_size();
             double hovering_time = compute_hovering_time(sensors[get<1>(tour[i])]);
@@ -20,7 +20,7 @@ void algorithms::approxTSPN_S_xxx() {
             double dist = get_distance(sensors[get<1>(tour[i])], get<0>(tour[i]));
             double collected_data = 0.;
             double lost_data_i = 0.;
-            if (dist > 0){
+            if (dist > 0) {
                 double new_dtr = 0.7 * dep->get_data_transfer_rate();
                 collected_data = hovering_time * new_dtr;
                 lost_data_i = sensors[get<1>(tour[i])].get_data_size() - collected_data;
@@ -29,7 +29,6 @@ void algorithms::approxTSPN_S_xxx() {
         }
     }
     cout << "Lost data : " << lost_data << "/" << total_data << endl;
-    
 }
 
 
@@ -39,35 +38,22 @@ void algorithms::approxTSPN_S_doi() {
     vector<sensor> sensors = dep->get_sensors();
 
     // compute with original radius
-    auto [sol_tours, sol_costs] = approxTSPN_S(dep->get_sensor_radius());
-    cout << "Number of drones: " << sol_tours.size() << endl;
-    // for (int i = 0; i < sol_tours.size(); i++){
-    //     for (auto j: sol_tours[i]){
-    //         cout << "(" << get<0>(get<0>(j)) << ", " << get<1>(get<0>(j)) << ") - ID=" << get<1>(j) << endl;
-    //     }
-    //     cout << "Cost: " << sol_costs[i] << endl;
-    //     cout << "-------" << endl;
-    // }
+    solution sol = approxTSPN_S(dep->get_sensor_radius());
+    cout << sol << endl;
+
     // double total_cost = 0.;
     // for (auto d : tspn_cost){
     //     total_cost += d;
     // }
     // cout << "tspn_cost " << total_cost << endl;
     // cout << "------" << endl;
-    
+
     // compute with doi
     double doi = dep->get_doi();
     double radius_doi = 0.9 * dep->get_sensor_radius();
-    auto [sol_tours_doi, sol_costs_doi] = approxTSPN_S(radius_doi);
+    solution sol2 = approxTSPN_S(radius_doi);
 
-    cout << "Number of drones_doi: " << sol_tours_doi.size() << endl;
-    // for (int i = 0; i < sol_tours_doi.size(); i++){
-    //     for (auto j: sol_tours_doi[i]){
-    //         cout << "(" << get<0>(get<0>(j)) << ", " << get<1>(get<0>(j)) << ") - ID=" << get<1>(j) << endl;
-    //     }
-    //     cout << "Cost: " << sol_costs_doi[i] << endl;
-    //     cout << "-------" << endl;
-    // }
+    cout << sol2 << endl;
     //draw_result(sol_tours_doi, true);
 
     // double total_cost_doi = 0.;
@@ -79,12 +65,12 @@ void algorithms::approxTSPN_S_doi() {
     // use sol_tours_doi and find uncovered sensors
     vector<sensor> uncovered_sensors;
     vector<int> uncovered_ids;
-    for (auto tour : sol_tours_doi){
-        for (int i = 1; i < tour.size() - 1; i++){
-            if (is_within_radius_doi(sensors[get<1>(tour[i])], get<0>(tour[i])) != true){
+    for (auto tour: sol2.tours) {
+        for (int i = 1; i < tour.size() - 1; i++) {
+            if (!is_within_radius_doi(sensors[get<1>(tour[i])], get<0>(tour[i]))) {
                 uncovered_sensors.push_back(sensors[get<1>(tour[i])]);
                 uncovered_ids.push_back(get<1>(tour[i]));
-            }            
+            }
         }
     }
     cout << "uncovered_sensors : " << uncovered_sensors.size() << endl;
@@ -95,23 +81,23 @@ void algorithms::approxMPN_S_doi() {
     cout << "approxMPN_S_doi: " << endl << endl;
 
     vector<sensor> sensors = dep->get_sensors();
-   
-    auto [sol_tours, sol_costs] = approxMPN_S(dep->get_sensor_radius());
-    cout << "Number of drones: " << sol_tours.size() << endl;
+
+    solution sol = approxMPN_S(dep->get_sensor_radius());
+    cout << sol << endl;
 
     double doi = dep->get_doi();
     double radius_doi = 0.9 * dep->get_sensor_radius();
-    auto [sol_tours_doi, sol_costs_doi] = approxMPN_S(radius_doi);
-    cout << "Number of drones_doi: " << sol_tours_doi.size() << endl;
+    solution sol2 = approxMPN_S(radius_doi);
+    cout << sol2 << endl;
 
     vector<sensor> uncovered_sensors;
     vector<int> uncovered_ids;
-    for (auto tour : sol_tours_doi){
-        for (int i = 1; i < tour.size() - 1; i++){
-            if (is_within_radius_doi(sensors[get<1>(tour[i])], get<0>(tour[i])) != true){
+    for (auto tour: sol2.tours) {
+        for (int i = 1; i < tour.size() - 1; i++) {
+            if (!is_within_radius_doi(sensors[get<1>(tour[i])], get<0>(tour[i]))) {
                 uncovered_sensors.push_back(sensors[get<1>(tour[i])]);
                 uncovered_ids.push_back(get<1>(tour[i]));
-            }            
+            }
         }
     }
     cout << "uncovered_sensors : " << uncovered_sensors.size() << endl;
@@ -121,23 +107,23 @@ void algorithms::approxTSPN_M_doi() {
     cout << "approxTSPN_M_doi: " << endl << endl;
 
     vector<sensor> sensors = dep->get_sensors();
-   
-    auto [sol_tours, sol_costs] = approxTSPN_M(dep->get_sensor_radius());
-    cout << "Number of drones: " << sol_tours.size() << endl;
+
+    solution sol = approxTSPN_M(dep->get_sensor_radius());
+    cout << sol << endl;
 
     double doi = dep->get_doi();
     double radius_doi = 0.9 * dep->get_sensor_radius();
-    auto [sol_tours_doi, sol_costs_doi] = approxTSPN_M(radius_doi);
-    cout << "Number of drones_doi: " << sol_tours_doi.size() << endl;
+    solution sol2 = approxTSPN_M(radius_doi);
+    cout << sol2 << endl;
 
     vector<sensor> uncovered_sensors;
     vector<int> uncovered_ids;
-    for (auto tour : sol_tours_doi){
-        for (int i = 1; i < tour.size() - 1; i++){
-            if (is_within_radius_doi(sensors[get<1>(tour[i])], get<0>(tour[i])) != true){
+    for (auto tour: sol2.tours) {
+        for (int i = 1; i < tour.size() - 1; i++) {
+            if (!is_within_radius_doi(sensors[get<1>(tour[i])], get<0>(tour[i]))) {
                 uncovered_sensors.push_back(sensors[get<1>(tour[i])]);
                 uncovered_ids.push_back(get<1>(tour[i]));
-            }            
+            }
         }
     }
     cout << "uncovered_sensors : " << uncovered_sensors.size() << endl;
@@ -147,68 +133,57 @@ void algorithms::approxMPN_M_doi() {
     cout << "approxMPN_M_doi: " << endl << endl;
 
     vector<sensor> sensors = dep->get_sensors();
-   
-    auto [sol_tours, sol_costs] = approxMPN_M(dep->get_sensor_radius());
-    cout << "Number of drones: " << sol_tours.size() << endl;
+
+    solution sol = approxMPN_M(dep->get_sensor_radius());
+    cout << sol << endl;
 
     double doi = dep->get_doi();
     double radius_doi = 0.9 * dep->get_sensor_radius();
-    auto [sol_tours_doi, sol_costs_doi] = approxMPN_M(radius_doi);
-    cout << "Number of drones_doi: " << sol_tours_doi.size() << endl;
+    solution sol2 = approxMPN_M(radius_doi);
+    cout << sol2 << endl;
 
     vector<sensor> uncovered_sensors;
     vector<int> uncovered_ids;
-    for (auto tour : sol_tours_doi){
-        for (int i = 1; i < tour.size() - 1; i++){
-            if (is_within_radius_doi(sensors[get<1>(tour[i])], get<0>(tour[i])) != true){
+    for (auto tour: sol2.tours) {
+        for (int i = 1; i < tour.size() - 1; i++) {
+            if (!is_within_radius_doi(sensors[get<1>(tour[i])], get<0>(tour[i]))) {
                 uncovered_sensors.push_back(sensors[get<1>(tour[i])]);
                 uncovered_ids.push_back(get<1>(tour[i]));
-            }            
+            }
         }
     }
     cout << "uncovered_sensors : " << uncovered_sensors.size() << endl;
 }
 
-
-tuple<vector<vector<tuple<point, int>>>, vector<double>> algorithms::approxTSPN_S(double radius) {
+// FIXME: radius never used!!!!
+solution algorithms::approxTSPN_S(double radius) {
     cout << "approxTSPN_S: " << endl << endl;
 
-    auto [tspn_tour, tspn_cost] = improved_tsp_neighbors(dep->get_sensors(), dep->get_sensor_radius());
+    solution sol = improved_tsp_neighbors(dep->get_sensors(), dep->get_sensor_radius());
     point depot = dep->get_depots()[0];
-    auto [sol_tours, sol_costs] = tsp_split(tspn_tour, tspn_cost, depot, dep->get_sensors(), false);
+    sol = tsp_split(sol.tours[0], sol.costs, depot, dep->get_sensors(), false);
 
-    cout << "Number of drones: " << sol_tours.size() << endl;
-    // for (int i = 0; i < sol_tours.size(); i++){
-    //     for (auto j: sol_tours[i]){
-    //         cout << "(" << get<0>(get<0>(j)) << ", " << get<1>(get<0>(j)) << ") - ID=" << get<1>(j) << endl;
-    //     }
-    //     cout << "Cost: " << sol_costs[i] << endl;
-    //     cout << "-------" << endl;
-    // }
+    cout << sol << endl;
+    draw_result(sol.tours, true);
 
-    draw_result(sol_tours, true);
-    return make_tuple(sol_tours, sol_costs);
+    return sol;
 }
 
-tuple<vector<vector<tuple<point, int>>>, vector<double>> algorithms::approxMPN_S(double radius) {
+solution algorithms::approxMPN_S(double radius) {
     cout << "approxMPN_S: " << endl;
-    point depot = dep->get_depots()[0];
-    auto [sol_tours, sol_costs] = approxMPN(depot, radius);
-    // cout << "Number of drones: " << sol_tours.size() << endl;
-    //     for (int i = 0; i < sol_tours.size(); i++){
-    //     for (auto j: sol_tours[i]){
-    //         cout << "(" << get<0>(get<0>(j)) << ", " << get<1>(get<0>(j)) << ") - ID=" << get<1>(j) << endl;
-    //     }
-    //     cout << "Cost: " << sol_costs[i] << endl;
-    //     cout << "-------" << endl;
-    // }
 
-    draw_result(sol_tours, true);
-    return make_tuple(sol_tours, sol_costs);
+    point depot = dep->get_depots()[0];
+    solution sol = approxMPN(depot, radius);
+
+    cout << sol << endl;
+    draw_result(sol.tours, true);
+
+    return sol;
 }
 
-tuple<vector<vector<tuple<point, int>>>, vector<double>> algorithms::approxTSPN_M(double radius) {
+solution algorithms::approxTSPN_M(double radius) {
     cout << "approxTSPN_M: " << endl;
+
     double ecf = dep->get_energy_cons_fly();
     //double radius = dep->get_sensor_radius();
     double R_0_f = radius * ecf;
@@ -237,53 +212,39 @@ tuple<vector<vector<tuple<point, int>>>, vector<double>> algorithms::approxTSPN_
     auto index = distance(A_d.begin(), min_element(A_d.begin(), A_d.end()));
     point depot = depots[index];
 
-    auto [tspn_tour, tspn_cost] = improved_tsp_neighbors(dep->get_sensors(), radius);
-    auto [sol_tours, sol_costs] = tsp_split(tspn_tour, tspn_cost, depot, dep->get_sensors(), false);
+    solution sol = improved_tsp_neighbors(dep->get_sensors(), radius);
+    sol = tsp_split(sol.tours[0], sol.costs, depot, dep->get_sensors(), false);
 
-    cout << "Number of drones: " << sol_tours.size() << endl;
-    // for (int i = 0; i < sol_tours.size(); i++){
-    //     for (auto j: sol_tours[i]){
-    //         cout << "(" << get<0>(get<0>(j)) << ", " << get<1>(get<0>(j)) << ") - ID=" << get<1>(j) << endl;
-    //     }
-    //     cout << "Cost: " << sol_costs[i] << endl;
-    //     cout << "-------" << endl;
-    // }
+    cout << sol << endl;
+    draw_result(sol.tours, false);
 
-    draw_result(sol_tours, false);
-    return make_tuple(sol_tours, sol_costs);
+    return sol;
 }
 
-tuple<vector<vector<tuple<point, int>>>, vector<double>> algorithms::approxMPN_M(double radius) {
+solution algorithms::approxMPN_M(double radius) {
     cout << "approxMPN_M: " << endl;
+
+    solution sol;
     vector<point> depots = dep->get_depots();
-    vector<vector<tuple<point, int>>> sol_tours;
-    vector<double> sol_costs;
     vector<tuple<point, int>> vec;
     vec.emplace_back(make_tuple(0.0, 0.0), 0);
 
     for (int i = 0; i < 2 * dep->get_sensors().size(); i++) {
-        sol_tours.push_back(vec);
+        sol.tours.push_back(vec);
     }
 
     for (auto depot: depots) {
-        auto [tours, costs] = approxMPN(depot, radius);
-        if (tours.size() < sol_tours.size()) {
-            sol_tours = tours;
-            sol_costs = costs;
+        solution tmp = approxMPN(depot, radius);
+        if (tmp.tours.size() < sol.tours.size()) {
+            sol.tours = tmp.tours;
+            sol.costs = tmp.costs;
         }
     }
 
-    cout << "Number of drones: " << sol_tours.size() << endl;
-    // for (int i = 0; i < sol_tours.size(); i++){
-    //     for (auto j: sol_tours[i]){
-    //         cout << "(" << get<0>(get<0>(j)) << ", " << get<1>(get<0>(j)) << ") - ID=" << get<1>(j) << endl;
-    //     }
-    //     cout << "Cost: " << sol_costs[i] << endl;
-    //     cout << "-------" << endl;
-    // }
+    cout << sol << endl;
+    draw_result(sol.tours, false);
 
-    draw_result(sol_tours, false);
-    return make_tuple(sol_tours, sol_costs);
+    return sol;
 }
 
 double algorithms::get_distance(point p1, point p2) {
@@ -297,7 +258,7 @@ double algorithms::get_distance(point p1, point p2) {
     return sqrt(delta_x * delta_x + delta_y * delta_y);
 }
 
-double algorithms::get_distance(const sensor& s, point p) {
+double algorithms::get_distance(const sensor &s, point p) {
     point pos_s = s.get_position();
 
     double x1, y1, x2, y2;
@@ -324,7 +285,7 @@ double algorithms::get_distance(const sensor &s1, const sensor &s2) {
     return sqrt(delta_x * delta_x + delta_y * delta_y);
 }
 
-int algorithms::get_angle(const sensor& s, point p) {
+int algorithms::get_angle(const sensor &s, point p) {
     point pos_s = s.get_position();
 
     double x1, y1, x2, y2;
@@ -376,7 +337,8 @@ double algorithms::compute_hovering_time(sensor s) {
 }
 
 
-double algorithms::tour_cost(vector<tuple<point, int>> T, vector<double> tspn_cost, int start, int end, point depot, const vector<sensor>& sensors) {
+double algorithms::tour_cost(vector<tuple<point, int>> T, vector<double> tspn_cost, int start, int end, point depot,
+                             const vector<sensor> &sensors) {
     vector<sensor> deployed_sensors = sensors; //dep->get_sensors();
 
     vector<sensor> orig_sensors = dep->get_sensors();
@@ -413,7 +375,7 @@ double algorithms::tour_cost(vector<tuple<point, int>> T, vector<double> tspn_co
     return cost_T_k;
 }
 
-tuple<vector<vector<tuple<point, int>>>, vector<double>> algorithms::approxMPN(point depot, double radius) {
+solution algorithms::approxMPN(point depot, double radius) {
     vector<sensor> deployed_sensors = dep->get_sensors();
 
     // get eps and compute t
@@ -441,51 +403,53 @@ tuple<vector<vector<tuple<point, int>>>, vector<double>> algorithms::approxMPN(p
         int j = floor(log2((energy_budget - 2. * lambda) / (epsilon * energy_budget)) + 1.);
 
         // find V_0,..., V_t
-        if ((static_cast<double>((1. - epsilon) * (energy_budget / 2.)) < lambda) && (lambda <= static_cast<double>(energy_budget / 2.))) {
+        if ((static_cast<double>((1. - epsilon) * (energy_budget / 2.)) < lambda) &&
+            (lambda <= static_cast<double>(energy_budget / 2.))) {
             V[0].push_back(s);
         } else {
             V[j].push_back(s);
         }
     }
 
-    vector<vector<tuple<point, int>>> sol_tours;
-    vector<double> sol_costs;
+    solution sol;
+
     for (int i = 0; i < V.size(); i++) {
         // for each V[i], run Minimum UAV Deployment Problem with Neighborhoods with budget 2^{j-1} epsilon B
-        vector<vector<tuple<point, int>>> tours;
-        vector<double> costs;
-        if (V[i].size() == 1){
+        solution tmp;
+
+        if (V[i].size() == 1) {
             sensor s = V[i][0];
-            double ecf = dep->get_energy_cons_fly(); // every meter (in J/m)
             double dist = get_distance(s, depot);
             double energy_flying = dist * ecf;
 
             double energy_hovering = compute_energy_hovering(s);
 
             double total_energy = energy_flying * 2 + energy_hovering;
-            costs.push_back(total_energy);
+            tmp.costs.push_back(total_energy);
 
             vector<tuple<point, int>> vec;
-            vec.push_back(make_tuple(depot, -1));            
-            vec.push_back(make_tuple(make_tuple(s.get_pos_x(), s.get_pos_y()), 0));           
+            vec.push_back(make_tuple(depot, -1));
+            vec.push_back(make_tuple(make_tuple(s.get_pos_x(), s.get_pos_y()), 0));
             vec.push_back(make_tuple(depot, -1));
 
-            tours.emplace_back(vec);
-      
+            tmp.tours.emplace_back(vec);
+
         } else {
-            tie(tours, costs) = approAlgNei(V[i], i, depot, radius);
+            auto azz = appro_alg_nei(V[i], i, depot, radius);
+            tmp.tours = azz.tours;
+            tmp.costs = azz.costs;
         }
-         
-        for (int k = 0 ; k < tours.size(); k++) { 
-            sol_tours.push_back(tours[k]);
-            sol_costs.push_back(costs[k]);      
+
+        for (int k = 0; k < tmp.tours.size(); k++) {
+            sol.tours.push_back(tmp.tours[k]);
+            sol.costs.push_back(tmp.costs[k]);
         }
     }
 
-    return make_tuple(sol_tours, sol_costs);
+    return sol;
 }
 
-tuple<vector<vector<tuple<point, int>>>, vector<double>> algorithms::approAlgNei(vector<sensor> V, int jth, point depot, double radius) {
+solution algorithms::appro_alg_nei(vector<sensor> V, int jth, point depot, double radius) {
     double budget = dep->get_energy_budget();
     double epsilon = dep->get_epsilon();
     double energy_budget = pow(2, jth - 1) * epsilon * budget;
@@ -508,7 +472,7 @@ tuple<vector<vector<tuple<point, int>>>, vector<double>> algorithms::approAlgNei
     // G', n x n, pairwise weight between points
     vector<vector<double>> G1(n, vector<double>(n));
     for (int i = 2; i <= n; i++) {
-        double delta = energy_budget /i;
+        double delta = energy_budget / i;
         // Algorithm 4 in [27]
         for (int j = 0; j < n; j++) {
             sensor sensor_j = V[j];
@@ -568,9 +532,9 @@ tuple<vector<vector<tuple<point, int>>>, vector<double>> algorithms::approAlgNei
         vector<vector<tuple<point, int>>> tours1;
         vector<double> costs1;
         // for each component run tspn
-        for (auto & component : components) {
+        for (auto &component: components) {
             auto [tspn_tour, tspn_cost] = improved_tsp_neighbors(component, radius); // dep->get_sensor_radius()
-            auto [tours_comp, costs_comp] = tsp_split(tspn_tour, tspn_cost, depot, component, true);
+            auto [tours_comp, costs_comp] = tsp_split(tspn_tour[0], tspn_cost, depot, component, true);
 
             for (int w = 0; w < tours_comp.size(); w++) {
                 tours1.push_back(tours_comp[w]);
@@ -582,11 +546,16 @@ tuple<vector<vector<tuple<point, int>>>, vector<double>> algorithms::approAlgNei
             sol_costs = costs1;
         }
     }
-    
-    return make_tuple(sol_tours, sol_costs);
+
+    solution sol;
+    sol.tours = sol_tours;
+    sol.costs = sol_costs;
+
+    return sol;
 }
 
-void algorithms::DFS(int v, unordered_set<int> &visited, unordered_set<int> &connectedComponent, vector<vector<int>> adjacencyList) {
+void algorithms::DFS(int v, unordered_set<int> &visited, unordered_set<int> &connectedComponent,
+                     vector<vector<int>> adjacencyList) {
     visited.insert(v);
     connectedComponent.insert(v);
     for (int neighbor: adjacencyList[v]) {
@@ -596,24 +565,23 @@ void algorithms::DFS(int v, unordered_set<int> &visited, unordered_set<int> &con
     }
 }
 
-
-tuple<vector<tuple<point, int>>, vector<double>> algorithms::improved_tsp_neighbors(const vector<sensor>& sensors, double radius_doi) {
+solution algorithms::improved_tsp_neighbors(const vector<sensor> &sensors, double radius_doi) {
     vector<tuple<point, int>> tspn_result;
     vector<double> tspn_cost;
 
     vector<sensor> deployed_sensors = sensors;
-    
+
     vector<sensor> orig_sensors = dep->get_sensors();
     // Sort sensors by x-coordinate
-    sort(deployed_sensors.begin(), deployed_sensors.end(), [](const sensor& a, const sensor& b) {
+    sort(deployed_sensors.begin(), deployed_sensors.end(), [](const sensor &a, const sensor &b) {
         return a.get_pos_x() < b.get_pos_x();
     });
-       
+
     map<int, map<int, vector<point>>> intersections;
     map<int, int> checked_sensors;
 
     for (int i = 0; i < deployed_sensors.size(); i++) {
-        if (checked_sensors[deployed_sensors[i].get_id()] == 0) {  
+        if (checked_sensors[deployed_sensors[i].get_id()] == 0) {
             point p1 = deployed_sensors[i].get_position();
             int intersect = 0;
             for (int j = i + 1; j < deployed_sensors.size(); j++) {
@@ -651,10 +619,10 @@ tuple<vector<tuple<point, int>>, vector<double>> algorithms::improved_tsp_neighb
     // get the keys of map (independent set) and compute tsp
     vector<point_3d> points;
     for (const auto &p: intersections) {
-        point_3d new_point = {orig_sensors[p.first].get_pos_x(), orig_sensors[p.first].get_pos_y(), double(p.first)}; 
+        point_3d new_point = {orig_sensors[p.first].get_pos_x(), orig_sensors[p.first].get_pos_y(), double(p.first)};
         points.push_back(new_point);
     }
- 
+
     TSP tsp(points);
     tsp.solve();
 
@@ -683,21 +651,21 @@ tuple<vector<tuple<point, int>>, vector<double>> algorithms::improved_tsp_neighb
 
         tspn_result.emplace_back(make_tuple(s1.get_pos_x(), s1.get_pos_y()), id);
 
-        int next_id = points[tsp_result_id[i+1]].z;
+        int next_id = points[tsp_result_id[i + 1]].z;
         sensor s2 = orig_sensors[next_id];
 
         // for intersection points in intersections[id] solve tsp
         vector<point_3d> intersection_points;
         for (const auto &p: intersections[id]) {
-            for (const auto &pp : p.second){
-                if (p.first != id){
-                    point_3d new_point = {get<0>(pp), get<1>(pp), double(p.first)}; 
+            for (const auto &pp: p.second) {
+                if (p.first != id) {
+                    point_3d new_point = {get<0>(pp), get<1>(pp), double(p.first)};
                     intersection_points.push_back(new_point);
                 }
             }
         }
 
-        if (intersection_points.size() != 0){
+        if (intersection_points.size() != 0) {
             TSP tsp(intersection_points);
             tsp.solve();
 
@@ -705,9 +673,9 @@ tuple<vector<tuple<point, int>>, vector<double>> algorithms::improved_tsp_neighb
 
             // add new points using tsp_result_id_intersection to tspn_result
             map<int, int> checked_ids;
-            for (int j = 0; j < tsp_result_id_intersection.size(); j++){
+            for (int j = 0; j < tsp_result_id_intersection.size(); j++) {
                 point_3d p = intersection_points[tsp_result_id_intersection[j]];
-                if (checked_ids[p.z] == 0){
+                if (checked_ids[p.z] == 0) {
                     tspn_result.emplace_back(make_tuple(p.x, p.y), p.z);
                     checked_ids[p.z] = 1;
                 }
@@ -725,26 +693,29 @@ tuple<vector<tuple<point, int>>, vector<double>> algorithms::improved_tsp_neighb
     // compute the cost
     double ecf = dep->get_energy_cons_fly(); // every meter (in J/m)
 
-    for (int i = 0; i < tspn_result.size() - 1; i++){
+    for (int i = 0; i < tspn_result.size() - 1; i++) {
         sensor s1 = orig_sensors[get<1>(tspn_result[i])];
-        sensor s2 = orig_sensors[get<1>(tspn_result[i+1])];
+        sensor s2 = orig_sensors[get<1>(tspn_result[i + 1])];
         double dist = get_distance(s1, s2);
         double energy_flying = dist * ecf;
-        
+
         double energy_hovering_s1 = compute_energy_hovering(s1);
         double energy_hovering_s2 = compute_energy_hovering(s2);
 
         double total_energy = energy_flying + energy_hovering_s1 / 2. + energy_hovering_s2 / 2.;
         tspn_cost.push_back(total_energy);
     }
-    
+
     // vector<vector<tuple<point, int>>> tspn_tours;
     // tspn_tours.push_back(tspn_result);
     // draw_result(tspn_tours, true);
 
-    return make_tuple(tspn_result, tspn_cost);
-}
+    solution sol;
+    sol.tours.push_back(tspn_result);
+    sol.costs = tspn_cost;
 
+    return sol;
+}
 
 
 /*tuple<vector<tuple<point, int>>, vector<double>> algorithms::tsp_neighbors(const vector<sensor>& sensors, double radius_doi) {
@@ -953,13 +924,14 @@ tuple<vector<tuple<point, int>>, vector<double>> algorithms::improved_tsp_neighb
     return make_tuple(tspn_result, tspn_cost);
 }*/
 
-tuple<vector<vector<tuple<point, int>>>, vector<double>> algorithms::tsp_split(vector<tuple<point, int>> tspn_result, const vector<double>& tspn_cost, point depot, const vector<sensor>& sensors, bool violation) {
+solution algorithms::tsp_split(vector<tuple<point, int>> tspn_result, const vector<double> &tspn_cost, point depot,
+                               const vector<sensor> &sensors, bool violation) {
     vector<vector<tuple<point, int>>> sol_tours;
     vector<double> sol_costs;
     double energy_budget = dep->get_energy_budget();
     double epsilon = dep->get_epsilon();
-    if (violation == true){
-        energy_budget = (1+epsilon) * energy_budget;
+    if (violation == true) {
+        energy_budget = (1 + epsilon) * energy_budget;
     }
 
     int i = 0;
@@ -1000,7 +972,11 @@ tuple<vector<vector<tuple<point, int>>>, vector<double>> algorithms::tsp_split(v
         }
     }
 
-    return make_tuple(sol_tours, sol_costs);
+    solution sol;
+    sol.tours = sol_tours;
+    sol.costs = sol_costs;
+
+    return sol;
 }
 
 
@@ -1094,8 +1070,8 @@ void algorithms::draw_result(vector<vector<tuple<point, int>>> tspn_tours, bool 
     }
 
     // Draw sensors and depots as before
-    vector<sensor> sensors = dep->get_sensors(); 
-    sort(sensors.begin(), sensors.end(), [](const sensor& a, const sensor& b) {
+    vector<sensor> sensors = dep->get_sensors();
+    sort(sensors.begin(), sensors.end(), [](const sensor &a, const sensor &b) {
         return a.get_pos_x() < b.get_pos_x();
     });
     for (size_t i = 0; i < sensors.size(); ++i) {
@@ -1110,24 +1086,24 @@ void algorithms::draw_result(vector<vector<tuple<point, int>>> tspn_tours, bool 
         htmlFile << "ctx.fillStyle = 'rgba(0, 0, 255, 0.25)';\n";
         htmlFile << "ctx.fill();\n";
         htmlFile << "ctx.stroke();\n";
-            //////////////////////////
+        //////////////////////////
         // Draw sensor shape based on radius_doi
-    //    htmlFile << "ctx.beginPath();\n";
-    //    for (int angle = 0; angle < 360; ++angle) {
-    //        double radius = s.get_radius_doi(angle);
-    //        double x = get<0>(pos) + radius * cos(angle * M_PI / 180.0);
-    //        double y = dep->get_area_width() - get<1>(pos) + radius * sin(angle * M_PI / 180.0);
+        //    htmlFile << "ctx.beginPath();\n";
+        //    for (int angle = 0; angle < 360; ++angle) {
+        //        double radius = s.get_radius_doi(angle);
+        //        double x = get<0>(pos) + radius * cos(angle * M_PI / 180.0);
+        //        double y = dep->get_area_width() - get<1>(pos) + radius * sin(angle * M_PI / 180.0);
 
-    //        if (angle == 0) {
-    //            htmlFile << "ctx.moveTo(" << x << ", " << y << ");\n";
-    //        } else {
-    //            htmlFile << "ctx.lineTo(" << x << ", " << y << ");\n";
-    //        }
-    //    }
-    //    htmlFile << "ctx.closePath();\n";
-    //    htmlFile << "ctx.fillStyle = 'rgba(0, 0, 255, 0.25)';\n";
-    //    htmlFile << "ctx.fill();\n";
-    //    htmlFile << "ctx.stroke();\n";
+        //        if (angle == 0) {
+        //            htmlFile << "ctx.moveTo(" << x << ", " << y << ");\n";
+        //        } else {
+        //            htmlFile << "ctx.lineTo(" << x << ", " << y << ");\n";
+        //        }
+        //    }
+        //    htmlFile << "ctx.closePath();\n";
+        //    htmlFile << "ctx.fillStyle = 'rgba(0, 0, 255, 0.25)';\n";
+        //    htmlFile << "ctx.fill();\n";
+        //    htmlFile << "ctx.stroke();\n";
         ///////////////////
 
         // Draw sensor center dot
@@ -1181,10 +1157,12 @@ void algorithms::draw_result(vector<vector<tuple<point, int>>> tspn_tours, bool 
     htmlFile << "ctx.strokeStyle = 'red';\n";
     htmlFile << "ctx.lineWidth = 2;\n";
     htmlFile << "ctx.beginPath();\n";
-    htmlFile << "ctx.moveTo(" << get<0>(get<0>(tspn_tours[0][0])) << ", " << dep->get_area_width() - get<1>(get<0>(tspn_tours[0][0])) << ");\n";
-    for (auto & tspn_tour : tspn_tours) {
+    htmlFile << "ctx.moveTo(" << get<0>(get<0>(tspn_tours[0][0])) << ", "
+             << dep->get_area_width() - get<1>(get<0>(tspn_tours[0][0])) << ");\n";
+    for (auto &tspn_tour: tspn_tours) {
         for (auto j: tspn_tour) {
-            htmlFile << "ctx.lineTo(" << get<0>(get<0>(j)) << ", " << dep->get_area_width() - get<1>(get<0>(j)) << ");\n";
+            htmlFile << "ctx.lineTo(" << get<0>(get<0>(j)) << ", " << dep->get_area_width() - get<1>(get<0>(j))
+                     << ");\n";
 
             // Draw sensor label with coordinates (bold)
             // htmlFile << "ctx.fillStyle = 'black';\n";
@@ -1194,7 +1172,8 @@ void algorithms::draw_result(vector<vector<tuple<point, int>>> tspn_tours, bool 
         }
 
     }
-    htmlFile << "ctx.lineTo(" << get<0>(get<0>(tspn_tours[0][0])) << ", " << dep->get_area_width() - get<1>(get<0>(tspn_tours[0][0])) << ");\n";
+    htmlFile << "ctx.lineTo(" << get<0>(get<0>(tspn_tours[0][0])) << ", "
+             << dep->get_area_width() - get<1>(get<0>(tspn_tours[0][0])) << ");\n";
 
     htmlFile << "ctx.stroke();\n";
 

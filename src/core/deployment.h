@@ -7,11 +7,10 @@
 #include <numeric>
 
 #include "../input.h"
+#include "../definitions.h"
 #include "sensor.h"
 
 using namespace std;
-
-typedef tuple<double, double> point;
 
 class deployment {
 

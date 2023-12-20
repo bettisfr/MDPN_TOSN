@@ -22,10 +22,10 @@ private:
 public:
     explicit algorithms(deployment *);
 
-    tuple<vector<vector<tuple<point, int>>>, vector<double>> approxTSPN_S(double);
-    tuple<vector<vector<tuple<point, int>>>, vector<double>> approxMPN_S(double);
-    tuple<vector<vector<tuple<point, int>>>, vector<double>> approxTSPN_M(double);
-    tuple<vector<vector<tuple<point, int>>>, vector<double>> approxMPN_M(double);
+    solution approxTSPN_S(double);
+    solution approxMPN_S(double);
+    solution approxTSPN_M(double);
+    solution approxMPN_M(double);
 
     void approxMPN_S_doi();
     void approxTSPN_S_doi();
@@ -35,13 +35,13 @@ public:
     void approxTSPN_S_xxx();
 
     //tuple<vector<tuple<point, int>>, vector<double>> tsp_neighbors(const vector<sensor>&, double);
-    tuple<vector<tuple<point, int>>, vector<double>> improved_tsp_neighbors(const vector<sensor>&, double);
+    solution improved_tsp_neighbors(const vector<sensor>&, double);
 
-    tuple<vector<vector<tuple<point, int>>>, vector<double>> tsp_split(vector<tuple<point, int>>, const vector<double>&, point, const vector<sensor>&, bool);
+    solution tsp_split(vector<tuple<point, int>>, const vector<double>&, point, const vector<sensor>&, bool);
 
-    tuple<vector<vector<tuple<point, int>>>, vector<double>> approxMPN(point, double);
+    solution approxMPN(point, double);
 
-    tuple<vector<vector<tuple<point, int>>>, vector<double>> approAlgNei(vector<sensor>, int, point, double);
+    solution appro_alg_nei(vector<sensor> V, int jth, point depot, double radius);
 
     void DFS(int, unordered_set<int> &, unordered_set<int> &, vector<vector<int>>);
 

@@ -8,12 +8,13 @@ using namespace std;
 
 class energy {
 public:
-    energy(); // Constructor
+    energy();
 
-    double get_energy_hovering(double time, double payload_weight, double wind_speed);
+    double get_energy_hovering(double, double, double);
 
-    double get_energy_movement(double distance, double payload_weight, double drone_speed, double wind_speed,
-                               double relative_wind_direction);
+    double get_energy_movement(double, double, double, double, double);
+
+    void evaluate();
 
 private:
     double m_drone;
@@ -40,5 +41,4 @@ private:
     double projected_area_package;
 };
 
-
-#endif //TOSN_ENERGY_H
+#endif // TOSN_ENERGY_H

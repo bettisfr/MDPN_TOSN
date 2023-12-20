@@ -1,6 +1,8 @@
-#ifndef QUARTIC_H
-#define QUARTIC_H
+#ifndef TOSN_QUARTIC_H
+#define TOSN_QUARTIC_H
 
+#include <iostream>
+#include <complex>
 #include <iostream>
 
 using namespace std;
@@ -13,9 +15,6 @@ using namespace std;
 //
 //     solve_quartic({a, b, c, d, e}, roots).
 
-#include <complex>
-#include <iostream>
-
 void solve_quartic(complex<double> coefficients[5], complex<double> roots[4]);
 
-#endif // QUARTIC_H
+#endif // TOSN_QUARTIC_H
