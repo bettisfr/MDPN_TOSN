@@ -18,4 +18,7 @@ add_executable(TOSN
         src/input.h
         src/main.cpp
         src/tsp/tsp.h
-        src/tsp/tsp.cpp)
+        src/tsp/tsp.cpp
+        src/model/energy.cpp
+        src/model/energy.h
+        src/model/quartic.cpp)

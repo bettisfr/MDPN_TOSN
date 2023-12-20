@@ -3,6 +3,9 @@
 #include "input.h"
 #include "core/algorithms.h"
 #include "core/deployment.h"
+#include "model/energy.h"
+
+void test();
 
 using namespace std;
 
@@ -45,11 +48,50 @@ void run_experiment(input &par) {
     //alg.approxMPN_M();
     
     // with DOI
+<<<<<<< HEAD
     alg.approxTSPN_S_doi();
+=======
+    //alg.approxTSPN_S_doi();
+}
+>>>>>>> 9d57f02579ae6ace6657b10ec8f24693d1e9b4e0
 
+void test() {
+    energy en;
+
+    // Drone's parameters
+    double payload = 0.5;
+
+    // Wind's parameters
+    double wind_speed = 0;
+    double wind_direction = 0;
+
+    // en required for HOVERING (time in seconds)
+    double time = 1;
+    double e_hovering = en.get_energy_hovering(time, payload, wind_speed);
+    cout << "en_Hovering=" << e_hovering << endl;
+
+    // en required for MOVING (distance in meters)
+    double speed = 1.75;
+    // Points A and B (assuming to fly from A to B)
+    // Distance between vertex A and vertex B
+    double Ax = 0, Ay = 0, Bx = 1, By = 0;
+    double distance = sqrt(pow(Ax - Bx, 2) + pow(Ay - By, 2));
+    // Directions between vertex A and vertex B
+    double direction = atan2(By - Ay, Bx - Ax) * 180 / M_PI;
+    if (direction < 0) {
+        direction += 360;
+    }
+    // Relative wind direction (difference between the two directions)
+    double relative_wind_direction = fabs(direction - wind_direction);
+    double e_moving = en.get_energy_movement(distance, payload, speed, wind_speed, relative_wind_direction);
+    cout << "en_Moving=" << e_moving << endl;
+
+    exit(0);
 }
 
 int main(int argc, char** argv) {
+
+//    test();
 
     input par;
 
