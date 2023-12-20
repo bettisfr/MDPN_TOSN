@@ -22,23 +22,28 @@ private:
 public:
     explicit algorithms(deployment *);
 
-    void approxTSPN_S();
+    tuple<vector<vector<tuple<point, int>>>, vector<double>> approxTSPN_S(double);
 
-    void approxMPN_S();
+    tuple<vector<vector<tuple<point, int>>>, vector<double>> approxMPN_S(double);
 
-    void approxTSPN_M();
+    tuple<vector<vector<tuple<point, int>>>, vector<double>> approxTSPN_M(double);
 
-    void approxMPN_M();
+    tuple<vector<vector<tuple<point, int>>>, vector<double>> approxMPN_M(double);
 
-    tuple<vector<tuple<point, int>>, vector<double>> tsp_neighbors(const vector<sensor>&, double);
+    void approxMPN_S_doi();
+    void approxTSPN_S_doi();
+    void approxTSPN_M_doi();
+    void approxMPN_M_doi();
+
+    //tuple<vector<tuple<point, int>>, vector<double>> tsp_neighbors(const vector<sensor>&, double);
     tuple<vector<tuple<point, int>>, vector<double>> improved_tsp_neighbors(const vector<sensor>&, double);
 
 
     tuple<vector<vector<tuple<point, int>>>, vector<double>> tsp_split(vector<tuple<point, int>>, const vector<double>&, point, const vector<sensor>&, bool);
 
-    tuple<vector<vector<tuple<point, int>>>, vector<double>> approxMPN(point depot);
+    tuple<vector<vector<tuple<point, int>>>, vector<double>> approxMPN(point, double);
 
-    tuple<vector<vector<tuple<point, int>>>, vector<double>> approAlgNei(vector<sensor>, int, point);
+    tuple<vector<vector<tuple<point, int>>>, vector<double>> approAlgNei(vector<sensor>, int, point, double);
 
     void DFS(int, unordered_set<int> &, unordered_set<int> &, vector<vector<int>>);
 
@@ -59,8 +64,6 @@ public:
     double tour_cost(vector<tuple<point, int>>, vector<double>, int, int, point, const vector<sensor>&);
 
     double compute_energy_hovering(sensor);
-
-    void approxTSPN_S_doi();
 
     void draw_result(vector<vector<tuple<point, int>>>, bool);
 };
