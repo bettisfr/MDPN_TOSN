@@ -62,7 +62,7 @@ void test() {
     double wind_direction = 0;
 
     // en required for HOVERING (time in seconds)
-    double time = 2;
+    double time = 1;
     double e_hovering = en.get_energy_hovering(time, payload, wind_speed);
     cout << "en_Hovering=" << e_hovering << endl;
 
@@ -70,7 +70,7 @@ void test() {
     double speed = 1.75;
     // Points A and B (assuming to fly from A to B)
     // Distance between vertex A and vertex B
-    double Ax = 0, Ay = 0, Bx = 4, By = 0;
+    double Ax = 0, Ay = 0, Bx = 1, By = 0;
     double distance = sqrt(pow(Ax - Bx, 2) + pow(Ay - By, 2));
     // Directions between vertex A and vertex B
     double direction = atan2(By - Ay, Bx - Ax) * 180 / M_PI;
@@ -87,7 +87,7 @@ void test() {
 
 int main(int argc, char** argv) {
 
-    test();
+//    test();
 
     input par;
 
