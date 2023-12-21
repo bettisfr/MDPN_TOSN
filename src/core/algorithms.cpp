@@ -6,12 +6,88 @@ algorithms::algorithms(deployment *m_dep) {
     dep = m_dep;
 }
 
-void algorithms::approxTSPN_S_xxx() {
+void algorithms::approxTSPN_S_dtr() {
     vector<sensor> sensors = dep->get_sensors();
     double lost_data = 0.;
     double total_data = 0.;
 
     solution sol = approxTSPN_S(dep->get_sensor_radius());
+    for (auto tour: sol.tours) {
+        for (int i = 1; i < tour.size() - 1; i++) {
+            total_data += sensors[get<1>(tour[i])].get_data_size();
+            double hovering_time = compute_hovering_time(sensors[get<1>(tour[i])]);
+            //distance of the point from sensor
+            double dist = get_distance(sensors[get<1>(tour[i])], get<0>(tour[i]));
+            double collected_data = 0.;
+            double lost_data_i = 0.;
+            if (dist > 0) {
+                double new_dtr = 0.7 * dep->get_data_transfer_rate();
+                collected_data = hovering_time * new_dtr;
+                lost_data_i = sensors[get<1>(tour[i])].get_data_size() - collected_data;
+            }
+            lost_data += lost_data_i;
+        }
+    }
+    cout << "Lost data : " << lost_data << "/" << total_data << endl;
+}
+
+void algorithms::approxMPN_S_dtr() {
+    vector<sensor> sensors = dep->get_sensors();
+    double lost_data = 0.;
+    double total_data = 0.;
+
+    solution sol = approxMPN_S(dep->get_sensor_radius());
+    for (auto tour: sol.tours) {
+        for (int i = 1; i < tour.size() - 1; i++) {
+            total_data += sensors[get<1>(tour[i])].get_data_size();
+            double hovering_time = compute_hovering_time(sensors[get<1>(tour[i])]);
+            //distance of the point from sensor
+            double dist = get_distance(sensors[get<1>(tour[i])], get<0>(tour[i]));
+            double collected_data = 0.;
+            double lost_data_i = 0.;
+            if (dist > 0) {
+                double new_dtr = 0.7 * dep->get_data_transfer_rate();
+                collected_data = hovering_time * new_dtr;
+                lost_data_i = sensors[get<1>(tour[i])].get_data_size() - collected_data;
+            }
+            lost_data += lost_data_i;
+        }
+    }
+    cout << "Lost data : " << lost_data << "/" << total_data << endl;
+}
+
+
+void algorithms::approxTSPN_M_dtr() {
+    vector<sensor> sensors = dep->get_sensors();
+    double lost_data = 0.;
+    double total_data = 0.;
+
+    solution sol = approxTSPN_M(dep->get_sensor_radius());
+    for (auto tour: sol.tours) {
+        for (int i = 1; i < tour.size() - 1; i++) {
+            total_data += sensors[get<1>(tour[i])].get_data_size();
+            double hovering_time = compute_hovering_time(sensors[get<1>(tour[i])]);
+            //distance of the point from sensor
+            double dist = get_distance(sensors[get<1>(tour[i])], get<0>(tour[i]));
+            double collected_data = 0.;
+            double lost_data_i = 0.;
+            if (dist > 0) {
+                double new_dtr = 0.7 * dep->get_data_transfer_rate();
+                collected_data = hovering_time * new_dtr;
+                lost_data_i = sensors[get<1>(tour[i])].get_data_size() - collected_data;
+            }
+            lost_data += lost_data_i;
+        }
+    }
+    cout << "Lost data : " << lost_data << "/" << total_data << endl;
+}
+
+void algorithms::approxMPN_M_dtr() {
+    vector<sensor> sensors = dep->get_sensors();
+    double lost_data = 0.;
+    double total_data = 0.;
+
+    solution sol = approxMPN_M(dep->get_sensor_radius());
     for (auto tour: sol.tours) {
         for (int i = 1; i < tour.size() - 1; i++) {
             total_data += sensors[get<1>(tour[i])].get_data_size();
@@ -155,11 +231,10 @@ void algorithms::approxMPN_M_doi() {
     cout << "uncovered_sensors : " << uncovered_sensors.size() << endl;
 }
 
-// FIXME: radius never used!!!!
 solution algorithms::approxTSPN_S(double radius) {
     cout << "approxTSPN_S: " << endl << endl;
 
-    solution sol = improved_tsp_neighbors(dep->get_sensors(), dep->get_sensor_radius());
+    solution sol = improved_tsp_neighbors(dep->get_sensors(), radius);
     point depot = dep->get_depots()[0];
     sol = tsp_split(sol.tours[0], sol.costs, depot, dep->get_sensors(), false);
 
@@ -565,7 +640,7 @@ void algorithms::DFS(int v, unordered_set<int> &visited, unordered_set<int> &con
     }
 }
 
-solution algorithms::improved_tsp_neighbors(const vector<sensor> &sensors, double radius_doi) {
+solution algorithms::improved_tsp_neighbors(const vector<sensor> &sensors, double radius) {
     vector<tuple<point, int>> tspn_result;
     vector<double> tspn_cost;
 
@@ -588,7 +663,7 @@ solution algorithms::improved_tsp_neighbors(const vector<sensor> &sensors, doubl
                 if (checked_sensors[deployed_sensors[j].get_id()] == 0) {
                     // find intersect of i and j
                     point p2 = deployed_sensors[j].get_position();
-                    vector<point> intersec_points = get_intersection_points(p1, p2, radius_doi);
+                    vector<point> intersec_points = get_intersection_points(p1, p2, radius);
                     if (!intersec_points.empty()) {
                         intersections[deployed_sensors[i].get_id()][deployed_sensors[j].get_id()] = intersec_points;
                         intersect = 1;
@@ -980,7 +1055,7 @@ solution algorithms::tsp_split(vector<tuple<point, int>> tspn_result, const vect
 }
 
 
-vector<point> algorithms::get_intersection_points(point pa, point pb, double radius_doi) {
+vector<point> algorithms::get_intersection_points(point pa, point pb, double radius) {
     // given two points a and b, returns the intersection points
     point int_ab_1 = {-1, -1};
     point int_ab_2 = {-1, -1};
@@ -995,19 +1070,19 @@ vector<point> algorithms::get_intersection_points(point pa, point pb, double rad
     double distance = sqrt(pow(x2 - x1, 2) + pow(y2 - y1, 2));
 
     // Check if circles are too far apart or coincide
-    if (distance > 2 * radius_doi || distance < fabs(radius_doi - radius_doi)) {
+    if (distance > 2 * radius || distance < fabs(radius - radius)) {
         // cout << "No intersection points found." << endl;
         return int_points;
     }
 
     // Calculate the distance from the center of circle A to the line joining the intersection points
-    double a = (pow(radius_doi, 2) - pow(radius_doi, 2) + pow(distance, 2)) / (2 * distance);
+    double a = (pow(radius, 2) - pow(radius, 2) + pow(distance, 2)) / (2 * distance);
 
     // Calculate the coordinates of the intersection points
     double x3 = x1 + a * (x2 - x1) / distance;
     double y3 = y1 + a * (y2 - y1) / distance;
 
-    double h = sqrt(pow(radius_doi, 2) - pow(a, 2));
+    double h = sqrt(pow(radius, 2) - pow(a, 2));
 
     // Calculate the coordinates of the two intersection points
     double int_x1 = x3 + h * (y2 - y1) / distance;

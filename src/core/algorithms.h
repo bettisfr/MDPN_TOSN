@@ -32,7 +32,10 @@ public:
     void approxTSPN_M_doi();
     void approxMPN_M_doi();
 
-    void approxTSPN_S_xxx();
+    void approxTSPN_S_dtr();
+    void approxMPN_S_dtr();
+    void approxTSPN_M_dtr();
+    void approxMPN_M_dtr();
 
     //tuple<vector<tuple<point, int>>, vector<double>> tsp_neighbors(const vector<sensor>&, double);
     solution improved_tsp_neighbors(const vector<sensor>&, double);
