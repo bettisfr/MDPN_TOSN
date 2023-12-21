@@ -15,12 +15,14 @@ struct input {
     // Application parameters
     int seed = 0;
 
-    // TODO: not used now
-    // Number of random scenarios
-    int scenarios = 10;
-
-    // 0: to do
+    // 0: Default values; 1: From cfg file
     int experiment = 0;
+
+    // 0: Regular; 1: With DOI; 2: With variable DTR
+    int scenario = 0;
+
+    // 0: TSPN_S; 1: MPN_S; 2: TSPN_M; 3: MPN_M
+    int algorithm = 0;
 
     // Name of the experiment (just a name)
     string exp_name = "default";
@@ -39,6 +41,9 @@ struct input {
 
     // Radius of the sensors (in case of no DOI)
     double sensor_radius = 20;
+
+    // Radius of the sensors in case of DOI (reduced radius)
+    double sensor_radius_doi = 10;
 
     // Degree of Irregularity (DOI)
     // -> https://www.sciencedirect.com/science/article/pii/S1574119218305406 (Section 4)

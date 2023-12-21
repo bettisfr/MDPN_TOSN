@@ -23,6 +23,7 @@ private:
     int area_width;
     int max_data;
     double sensor_radius;
+    double sensor_radius_doi;
     double doi;
     double epsilon;
 
@@ -61,7 +62,10 @@ public:
 
     double get_sensor_radius() const;
 
+    double get_sensor_radius_doi() const;
+
     double get_epsilon() const;
+
     double get_doi() const;
 
     vector<sensor> get_sensors();

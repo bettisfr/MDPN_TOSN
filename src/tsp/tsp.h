@@ -18,16 +18,15 @@
 
 using namespace std;
 
-struct point_3d {
+struct point_2d {
     double x;
     double y;
-    double z;
+    int id;
 };
 
 //---------------------------------------------------------------------------
 class TSP {
 public:
-
 
 protected:
     // List of odd nodes
@@ -49,7 +48,7 @@ protected:
     double **graph;
 
     // Point list
-    vector<point_3d> points;
+    vector<point_2d> points;
 
     // -
     void find_odds();
@@ -63,9 +62,9 @@ protected:
     //Find Hamiltonian path
     void make_hamiltonian(vector<int> &path, double &pathCost);
 
-    double get_distance(struct point_3d c1, struct point_3d c2);
+    double get_distance(struct point_2d c1, struct point_2d c2);
 
-    //T get_distance(struct point_3d c1, struct point_3d c2);
+    //T get_distance(struct point_2d c1, struct point_2d c2);
 
     void find_MST();
 
@@ -76,7 +75,7 @@ protected:
     double find_best_path(int start);
 
 public:
-    TSP(vector<point_3d> aPointList);
+    TSP(vector<point_2d> aPointList);
 
     ~TSP();
 
@@ -84,7 +83,7 @@ public:
 
     vector<int> get_path_id();
 
-    vector<point_3d> get_path();
+    vector<point_2d> get_path();
 
     double get_length();
 

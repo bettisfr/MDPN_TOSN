@@ -17,24 +17,12 @@ void run_experiment(input &par) {
     // Deployment creation with respect to the input parameters
     deployment dep(par);
     // cout << dep << endl;
-    // Algorithms creation and invocation
-    algorithms alg(&dep);
-    
-//    alg.approxTSPN_S(dep.get_sensor_radius());
-//    alg.approxMPN_S(dep.get_sensor_radius());
-//    alg.approxTSPN_M(dep.get_sensor_radius());
-//    alg.approxMPN_M(dep.get_sensor_radius());
-    
-    // with DOI
-//    alg.approxTSPN_S_doi();
-//    alg.approxMPN_S_doi();
-//    alg.approxTSPN_M_doi();
-//    alg.approxMPN_M_doi();
 
-    alg.approxTSPN_S_dtr();
-    //alg.approxMPN_S_dtr();
-    //alg.approxTSPN_M_dtr();
-    //alg.approxMPN_M_dtr();
+    algorithms alg(&dep);
+
+    // Scenario is  -> 0: Regular; 1: With DOI; 2: With variable DTR
+    // Algorithm is -> 0: TSPN_S; 1: MPN_S; 2: TSPN_M; 3: MPN_M
+    alg.run_experiment(par.scenario, par.algorithm);
 }
 
 int main(int argc, char** argv) {

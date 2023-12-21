@@ -4,7 +4,7 @@
 
 
 //Constructor
-TSP::TSP(vector<point_3d> aPointList) : points(std::move(aPointList)) {
+TSP::TSP(vector<point_2d> aPointList) : points(std::move(aPointList)) {
     n = points.size();
 
     graph = new double *[n];
@@ -56,10 +56,10 @@ double TSP::get_length() {
     return path_length;
 }
 
-double TSP::get_distance(struct point_3d c1, struct point_3d c2) {
+double TSP::get_distance(struct point_2d c1, struct point_2d c2) {
     double dx = pow(c1.x - c2.x, 2);
     double dy = pow(c1.y - c2.y, 2);
-    double dz = 0; // = pow(c1.z - c2.z, 2);
+    double dz = 0; // = pow(c1.id - c2.id, 2);
 
     return sqrt(dx + dy + dz);
 }
@@ -324,8 +324,8 @@ vector<int> TSP::get_path_id() {
     return tmp;
 }
 
-vector<point_3d> TSP::get_path() {
-    vector<point_3d> path;
+vector<point_2d> TSP::get_path() {
+    vector<point_2d> path;
 
     for (auto i: circuit) {
         path.push_back(points[i]);

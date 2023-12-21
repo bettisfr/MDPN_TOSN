@@ -10,6 +10,7 @@ deployment::deployment(const input &par) {
     area_width = par.area_width;
     max_data = par.max_data;
     sensor_radius = par.sensor_radius;
+    sensor_radius_doi = par.sensor_radius_doi;
     doi = par.doi;
     epsilon = par.epsilon;
 
@@ -57,7 +58,7 @@ deployment::deployment(const input &par) {
     }
 
     // Sort sensors by x-coordinate
-    sort(sensors.begin(), sensors.end(), [](const sensor& a, const sensor& b) {
+    sort(sensors.begin(), sensors.end(), [](const sensor &a, const sensor &b) {
         return a.get_pos_x() < b.get_pos_x();
     });
     //////////
@@ -92,6 +93,10 @@ double deployment::get_sensor_radius() const {
 
 vector<sensor> deployment::get_sensors() {
     return sensors;
+}
+
+double deployment::get_sensor_radius_doi() const {
+    return sensor_radius_doi;
 }
 
 vector<point> deployment::get_depots() {
