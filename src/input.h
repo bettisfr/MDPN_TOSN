@@ -15,7 +15,7 @@ struct input {
     // Application parameters
     int seed = 0;
 
-    // 0: Default values; 1: From cfg file
+    // 0: Default values; 1: From cfg file; 2 From command line
     int experiment = 0;
 
     // 0: Regular; 1: With DOI; 2: With variable DTR
@@ -55,8 +55,8 @@ struct input {
 
     // The following 4 parameters
     // -> https://www.sciencedirect.com/science/article/pii/S0022000023000806 (Section 6)
-    // Energy budget of each drone (in kJ)
-    int energy_budget = 5000;
+    // Energy budget of each drone (in J)
+    int energy_budget = 5000000;
 
     // Average energy consumption for flying for each meter traveled (in J/m)
     double energy_cons_fly = 200;
@@ -76,5 +76,6 @@ struct input {
 void print_parameters(const input &);
 void save_parameters(const input &);
 input load_parameters(input &);
+input read_parameters(input &, int, char* []);
 
 #endif //TOSN_INPUT_H

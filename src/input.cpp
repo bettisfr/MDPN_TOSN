@@ -6,7 +6,8 @@ void print_parameters(const input &par) {
 
     map<int, string> experiment_str = {
             {0, "Default parameters"},
-            {1, "From loaded parameters"},
+            {1, "Loaded parameters from config file"},
+            {2, "Read parameters from command line"},
     };
 
     map<int, string> scenario_str = {
@@ -24,18 +25,18 @@ void print_parameters(const input &par) {
 
     cout << "Experiment=" << par.experiment << " (" << experiment_str[par.experiment] << ")" << endl << endl;
 
-    cout << "Area length=" << par.area_length << "m" << endl;
-    cout << "Area width=" << par.area_width << "m" << endl;
+    cout << "Area length=" << par.area_length << " m" << endl;
+    cout << "Area width=" << par.area_width << " m" << endl;
     cout << "Number of sensors=" << par.num_sensors << endl;
     cout << "Number of depots=" << par.num_depots << endl;
     cout << "Radius of sensor=" << par.sensor_radius << endl;
-    cout << "Radius DOI of sensor=" << par.sensor_radius_doi_percentage << "%" << endl;
+    cout << "Radius DOI of sensor=" << par.sensor_radius_doi_percentage << " %" << endl;
     cout << "DOI=" << par.doi << endl;
-    cout << "Max data=" << par.max_data << "MB" << endl;
-    cout << "Energy budget=" << par.energy_budget << "J" << endl;
-    cout << "Energy consumption for flying=" << par.energy_cons_fly << "J/m" << endl;
-    cout << "Energy consumption for hovering=" << par.energy_cons_hover << "J/s" << endl;
-    cout << "Maximum data transfer rate=" << par.data_transfer_rate << "MB/s" << endl;
+    cout << "Max data=" << par.max_data << " MB" << endl;
+    cout << "Energy budget=" << par.energy_budget << " J" << endl;
+    cout << "Energy consumption for flying=" << par.energy_cons_fly << " J/m" << endl;
+    cout << "Energy consumption for hovering=" << par.energy_cons_hover << " J/s" << endl;
+    cout << "Maximum data transfer rate=" << par.data_transfer_rate << " MB/s" << endl;
     cout << "Epsilon (budget violation)=" << par.epsilon << endl;
 
     cout << "Scenario=" << scenario_str[par.scenario] << endl;
@@ -73,6 +74,12 @@ void save_parameters(const input &par) {
 input load_parameters(input &par) {
     string cfg_filename = "input/" + par.exp_name + ".cfg";
     ifstream file_cfg(cfg_filename);
+
+    // Check if the file exists and can be opened
+    if (!file_cfg.is_open()) {
+        cerr << "Error opening config file: " << cfg_filename << endl;
+        exit(-1);
+    }
 
     string line;
     while (getline(file_cfg, line)) {
@@ -118,6 +125,56 @@ input load_parameters(input &par) {
     }
 
     file_cfg.close();
+
+    return par;
+}
+
+input read_parameters(input &par, int argc, char* argv[]) {
+    // Iterate through command line arguments
+    // Start from 2 to skip program name and --params
+    for (int i = 2; i < argc; ++i) {
+        string arg = argv[i];
+
+        // Check if the argument is a flag (e.g., starts with '-')
+        if (!arg.empty() && arg[0] == '-') {
+            // Process the flag or option accordingly
+            if (arg == "-exp_name") {
+                par.exp_name = argv[i + 1];
+            } else if (arg == "-seed") {
+                par.seed = stoi(argv[i + 1]);
+            } else if (arg == "-area_length") {
+                par.area_length = stoi(argv[i + 1]);
+            } else if (arg == "-area_width") {
+                par.area_width = stoi(argv[i + 1]);
+            } else if (arg == "-num_sensors") {
+                par.num_sensors = stoi(argv[i + 1]);
+            } else if (arg == "-num_depots") {
+                par.num_depots = stoi(argv[i + 1]);
+            } else if (arg == "-sensor_radius") {
+                par.sensor_radius = stoi(argv[i + 1]);
+            } else if (arg == "-sensor_radius_doi_percentage") {
+                par.sensor_radius_doi_percentage = stod(argv[i + 1]);
+            } else if (arg == "-doi") {
+                par.doi = stod(argv[i + 1]);
+            } else if (arg == "-max_data") {
+                par.max_data = stoi(argv[i + 1]);
+            } else if (arg == "-energy_budget") {
+                par.energy_budget = stoi(argv[i + 1]);
+            } else if (arg == "-energy_cons_fly") {
+                par.energy_cons_fly = stoi(argv[i + 1]);
+            } else if (arg == "-energy_cons_hover") {
+                par.energy_cons_hover = stoi(argv[i + 1]);
+            } else if (arg == "-epsilon") {
+                par.epsilon = stod(argv[i + 1]);
+            } else if (arg == "-scenario") {
+                par.scenario = stoi(argv[i + 1]);
+            } else if (arg == "-algorithm") {
+                par.algorithm = stoi(argv[i + 1]);
+            } else {
+                cerr << "Unknown option: " << arg << endl;
+            }
+        }
+    }
 
     return par;
 }
