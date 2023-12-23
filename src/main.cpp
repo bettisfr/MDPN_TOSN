@@ -28,6 +28,9 @@ void run_experiment(input &par) {
 int main(int argc, char** argv) {
 //    energy e;
 
+    // Set global precision for cout
+    cout << fixed << setprecision(2);
+
     input par;
 
     if (argc >= 3) {

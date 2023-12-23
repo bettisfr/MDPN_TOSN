@@ -104,6 +104,10 @@ public:
 
     double compute_hovering_time(sensor);
 
+    int compute_uncovered_sensors(const solution&);
+
+    tuple<double, double> compute_lost_data(const solution&);
+
     void draw_result(vector<vector<tuple<point, int>>>, bool);
 };
 
