@@ -20,23 +20,21 @@ class algorithms {
 private:
     deployment *dep;
 
-    using algs = function<void(algorithms&)>;
-
-    vector<algs> algorithm_functions = {
+    vector<function<void(algorithms&)>> algorithm_functions = {
             &algorithms::approxTSPN_S,
             &algorithms::approxMPN_S,
             &algorithms::approxTSPN_M,
             &algorithms::approxMPN_M,
 
-            &algorithms::approxTSPN_S_doi,
-            &algorithms::approxMPN_S_doi,
-            &algorithms::approxTSPN_M_doi,
-            &algorithms::approxMPN_M_doi,
+            &algorithms::approxTSPN_S_DOI,
+            &algorithms::approxMPN_S_DOI,
+            &algorithms::approxTSPN_M_DOI,
+            &algorithms::approxMPN_M_DOI,
 
-            &algorithms::approxTSPN_S_dtr,
-            &algorithms::approxMPN_S_dtr,
-            &algorithms::approxTSPN_M_dtr,
-            &algorithms::approxMPN_M_dtr
+            &algorithms::approxTSPN_S_DTR,
+            &algorithms::approxMPN_S_DTR,
+            &algorithms::approxTSPN_M_DTR,
+            &algorithms::approxMPN_M_DTR
     };
 
     solution internal_approxTSPN_S(double);
@@ -60,23 +58,22 @@ public:
 
     void approxMPN_M();
 
-    void approxMPN_S_doi();
+    void approxMPN_S_DOI();
 
-    void approxTSPN_S_doi();
+    void approxTSPN_S_DOI();
 
-    void approxTSPN_M_doi();
+    void approxTSPN_M_DOI();
 
-    void approxMPN_M_doi();
+    void approxMPN_M_DOI();
 
-    void approxTSPN_S_dtr();
+    void approxTSPN_S_DTR();
 
-    void approxMPN_S_dtr();
+    void approxMPN_S_DTR();
 
-    void approxTSPN_M_dtr();
+    void approxTSPN_M_DTR();
 
-    void approxMPN_M_dtr();
+    void approxMPN_M_DTR();
 
-    //tuple<vector<tuple<point, int>>, vector<double>> tsp_neighbors(const vector<sensor>&, double);
     solution improved_tsp_neighbors(const vector<sensor> &, double);
 
     solution tsp_split(vector<tuple<point, int>>, const vector<double> &, point, const vector<sensor> &, bool);

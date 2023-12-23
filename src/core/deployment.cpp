@@ -10,13 +10,15 @@ deployment::deployment(const input &par) {
     area_width = par.area_width;
     max_data = par.max_data;
     sensor_radius = par.sensor_radius;
-    sensor_radius_doi = par.sensor_radius_doi;
+    sensor_radius_doi_percentage = par.sensor_radius_doi_percentage;
     doi = par.doi;
     epsilon = par.epsilon;
 
     energy_budget = par.energy_budget;
     energy_cons_fly = par.energy_cons_fly;
     energy_cons_hover = par.energy_cons_hover;
+
+    // It is 50 MB/s
     data_transfer_rate = par.data_transfer_rate;
 
     mt19937 re(par.seed);
@@ -61,7 +63,7 @@ deployment::deployment(const input &par) {
     sort(sensors.begin(), sensors.end(), [](const sensor &a, const sensor &b) {
         return a.get_pos_x() < b.get_pos_x();
     });
-    //////////
+
     for (int i = 0; i < num_sensors; i++) {
         sensors[i].set_id(i);
     }
@@ -96,7 +98,8 @@ vector<sensor> deployment::get_sensors() {
 }
 
 double deployment::get_sensor_radius_doi() const {
-    return sensor_radius_doi;
+    // Reduced by a percentage
+    return sensor_radius_doi_percentage * sensor_radius;
 }
 
 vector<point> deployment::get_depots() {
@@ -124,6 +127,7 @@ double deployment::get_FSPL() const {
     double min_P_Rx = -100.0;
     double min_P_Tx = min_P_Rx + 20 * log10(4 * M_PI * f_c * sensor_radius / c);
     double FSPL = min_P_Tx - min_P_Rx;
+
     return FSPL;
 }
 
@@ -132,7 +136,8 @@ double deployment::get_DTR(double distance) const {
     double P_Rx_W = pow(10, P_Rx / 10.0);  // Convert dB to watts
     double C = B * log2(1 + P_Rx_W / N);
     double C_MBps = C / 8e6;  // Convert bps to MB/s
-    return C_MBps;
+
+    return (distance <= 1 ? 50. : C_MBps);
 }
 
 double deployment::get_energy_budget() const {

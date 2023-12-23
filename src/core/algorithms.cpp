@@ -18,8 +18,6 @@ void algorithms::run_experiment(int scenario, int algorithm) {
 }
 
 void algorithms::approxTSPN_S() {
-    cout << "approxTSPN_S: " << endl << endl;
-
     solution sol = internal_approxTSPN_S(dep->get_sensor_radius());
     cout << sol << endl;
     draw_result(sol.tours, true);
@@ -33,8 +31,6 @@ solution algorithms::internal_approxTSPN_S(double radius) {
 }
 
 void algorithms::approxMPN_S() {
-    cout << "approxMPN_S: " << endl;
-
     solution sol = internal_approxMPN_S(dep->get_sensor_radius());
 
     cout << sol << endl;
@@ -48,8 +44,6 @@ solution algorithms::internal_approxMPN_S(double radius) {
 }
 
 void algorithms::approxTSPN_M() {
-    cout << "approxTSPN_M: " << endl;
-
     solution sol = internal_approxTSPN_M(dep->get_sensor_radius());
 
     cout << sol << endl;
@@ -92,8 +86,6 @@ solution algorithms::internal_approxTSPN_M(double radius) {
 }
 
 void algorithms::approxMPN_M() {
-    cout << "approxMPN_M: " << endl;
-
     solution sol = internal_approxMPN_M(dep->get_sensor_radius());
 
     cout << sol << endl;
@@ -121,34 +113,16 @@ solution algorithms::internal_approxMPN_M(double radius) {
     return sol;
 }
 
-void algorithms::approxTSPN_S_doi() {
-    cout << "approxTSPN_S_doi: " << endl << endl;
-
+void algorithms::approxTSPN_S_DOI() {
     vector<sensor> sensors = dep->get_sensors();
 
     // compute with original radius
     solution sol = internal_approxTSPN_S(dep->get_sensor_radius());
     cout << sol << endl;
 
-    // double total_cost = 0.;
-    // for (auto d : tspn_cost){
-    //     total_cost += d;
-    // }
-    // cout << "tspn_cost " << total_cost << endl;
-    // cout << "------" << endl;
-
     // compute with doi
-    double doi = dep->get_doi();
     solution sol2 = internal_approxTSPN_S(dep->get_sensor_radius_doi());
-
     cout << sol2 << endl;
-    //draw_result(sol_tours_doi, true);
-
-    // double total_cost_doi = 0.;
-    // for (auto c : tspn_cost_doi){
-    //     total_cost_doi += c;
-    // }
-    // cout << "tspn_cost_doi " << total_cost_doi << endl;
 
     // use sol_tours_doi and find uncovered sensors
     vector<sensor> uncovered_sensors;
@@ -165,16 +139,12 @@ void algorithms::approxTSPN_S_doi() {
 }
 
 
-void algorithms::approxMPN_S_doi() {
-    cout << "approxMPN_S_doi: " << endl << endl;
-
+void algorithms::approxMPN_S_DOI() {
     vector<sensor> sensors = dep->get_sensors();
 
     solution sol = approxMPN(dep->get_depots()[0], dep->get_sensor_radius());
     cout << sol << endl;
 
-    double doi = dep->get_doi();
-//    double radius_doi = 0.9 * dep->get_sensor_radius();
     solution sol2 = approxMPN(dep->get_depots()[0], dep->get_sensor_radius_doi());
     cout << sol2 << endl;
 
@@ -191,15 +161,12 @@ void algorithms::approxMPN_S_doi() {
     cout << "uncovered_sensors : " << uncovered_sensors.size() << endl;
 }
 
-void algorithms::approxTSPN_M_doi() {
-    cout << "approxTSPN_M_doi: " << endl << endl;
-
+void algorithms::approxTSPN_M_DOI() {
     vector<sensor> sensors = dep->get_sensors();
 
     solution sol = internal_approxTSPN_M(dep->get_sensor_radius());
     cout << sol << endl;
 
-    double doi = dep->get_doi();
     solution sol2 = internal_approxTSPN_M(dep->get_sensor_radius_doi());
     cout << sol2 << endl;
 
@@ -216,15 +183,12 @@ void algorithms::approxTSPN_M_doi() {
     cout << "uncovered_sensors : " << uncovered_sensors.size() << endl;
 }
 
-void algorithms::approxMPN_M_doi() {
-    cout << "approxMPN_M_doi: " << endl << endl;
-
+void algorithms::approxMPN_M_DOI() {
     vector<sensor> sensors = dep->get_sensors();
 
     solution sol = internal_approxMPN_M(dep->get_sensor_radius());
     cout << sol << endl;
 
-    double doi = dep->get_doi();
     solution sol2 = internal_approxMPN_M(dep->get_sensor_radius_doi());
     cout << sol2 << endl;
 
@@ -241,9 +205,7 @@ void algorithms::approxMPN_M_doi() {
     cout << "uncovered_sensors : " << uncovered_sensors.size() << endl;
 }
 
-void algorithms::approxTSPN_S_dtr() {
-    cout << "approxTSPN_S_dtr: " << endl << endl;
-
+void algorithms::approxTSPN_S_DTR() {
     vector<sensor> sensors = dep->get_sensors();
     double lost_data = 0.;
     double total_data = 0.;
@@ -260,8 +222,7 @@ void algorithms::approxTSPN_S_dtr() {
             double collected_data = 0.;
             double lost_data_i = 0.;
             if (dist > 0) {
-                double new_dtr = 0.7 * dep->get_data_transfer_rate();
-                collected_data = hovering_time * new_dtr;
+                collected_data = hovering_time * dep->get_DTR(dist);
                 lost_data_i = sensors[get<1>(tour[i])].get_data_size() - collected_data;
             }
             lost_data += lost_data_i;
@@ -270,9 +231,7 @@ void algorithms::approxTSPN_S_dtr() {
     cout << "Lost data : " << lost_data << "/" << total_data << endl;
 }
 
-void algorithms::approxMPN_S_dtr() {
-    cout << "approxMPN_S_dtr: " << endl << endl;
-
+void algorithms::approxMPN_S_DTR() {
     vector<sensor> sensors = dep->get_sensors();
     double lost_data = 0.;
     double total_data = 0.;
@@ -289,8 +248,7 @@ void algorithms::approxMPN_S_dtr() {
             double collected_data = 0.;
             double lost_data_i = 0.;
             if (dist > 0) {
-                double new_dtr = 0.7 * dep->get_data_transfer_rate();
-                collected_data = hovering_time * new_dtr;
+                collected_data = hovering_time * dep->get_DTR(dist);
                 lost_data_i = sensors[get<1>(tour[i])].get_data_size() - collected_data;
             }
             lost_data += lost_data_i;
@@ -299,9 +257,7 @@ void algorithms::approxMPN_S_dtr() {
     cout << "Lost data : " << lost_data << "/" << total_data << endl;
 }
 
-void algorithms::approxTSPN_M_dtr() {
-    cout << "approxTSPN_M_dtr: " << endl << endl;
-
+void algorithms::approxTSPN_M_DTR() {
     vector<sensor> sensors = dep->get_sensors();
     double lost_data = 0.;
     double total_data = 0.;
@@ -318,8 +274,7 @@ void algorithms::approxTSPN_M_dtr() {
             double collected_data = 0.;
             double lost_data_i = 0.;
             if (dist > 0) {
-                double new_dtr = 0.7 * dep->get_data_transfer_rate();
-                collected_data = hovering_time * new_dtr;
+                collected_data = hovering_time * dep->get_DTR(dist);
                 lost_data_i = sensors[get<1>(tour[i])].get_data_size() - collected_data;
             }
             lost_data += lost_data_i;
@@ -328,9 +283,7 @@ void algorithms::approxTSPN_M_dtr() {
     cout << "Lost data : " << lost_data << "/" << total_data << endl;
 }
 
-void algorithms::approxMPN_M_dtr() {
-    cout << "approxMPN_M_dtr: " << endl << endl;
-
+void algorithms::approxMPN_M_DTR() {
     vector<sensor> sensors = dep->get_sensors();
     double lost_data = 0.;
     double total_data = 0.;
@@ -347,8 +300,7 @@ void algorithms::approxMPN_M_dtr() {
             double collected_data = 0.;
             double lost_data_i = 0.;
             if (dist > 0) {
-                double new_dtr = 0.7 * dep->get_data_transfer_rate();
-                collected_data = hovering_time * new_dtr;
+                collected_data = hovering_time * dep->get_DTR(dist);
                 lost_data_i = sensors[get<1>(tour[i])].get_data_size() - collected_data;
             }
             lost_data += lost_data_i;

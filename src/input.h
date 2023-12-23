@@ -42,8 +42,8 @@ struct input {
     // Radius of the sensors (in case of no DOI)
     double sensor_radius = 20;
 
-    // Radius of the sensors in case of DOI (reduced radius)
-    double sensor_radius_doi = 10;
+    // Radius of the sensors in case of DOI (reduced radius in percentage)
+    double sensor_radius_doi_percentage = 0.8;
 
     // Degree of Irregularity (DOI)
     // -> https://www.sciencedirect.com/science/article/pii/S1574119218305406 (Section 4)
@@ -64,7 +64,7 @@ struct input {
     // Average energy consumption for hovering for each second spent (in J/s = W)
     double energy_cons_hover = 700;
 
-    // Maximum data transfer rate between drone and sensors (in MB/s)
+    // Maximum data transfer rate between drone and sensors (in MB/s) [hardcoded]
     double data_transfer_rate = 50.0;
 
     // Budget violation constant (1 + \epsilon)

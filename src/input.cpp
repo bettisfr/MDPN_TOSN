@@ -29,7 +29,7 @@ void print_parameters(const input &par) {
     cout << "Number of sensors=" << par.num_sensors << endl;
     cout << "Number of depots=" << par.num_depots << endl;
     cout << "Radius of sensor=" << par.sensor_radius << endl;
-    cout << "Radius DOI of sensor=" << par.sensor_radius_doi << endl;
+    cout << "Radius DOI of sensor=" << par.sensor_radius_doi_percentage << "%" << endl;
     cout << "DOI=" << par.doi << endl;
     cout << "Max data=" << par.max_data << "MB" << endl;
     cout << "Energy budget=" << par.energy_budget << "J" << endl;
@@ -54,13 +54,13 @@ void save_parameters(const input &par) {
     file_cfg << "num_sensors=" << par.num_sensors << endl;
     file_cfg << "num_depots=" << par.num_depots << endl;
     file_cfg << "sensor_radius=" << par.sensor_radius << endl;
-    file_cfg << "sensor_radius_doi=" << par.sensor_radius_doi << endl;
+    file_cfg << "sensor_radius_doi_percentage=" << par.sensor_radius_doi_percentage << endl;
     file_cfg << "doi=" << par.doi << endl;
     file_cfg << "max_data=" << par.max_data << endl;
     file_cfg << "energy_budget=" << par.energy_budget << endl;
     file_cfg << "energy_cons_fly=" << par.energy_cons_fly << endl;
     file_cfg << "energy_cons_hover=" << par.energy_cons_hover << endl;
-    file_cfg << "data_transfer_rate=" << par.data_transfer_rate << endl;
+//    file_cfg << "data_transfer_rate=" << par.data_transfer_rate << endl;
     file_cfg << "epsilon=" << par.epsilon << endl;
     file_cfg << "scenario=" << par.scenario << endl;
     file_cfg << "algorithm=" << par.algorithm << endl;
@@ -93,8 +93,8 @@ input load_parameters(input &par) {
                 par.num_depots = stoi(value);
             } else if (key == "sensor_radius") {
                 par.sensor_radius = stod(value);
-            } else if (key == "sensor_radius_doi") {
-                par.sensor_radius_doi = stod(value);
+            } else if (key == "sensor_radius_doi_percentage") {
+                par.sensor_radius_doi_percentage = stod(value);
             } else if (key == "doi") {
                 par.doi = stod(value);
             } else if (key == "max_data") {
@@ -105,8 +105,8 @@ input load_parameters(input &par) {
                 par.energy_cons_fly = stod(value);
             } else if (key == "energy_cons_hover") {
                 par.energy_cons_hover = stod(value);
-            } else if (key == "data_transfer_rate") {
-                par.data_transfer_rate = stod(value);
+//            } else if (key == "data_transfer_rate") {
+//                par.data_transfer_rate = stod(value);
             } else if (key == "epsilon") {
                 par.epsilon = stod(value);
             } else if (key == "scenario") {
