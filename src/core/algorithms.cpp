@@ -140,7 +140,7 @@ void algorithms::approxTSPN_S_DOI() {
 
 
 void algorithms::approxMPN_S_DOI() {
-    solution sol = approxMPN(dep->get_depots()[0], dep->get_sensor_radius_doi());
+    solution sol = internal_approxMPN_S(dep->get_sensor_radius_doi());
     cout << sol << endl;
 
     int uncovered = compute_uncovered_sensors(sol);
