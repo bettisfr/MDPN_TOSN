@@ -41,6 +41,7 @@ void print_parameters(const input &par) {
 
     cout << "Scenario=" << scenario_str[par.scenario] << endl;
     cout << "Algorithm=" << algorithm_str[par.algorithm] << endl;
+    cout << "Iterations=" << par.iterations << endl;
 
     cout << endl << endl;
 }
@@ -65,6 +66,7 @@ void save_parameters(const input &par) {
     file_cfg << "epsilon=" << par.epsilon << endl;
     file_cfg << "scenario=" << par.scenario << endl;
     file_cfg << "algorithm=" << par.algorithm << endl;
+    file_cfg << "iterations=" << par.iterations << endl;
 
     file_cfg << endl;
 
@@ -120,6 +122,8 @@ input load_parameters(input &par) {
                 par.scenario = stoi(value);
             } else if (key == "algorithm") {
                 par.algorithm = stoi(value);
+            } else if (key == "iterations") {
+                par.iterations = stoi(value);
             }
         }
     }
@@ -170,6 +174,8 @@ input read_parameters(input &par, int argc, char* argv[]) {
                 par.scenario = stoi(argv[i + 1]);
             } else if (arg == "-algorithm") {
                 par.algorithm = stoi(argv[i + 1]);
+            } else if (arg == "-iterations") {
+                par.iterations = stoi(argv[i + 1]);
             } else {
                 cerr << "Unknown option: " << arg << endl;
             }

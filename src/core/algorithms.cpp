@@ -13,7 +13,7 @@ void algorithms::run_experiment(int scenario, int algorithm) {
     if (index >= 0 && index < 12) {
         algorithm_functions[index](*this);
     } else {
-        cout << "Invalid scenario or algorithm index." << endl;
+        cerr << "Invalid scenario or algorithm index." << endl;
     }
 }
 

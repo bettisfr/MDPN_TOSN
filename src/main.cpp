@@ -10,15 +10,19 @@ using namespace std;
 void run_experiment(input &par) {
     print_parameters(par);
 
-    // Deployment creation with respect to the input parameters
-    deployment dep(par);
-    // cout << dep << endl;
+    for (int i = 0; i < par.iterations; i++) {
+        cout << "Iteration: " << (i + 1) << "/" << par.iterations << endl;
 
-    algorithms alg(&dep);
+        // Deployment creation with respect to the input parameters
+        deployment dep(par);
+        // cout << dep << endl;
 
-    // Scenario is  -> 0: Regular; 1: With DOI; 2: With variable DTR
-    // Algorithm is -> 0: TSPN_S; 1: MPN_S; 2: TSPN_M; 3: MPN_M
-    alg.run_experiment(par.scenario, par.algorithm);
+        algorithms alg(&dep);
+
+        // Scenario is  -> 0: Regular; 1: With DOI; 2: With variable DTR
+        // Algorithm is -> 0: TSPN_S; 1: MPN_S; 2: TSPN_M; 3: MPN_M
+        alg.run_experiment(par.scenario, par.algorithm);
+    }
 }
 
 int main(int argc, char** argv) {

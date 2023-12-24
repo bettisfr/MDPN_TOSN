@@ -21,7 +21,7 @@ deployment::deployment(const input &par) {
     // It is 50 MB/s
     data_transfer_rate = par.data_transfer_rate;
 
-    mt19937 re(par.seed);
+    static mt19937 re(par.seed);
     uniform_real_distribution<double> length_rand(0, area_length);
     uniform_real_distribution<double> width_rand(0, area_width);
     uniform_int_distribution<int> data_rand(0, max_data);

@@ -24,6 +24,9 @@ struct input {
     // 0: TSPN_S; 1: MPN_S; 2: TSPN_M; 3: MPN_M
     int algorithm = 0;
 
+    // Number or random instances to be performed
+    int iterations = 10;
+
     // Name of the experiment (just a name)
     string exp_name = "default";
 
