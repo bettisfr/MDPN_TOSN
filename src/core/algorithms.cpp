@@ -1093,11 +1093,11 @@ void algorithms::draw_result(vector<vector<tuple<point, int>>> tspn_tours, bool 
         htmlFile << "ctx.fill();\n";
         htmlFile << "ctx.stroke();\n";
 
-        // Draw sensor label with coordinates (bold)
-        htmlFile << "ctx.fillStyle = 'black';\n";
-        htmlFile << "ctx.font = 'bold 15px Arial';\n";
-        htmlFile << "ctx.fillText('" << i << " (" << sensor_x << ", " << sensor_y << ")', "
-                 << sensor_x + 10 << ", " << dep->get_area_width() - sensor_y + 10 << ");\n";
+//        // Draw sensor label with coordinates (bold)
+//        htmlFile << "ctx.fillStyle = 'black';\n";
+//        htmlFile << "ctx.font = 'bold 15px Arial';\n";
+//        htmlFile << "ctx.fillText('" << i << " (" << sensor_x << ", " << sensor_y << ")', "
+//                 << sensor_x + 10 << ", " << dep->get_area_width() - sensor_y + 10 << ");\n";
     }
 
     // Draw depots
@@ -1111,11 +1111,11 @@ void algorithms::draw_result(vector<vector<tuple<point, int>>> tspn_tours, bool 
         htmlFile << "ctx.fillStyle = 'green';\n";
         htmlFile << "ctx.fillRect(" << depot_x - 7.5 << ", " << dep->get_area_width() - depot_y - 7.5 << ", 15, 15);\n";
 
-        // Draw depot label with coordinates
-        htmlFile << "ctx.fillStyle = 'black';\n";
-        htmlFile << "ctx.font = '15px Arial';\n";
-        htmlFile << "ctx.fillText('D" << i << " (" << depot_x << ", " << depot_y << ")', "
-                 << depot_x + 10 << ", " << dep->get_area_width() - depot_y + 10 << ");\n";
+//        // Draw depot label with coordinates
+//        htmlFile << "ctx.fillStyle = 'black';\n";
+//        htmlFile << "ctx.font = '15px Arial';\n";
+//        htmlFile << "ctx.fillText('D" << i << " (" << depot_x << ", " << depot_y << ")', "
+//                 << depot_x + 10 << ", " << dep->get_area_width() - depot_y + 10 << ");\n";
 
         if (single) {
             break;
@@ -1123,7 +1123,8 @@ void algorithms::draw_result(vector<vector<tuple<point, int>>> tspn_tours, bool 
     }
 
     // Draw TSP circuit connecting points in the order specified by tspn_tours
-    vector<string> path_colors = {"red", "blue", "green", "orange", "purple", "cyan", "magenta"};
+    vector<string> path_colors = {"red", "blue", "green", "orange", "purple", "cyan", "magenta",
+                                  "yellow", "pink", "brown", "teal", "olive", "maroon", "navy", "lavender", "turquoise", "indigo"};
     int col = 0;
     for (auto &tspn_tour: tspn_tours) {
         htmlFile << "ctx.beginPath();\n";
