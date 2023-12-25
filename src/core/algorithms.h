@@ -108,7 +108,7 @@ public:
 
     tuple<double, double> compute_lost_data(const solution&);
 
-    void draw_result(vector<vector<tuple<point, int>>>, bool);
+    void draw_result(vector<vector<tuple<point, int>>>, bool, bool);
 };
 
 #endif //TOSN_ALGORITHMS_H

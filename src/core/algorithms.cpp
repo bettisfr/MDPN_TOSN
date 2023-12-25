@@ -20,7 +20,7 @@ void algorithms::run_experiment(int scenario, int algorithm) {
 void algorithms::approxTSPN_S() {
     solution sol = internal_approxTSPN_S(dep->get_sensor_radius());
     cout << sol << endl;
-    draw_result(sol.tours, true);
+    draw_result(sol.tours, true, false);
 }
 
 solution algorithms::internal_approxTSPN_S(double radius) {
@@ -34,7 +34,7 @@ void algorithms::approxMPN_S() {
     solution sol = internal_approxMPN_S(dep->get_sensor_radius());
 
     cout << sol << endl;
-    draw_result(sol.tours, true);
+    draw_result(sol.tours, true, false);
 }
 
 solution algorithms::internal_approxMPN_S(double radius) {
@@ -47,7 +47,7 @@ void algorithms::approxTSPN_M() {
     solution sol = internal_approxTSPN_M(dep->get_sensor_radius());
 
     cout << sol << endl;
-    draw_result(sol.tours, false);
+    draw_result(sol.tours, false, false);
 }
 
 solution algorithms::internal_approxTSPN_M(double radius) {
@@ -89,7 +89,7 @@ void algorithms::approxMPN_M() {
     solution sol = internal_approxMPN_M(dep->get_sensor_radius());
 
     cout << sol << endl;
-    draw_result(sol.tours, false);
+    draw_result(sol.tours, false, false);
 }
 
 solution algorithms::internal_approxMPN_M(double radius) {
@@ -133,6 +133,7 @@ int algorithms::compute_uncovered_sensors(const solution &sol) {
 void algorithms::approxTSPN_S_DOI() {
     solution sol = internal_approxTSPN_S(dep->get_sensor_radius_doi());
     cout << sol << endl;
+    draw_result(sol.tours, true, true);
 
     int uncovered = compute_uncovered_sensors(sol);
     cout << "Uncovered sensors: " << uncovered << "/" << dep->get_num_sensors() << endl;
@@ -142,6 +143,7 @@ void algorithms::approxTSPN_S_DOI() {
 void algorithms::approxMPN_S_DOI() {
     solution sol = internal_approxMPN_S(dep->get_sensor_radius_doi());
     cout << sol << endl;
+    draw_result(sol.tours, true, true);
 
     int uncovered = compute_uncovered_sensors(sol);
     cout << "Uncovered sensors: " << uncovered << "/" << dep->get_num_sensors() << endl;
@@ -150,6 +152,7 @@ void algorithms::approxMPN_S_DOI() {
 void algorithms::approxTSPN_M_DOI() {
     solution sol = internal_approxTSPN_M(dep->get_sensor_radius_doi());
     cout << sol << endl;
+    draw_result(sol.tours, false, true);
 
     int uncovered = compute_uncovered_sensors(sol);
     cout << "Uncovered sensors: " << uncovered << "/" << dep->get_num_sensors() << endl;
@@ -158,6 +161,7 @@ void algorithms::approxTSPN_M_DOI() {
 void algorithms::approxMPN_M_DOI() {
     solution sol = internal_approxMPN_M(dep->get_sensor_radius_doi());
     cout << sol << endl;
+    draw_result(sol.tours, false, true);
 
     int uncovered = compute_uncovered_sensors(sol);
     cout << "Uncovered sensors: " << uncovered << "/" << dep->get_num_sensors() << endl;
@@ -188,6 +192,7 @@ tuple<double, double> algorithms::compute_lost_data(const solution& sol) {
 void algorithms::approxTSPN_S_DTR() {
     solution sol = internal_approxTSPN_S(dep->get_sensor_radius());
     cout << sol << endl;
+    draw_result(sol.tours, true, false);
 
     auto [lost_data, total_data] = compute_lost_data(sol);
     cout << "Lost data: " << lost_data << "/" << total_data << endl;
@@ -196,6 +201,7 @@ void algorithms::approxTSPN_S_DTR() {
 void algorithms::approxMPN_S_DTR() {
     solution sol = internal_approxMPN_S(dep->get_sensor_radius());
     cout << sol << endl;
+    draw_result(sol.tours, true, false);
 
     auto [lost_data, total_data] = compute_lost_data(sol);
     cout << "Lost data: " << lost_data << "/" << total_data << endl;
@@ -204,6 +210,7 @@ void algorithms::approxMPN_S_DTR() {
 void algorithms::approxTSPN_M_DTR() {
     solution sol = internal_approxTSPN_M(dep->get_sensor_radius());
     cout << sol << endl;
+    draw_result(sol.tours, false, false);
 
     auto [lost_data, total_data] = compute_lost_data(sol);
     cout << "Lost data: " << lost_data << "/" << total_data << endl;
@@ -212,6 +219,7 @@ void algorithms::approxTSPN_M_DTR() {
 void algorithms::approxMPN_M_DTR() {
     solution sol = internal_approxMPN_M(dep->get_sensor_radius());
     cout << sol << endl;
+    draw_result(sol.tours, false, false);
 
     auto [lost_data, total_data] = compute_lost_data(sol);
     cout << "Lost data: " << lost_data << "/" << total_data << endl;
@@ -1000,7 +1008,7 @@ vector<point> algorithms::get_intersection_points(point pa, point pb, double rad
     return int_points;
 }
 
-void algorithms::draw_result(vector<vector<tuple<point, int>>> tspn_tours, bool single) {
+void algorithms::draw_result(vector<vector<tuple<point, int>>> tspn_tours, bool single, bool doi) {
     ofstream htmlFile("output/sensor_deployment.html");
 
     htmlFile << "<!DOCTYPE html>\n<html>\n<head>\n";
@@ -1040,47 +1048,47 @@ void algorithms::draw_result(vector<vector<tuple<point, int>>> tspn_tours, bool 
         htmlFile << "ctx.stroke();\n";
     }
 
-    // Draw sensors and depots as before
+    // Draw sensors
     vector<sensor> sensors = dep->get_sensors();
-    sort(sensors.begin(), sensors.end(), [](const sensor &a, const sensor &b) {
-        return a.get_pos_x() < b.get_pos_x();
-    });
     for (size_t i = 0; i < sensors.size(); ++i) {
         auto s = sensors[i];
         auto pos = s.get_position();
 
-        // Draw sensor circle
-        htmlFile << "ctx.beginPath();\n";
-        htmlFile << "ctx.arc(" << get<0>(pos) << ", " << dep->get_area_width() - get<1>(pos) << ", "
-                 << dep->get_sensor_radius()
-                 << ", 0, 2 * Math.PI);\n";
-        htmlFile << "ctx.fillStyle = 'rgba(0, 0, 255, 0.25)';\n";
-        htmlFile << "ctx.fill();\n";
-        htmlFile << "ctx.stroke();\n";
-        //////////////////////////
-        // Draw sensor shape based on radius_doi
-        //    htmlFile << "ctx.beginPath();\n";
-        //    for (int angle = 0; angle < 360; ++angle) {
-        //        double radius = s.get_radius_doi(angle);
-        //        double x = get<0>(pos) + radius * cos(angle * M_PI / 180.0);
-        //        double y = dep->get_area_width() - get<1>(pos) + radius * sin(angle * M_PI / 180.0);
+        double sensor_x = get<0>(pos);
+        double sensor_y = get<1>(pos);
 
-        //        if (angle == 0) {
-        //            htmlFile << "ctx.moveTo(" << x << ", " << y << ");\n";
-        //        } else {
-        //            htmlFile << "ctx.lineTo(" << x << ", " << y << ");\n";
-        //        }
-        //    }
-        //    htmlFile << "ctx.closePath();\n";
-        //    htmlFile << "ctx.fillStyle = 'rgba(0, 0, 255, 0.25)';\n";
-        //    htmlFile << "ctx.fill();\n";
-        //    htmlFile << "ctx.stroke();\n";
-        ///////////////////
+        if (doi) {
+            // Draw sensor shape based on radius_doi
+            htmlFile << "ctx.beginPath();\n";
+            for (int angle = 0; angle < 360; ++angle) {
+                double radius = s.get_radius_doi(angle);
+                double x = sensor_x + radius * cos(angle * M_PI / 180.0);
+                double y = dep->get_area_width() - sensor_y + radius * sin(angle * M_PI / 180.0);
+
+                if (angle == 0) {
+                    htmlFile << "ctx.moveTo(" << x << ", " << y << ");\n";
+                } else {
+                    htmlFile << "ctx.lineTo(" << x << ", " << y << ");\n";
+                }
+            }
+            htmlFile << "ctx.closePath();\n";
+            htmlFile << "ctx.fillStyle = 'rgba(255, 165, 0, 0.15)';\n";
+            htmlFile << "ctx.fill();\n";
+            htmlFile << "ctx.stroke();\n";
+        } else {
+            // Draw sensor circle
+            htmlFile << "ctx.beginPath();\n";
+            htmlFile << "ctx.arc(" << sensor_x << ", " << dep->get_area_width() - sensor_y << ", "
+                     << dep->get_sensor_radius()
+                     << ", 0, 2 * Math.PI);\n";
+            htmlFile << "ctx.fillStyle = 'rgba(255, 165, 0, 0.15)';\n";
+            htmlFile << "ctx.fill();\n";
+            htmlFile << "ctx.stroke();\n";
+        }
 
         // Draw sensor center dot
         htmlFile << "ctx.beginPath();\n";
-        htmlFile << "ctx.arc(" << get<0>(pos) << ", " << dep->get_area_width() - get<1>(pos)
-                 << ", 2, 0, 2 * Math.PI);\n";
+        htmlFile << "ctx.arc(" << sensor_x << ", " << dep->get_area_width() - sensor_y << ", 2, 0, 2 * Math.PI);\n";
         htmlFile << "ctx.fillStyle = 'black';\n";
         htmlFile << "ctx.fill();\n";
         htmlFile << "ctx.stroke();\n";
@@ -1088,68 +1096,62 @@ void algorithms::draw_result(vector<vector<tuple<point, int>>> tspn_tours, bool 
         // Draw sensor label with coordinates (bold)
         htmlFile << "ctx.fillStyle = 'black';\n";
         htmlFile << "ctx.font = 'bold 15px Arial';\n";
-        htmlFile << "ctx.fillText('" << i << " (" << get<0>(pos) << ", " << get<1>(pos) << ")', "
-                 << get<0>(pos) + 10 << ", " << dep->get_area_width() - get<1>(pos) + 10 << ");\n";
+        htmlFile << "ctx.fillText('" << i << " (" << sensor_x << ", " << sensor_y << ")', "
+                 << sensor_x + 10 << ", " << dep->get_area_width() - sensor_y + 10 << ");\n";
     }
 
+    // Draw depots
     for (size_t i = 0; i < dep->get_depots().size(); ++i) {
         auto d = dep->get_depots()[i];
         auto pos = d;
+        double depot_x = get<0>(pos);
+        double depot_y = get<1>(pos);
 
         // Draw depot square
         htmlFile << "ctx.fillStyle = 'green';\n";
-        htmlFile << "ctx.fillRect(" << get<0>(pos) - 7.5 << ", " << dep->get_area_width() - get<1>(pos) - 7.5
-                 << ", 15, 15);\n";
+        htmlFile << "ctx.fillRect(" << depot_x - 7.5 << ", " << dep->get_area_width() - depot_y - 7.5 << ", 15, 15);\n";
 
         // Draw depot label with coordinates
         htmlFile << "ctx.fillStyle = 'black';\n";
         htmlFile << "ctx.font = '15px Arial';\n";
-        htmlFile << "ctx.fillText('D" << i << " (" << get<0>(pos) << ", " << get<1>(pos) << ")', "
-                 << get<0>(pos) + 10 << ", " << dep->get_area_width() - get<1>(pos) + 10 << ");\n";
+        htmlFile << "ctx.fillText('D" << i << " (" << depot_x << ", " << depot_y << ")', "
+                 << depot_x + 10 << ", " << dep->get_area_width() - depot_y + 10 << ");\n";
 
         if (single) {
             break;
         }
     }
 
-    // // Draw TSP circuit connecting points in the order specified by tsp_result
-    // htmlFile << "ctx.strokeStyle = 'red';\n";
-    // htmlFile << "ctx.lineWidth = 2;\n";
-    // htmlFile << "ctx.beginPath();\n";
-    // htmlFile << "ctx.moveTo(" << get<0>(tspn_result[0]) << ", " << dep->get_area_width() - get<1>(tspn_result[0]) << ");\n";
-    // for (auto &i: tspn_result) {
-    //     htmlFile << "ctx.lineTo(" << get<0>(i) << ", " << dep->get_area_width() - get<1>(i) << ");\n";
-    // }
-    // htmlFile << "ctx.lineTo(" << get<0>(tspn_result[0]) << ", " << dep->get_area_width() - get<1>(tspn_result[0]) << ");\n";
-    // htmlFile << "ctx.stroke();\n";
-
-//////////////////////////////////
     // Draw TSP circuit connecting points in the order specified by tspn_tours
-    htmlFile << "ctx.strokeStyle = 'red';\n";
-    htmlFile << "ctx.lineWidth = 2;\n";
-    htmlFile << "ctx.beginPath();\n";
-    htmlFile << "ctx.moveTo(" << get<0>(get<0>(tspn_tours[0][0])) << ", "
-             << dep->get_area_width() - get<1>(get<0>(tspn_tours[0][0])) << ");\n";
+    vector<string> path_colors = {"red", "blue", "green", "orange", "purple", "cyan", "magenta"};
+    int col = 0;
     for (auto &tspn_tour: tspn_tours) {
+        htmlFile << "ctx.beginPath();\n";
+        htmlFile << "ctx.lineWidth = 2;\n";
+        htmlFile << "ctx.strokeStyle = '" << path_colors[col % path_colors.size()] << "';\n";
+        htmlFile << "ctx.setLineDash([5, 5]);\n"; // 5-pixel dashes with 5-pixel gaps
         for (auto j: tspn_tour) {
-            htmlFile << "ctx.lineTo(" << get<0>(get<0>(j)) << ", " << dep->get_area_width() - get<1>(get<0>(j))
-                     << ");\n";
+            double path_x = get<0>(get<0>(j));
+            double path_y = get<1>(get<0>(j));
+            htmlFile << "ctx.lineTo(" << path_x << ", " << dep->get_area_width() - path_y << ");\n";
+        }
+        htmlFile << "ctx.stroke();\n";
 
-            // Draw sensor label with coordinates (bold)
-            // htmlFile << "ctx.fillStyle = 'black';\n";
-            // htmlFile << "ctx.font = 'bold 15px Arial';\n";
-            // htmlFile << "ctx.fillText('" << get<1>(j) << " (" << get<0>(get<0>(j)) << ", " << get<1>(get<0>(j)) << ")', "
-            //         << get<0>(get<0>(j)) + 10 << ", " << dep->get_area_width() - get<1>(get<0>(j)) + 10 << ");\n";
+        for (auto j: tspn_tour) {
+            double path_x = get<0>(get<0>(j));
+            double path_y = get<1>(get<0>(j));
+
+            // Draw a circle at each coordinate
+            htmlFile << "ctx.beginPath();\n";
+            htmlFile << "ctx.arc(" << path_x << ", " << dep->get_area_width() - path_y << ", 3, 0, 2 * Math.PI);\n";
+            htmlFile << "ctx.fillStyle = '" << path_colors[col % path_colors.size()] << "';\n";
+            htmlFile << "ctx.fill();\n";
+            htmlFile << "ctx.closePath();\n";
+            htmlFile << "ctx.stroke();\n";
         }
 
+        col++;
     }
-    htmlFile << "ctx.lineTo(" << get<0>(get<0>(tspn_tours[0][0])) << ", "
-             << dep->get_area_width() - get<1>(get<0>(tspn_tours[0][0])) << ");\n";
-
-    htmlFile << "ctx.stroke();\n";
-
-
-////////////////////////////////////
 
     htmlFile << "}\n";
     htmlFile << "</script>\n";
