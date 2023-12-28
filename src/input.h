@@ -26,7 +26,7 @@ struct input {
     int algorithm = 0;
 
     // Number or random instances to be performed
-    int iterations = 10;
+    int iterations = 30;
 
     // Name of the experiment (just a name)
     string exp_name = "default";
@@ -38,16 +38,16 @@ struct input {
     int num_depots = 1;
 
     // Length of the area (in meters)
-    int area_length = 100;
+    int area_length = 2000;
 
     // Width of the area (in meters)
-    int area_width = 100;
+    int area_width = 2000;
 
     // Radius of the sensors (in case of no DOI)
     double sensor_radius = 20;
 
-    // Radius of the sensors in case of DOI (reduced radius in percentage)
-    double sensor_radius_doi_percentage = 0.8;
+    // Radius of the sensors in case of DOI (reduced radius in percentage, e.g., 0.8 means 80% of sensor_radius)
+    double sensor_radius_doi_percentage = 1;
 
     // Degree of Irregularity (DOI)
     // -> https://www.sciencedirect.com/science/article/pii/S1574119218305406 (Section 4)

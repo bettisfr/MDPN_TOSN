@@ -17,16 +17,15 @@ void run_experiment(input &par) {
 
         // Deployment creation with respect to the input parameters
         deployment dep(par);
-        // cout << dep << endl;
 
         algorithms alg(&dep);
 
         // Scenario is  -> 0: Regular; 1: With DOI; 2: With variable DTR
         // Algorithm is -> 0: TSPN_S; 1: MPN_S; 2: TSPN_M; 3: MPN_M
         solution out = alg.run_experiment(par.scenario, par.algorithm);
+//        cout << out << endl;
 
         outputs.push_back(out);
-        cout << out << endl;
     }
 
     save_output(par, outputs);
