@@ -73,7 +73,7 @@ struct input {
 
     // Budget violation constant (1 + \epsilon)
     // Impacts the performance of the algorithm: > 0 slow (no violation), 1 <= fast (2x budget required)
-    double epsilon = 0.5;
+    double epsilon = 0.1;
 
 };
 

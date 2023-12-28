@@ -24,7 +24,7 @@ foreach ($numSensors in $numSensorsRange) {
                     Write-Host "Executing: $fullCommand"
 
                     # Uncomment the next line to execute the command
-                    # Invoke-Expression $fullCommand
+                    Invoke-Expression $fullCommand
                 }
             }
         }
