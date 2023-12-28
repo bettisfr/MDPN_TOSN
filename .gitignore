@@ -36,7 +36,7 @@ build/
 tests/build/
 src/build/
 examples/build/
-data_size/output/
+data_size/solution/
 data_size/bkp/
 data_size/plots/
 scripts/__pycache__/

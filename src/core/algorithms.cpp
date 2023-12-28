@@ -7,9 +7,9 @@ algorithms::algorithms(deployment *m_dep) {
 }
 
 // Useless (and stupid) method, but it was nice to use a vector of pointers to methods :-D
-output algorithms::run_experiment(int scenario, int algorithm) {
+solution algorithms::run_experiment(int scenario, int algorithm) {
     int index = scenario * 4 + algorithm;
-    output out;
+    solution out;
 
     if (index >= 0 && index < 12) {
         out = algorithm_functions[index](*this);
@@ -20,8 +20,8 @@ output algorithms::run_experiment(int scenario, int algorithm) {
     return out;
 }
 
-output algorithms::approxTSPN_S() {
-    output sol = internal_approxTSPN_S(dep->get_sensor_radius());
+solution algorithms::approxTSPN_S() {
+    solution sol = internal_approxTSPN_S(dep->get_sensor_radius());
 
     draw_result(sol.tours, true, false);
 
@@ -31,8 +31,8 @@ output algorithms::approxTSPN_S() {
     return sol;
 }
 
-output algorithms::internal_approxTSPN_S(double radius) {
-    output sol = improved_tsp_neighbors(dep->get_sensors(), radius);
+solution algorithms::internal_approxTSPN_S(double radius) {
+    solution sol = improved_tsp_neighbors(dep->get_sensors(), radius);
     sol = tsp_split(sol.tours[0], sol.tours_costs, dep->get_depots()[0], dep->get_sensors(), false);
 
     sol.tours_number = static_cast<int>(sol.tours.size());
@@ -46,8 +46,8 @@ output algorithms::internal_approxTSPN_S(double radius) {
     return sol;
 }
 
-output algorithms::approxMPN_S() {
-    output sol = internal_approxMPN_S(dep->get_sensor_radius());
+solution algorithms::approxMPN_S() {
+    solution sol = internal_approxMPN_S(dep->get_sensor_radius());
 
     draw_result(sol.tours, true, false);
 
@@ -57,8 +57,8 @@ output algorithms::approxMPN_S() {
     return sol;
 }
 
-output algorithms::internal_approxMPN_S(double radius) {
-    output sol = approxMPN(dep->get_depots()[0], dep->get_sensor_radius());
+solution algorithms::internal_approxMPN_S(double radius) {
+    solution sol = approxMPN(dep->get_depots()[0], dep->get_sensor_radius());
 
     sol.tours_number = static_cast<int>(sol.tours.size());
     sol.tours_costs = sol.tours_costs;
@@ -71,8 +71,8 @@ output algorithms::internal_approxMPN_S(double radius) {
     return sol;
 }
 
-output algorithms::approxTSPN_M() {
-    output sol = internal_approxTSPN_M(dep->get_sensor_radius());
+solution algorithms::approxTSPN_M() {
+    solution sol = internal_approxTSPN_M(dep->get_sensor_radius());
 
     draw_result(sol.tours, false, false);
 
@@ -82,7 +82,7 @@ output algorithms::approxTSPN_M() {
     return sol;
 }
 
-output algorithms::internal_approxTSPN_M(double radius) {
+solution algorithms::internal_approxTSPN_M(double radius) {
     double ecf = dep->get_energy_cons_fly();
     //double radius = dep->get_sensor_radius();
     double R_0_f = radius * ecf;
@@ -111,7 +111,7 @@ output algorithms::internal_approxTSPN_M(double radius) {
     auto index = distance(A_d.begin(), min_element(A_d.begin(), A_d.end()));
     point depot = depots[index];
 
-    output sol = improved_tsp_neighbors(dep->get_sensors(), radius);
+    solution sol = improved_tsp_neighbors(dep->get_sensors(), radius);
     sol = tsp_split(sol.tours[0], sol.tours_costs, depot, dep->get_sensors(), false);
 
     sol.tours_number = static_cast<int>(sol.tours.size());
@@ -124,8 +124,8 @@ output algorithms::internal_approxTSPN_M(double radius) {
     return sol;
 }
 
-output algorithms::approxMPN_M() {
-    output sol = internal_approxMPN_M(dep->get_sensor_radius());
+solution algorithms::approxMPN_M() {
+    solution sol = internal_approxMPN_M(dep->get_sensor_radius());
 
     draw_result(sol.tours, false, false);
 
@@ -135,8 +135,8 @@ output algorithms::approxMPN_M() {
     return sol;
 }
 
-output algorithms::internal_approxMPN_M(double radius) {
-    output sol;
+solution algorithms::internal_approxMPN_M(double radius) {
+    solution sol;
     vector<point> depots = dep->get_depots();
     vector<tuple<point, int>> vec;
     vec.emplace_back(make_tuple(0.0, 0.0), 0);
@@ -146,7 +146,7 @@ output algorithms::internal_approxMPN_M(double radius) {
     }
 
     for (auto depot: depots) {
-        output tmp = approxMPN(depot, radius);
+        solution tmp = approxMPN(depot, radius);
         if (tmp.tours.size() < sol.tours.size()) {
             sol.tours = tmp.tours;
             sol.tours_costs = tmp.tours_costs;
@@ -163,7 +163,7 @@ output algorithms::internal_approxMPN_M(double radius) {
     return sol;
 }
 
-int algorithms::compute_uncovered_sensors(const output &sol) {
+int algorithms::compute_uncovered_sensors(const solution &sol) {
     vector<sensor> uncovered_sensors;
     vector<int> uncovered_ids;
     for (auto tour: sol.tours) {
@@ -180,8 +180,8 @@ int algorithms::compute_uncovered_sensors(const output &sol) {
     return static_cast<int>(uncovered_sensors.size());
 }
 
-output algorithms::approxTSPN_S_DOI() {
-    output sol = internal_approxTSPN_S(dep->get_sensor_radius_doi());
+solution algorithms::approxTSPN_S_DOI() {
+    solution sol = internal_approxTSPN_S(dep->get_sensor_radius_doi());
 
     draw_result(sol.tours, true, true);
 
@@ -191,8 +191,8 @@ output algorithms::approxTSPN_S_DOI() {
 }
 
 
-output algorithms::approxMPN_S_DOI() {
-    output sol = internal_approxMPN_S(dep->get_sensor_radius_doi());
+solution algorithms::approxMPN_S_DOI() {
+    solution sol = internal_approxMPN_S(dep->get_sensor_radius_doi());
 
     draw_result(sol.tours, true, true);
 
@@ -201,8 +201,8 @@ output algorithms::approxMPN_S_DOI() {
     return sol;
 }
 
-output algorithms::approxTSPN_M_DOI() {
-    output sol = internal_approxTSPN_M(dep->get_sensor_radius_doi());
+solution algorithms::approxTSPN_M_DOI() {
+    solution sol = internal_approxTSPN_M(dep->get_sensor_radius_doi());
 
     draw_result(sol.tours, false, true);
 
@@ -211,8 +211,8 @@ output algorithms::approxTSPN_M_DOI() {
     return sol;
 }
 
-output algorithms::approxMPN_M_DOI() {
-    output sol = internal_approxMPN_M(dep->get_sensor_radius_doi());
+solution algorithms::approxMPN_M_DOI() {
+    solution sol = internal_approxMPN_M(dep->get_sensor_radius_doi());
 
     draw_result(sol.tours, false, true);
 
@@ -221,7 +221,7 @@ output algorithms::approxMPN_M_DOI() {
     return sol;
 }
 
-tuple<double, double> algorithms::compute_lost_data(const output& sol) {
+tuple<double, double> algorithms::compute_lost_data(const solution& sol) {
     double lost_data = 0.;
     double total_data = 0.;
 
@@ -243,8 +243,8 @@ tuple<double, double> algorithms::compute_lost_data(const output& sol) {
     return make_tuple(lost_data, total_data);
 }
 
-output algorithms::approxTSPN_S_DTR() {
-    output sol = internal_approxTSPN_S(dep->get_sensor_radius());
+solution algorithms::approxTSPN_S_DTR() {
+    solution sol = internal_approxTSPN_S(dep->get_sensor_radius());
 
     draw_result(sol.tours, true, false);
 
@@ -253,8 +253,8 @@ output algorithms::approxTSPN_S_DTR() {
     return sol;
 }
 
-output algorithms::approxMPN_S_DTR() {
-    output sol = internal_approxMPN_S(dep->get_sensor_radius());
+solution algorithms::approxMPN_S_DTR() {
+    solution sol = internal_approxMPN_S(dep->get_sensor_radius());
 
     draw_result(sol.tours, true, false);
 
@@ -263,8 +263,8 @@ output algorithms::approxMPN_S_DTR() {
     return sol;
 }
 
-output algorithms::approxTSPN_M_DTR() {
-    output sol = internal_approxTSPN_M(dep->get_sensor_radius());
+solution algorithms::approxTSPN_M_DTR() {
+    solution sol = internal_approxTSPN_M(dep->get_sensor_radius());
 
     draw_result(sol.tours, false, false);
 
@@ -273,8 +273,8 @@ output algorithms::approxTSPN_M_DTR() {
     return sol;
 }
 
-output algorithms::approxMPN_M_DTR() {
-    output sol = internal_approxMPN_M(dep->get_sensor_radius());
+solution algorithms::approxMPN_M_DTR() {
+    solution sol = internal_approxMPN_M(dep->get_sensor_radius());
 
     draw_result(sol.tours, false, false);
 
@@ -412,7 +412,7 @@ double algorithms::tour_cost(vector<tuple<point, int>> T, vector<double> tspn_co
     return cost_T_k;
 }
 
-output algorithms::approxMPN(point depot, double radius) {
+solution algorithms::approxMPN(point depot, double radius) {
     vector<sensor> deployed_sensors = dep->get_sensors();
 
     // get eps and compute t
@@ -448,11 +448,11 @@ output algorithms::approxMPN(point depot, double radius) {
         }
     }
 
-    output sol;
+    solution sol;
 
     for (int i = 0; i < V.size(); i++) {
         // for each V[i], run Minimum UAV Deployment Problem with Neighborhoods with budget 2^{j-1} epsilon B
-        output tmp;
+        solution tmp;
 
         if (V[i].size() == 1) {
             sensor s = V[i][0];
@@ -486,7 +486,7 @@ output algorithms::approxMPN(point depot, double radius) {
     return sol;
 }
 
-output algorithms::appro_alg_nei(vector<sensor> V, int jth, point depot, double radius) {
+solution algorithms::appro_alg_nei(vector<sensor> V, int jth, point depot, double radius) {
     double budget = dep->get_energy_budget();
     double epsilon = dep->get_epsilon();
     double energy_budget = pow(2, jth - 1) * epsilon * budget;
@@ -584,7 +584,7 @@ output algorithms::appro_alg_nei(vector<sensor> V, int jth, point depot, double 
         }
     }
 
-    output sol;
+    solution sol;
     sol.tours = sol_tours;
     sol.tours_costs = sol_costs;
 
@@ -602,7 +602,7 @@ void algorithms::DFS(int v, unordered_set<int> &visited, unordered_set<int> &con
     }
 }
 
-output algorithms::improved_tsp_neighbors(const vector<sensor> &sensors, double radius) {
+solution algorithms::improved_tsp_neighbors(const vector<sensor> &sensors, double radius) {
     vector<tuple<point, int>> tspn_result;
     vector<double> tspn_cost;
 
@@ -747,7 +747,7 @@ output algorithms::improved_tsp_neighbors(const vector<sensor> &sensors, double 
     // tspn_tours.push_back(tspn_result);
     // draw_result(tspn_tours, true);
 
-    output sol;
+    solution sol;
     sol.tours.push_back(tspn_result);
     sol.tours_costs = tspn_cost;
 
@@ -961,7 +961,7 @@ output algorithms::improved_tsp_neighbors(const vector<sensor> &sensors, double 
     return make_tuple(tspn_result, tspn_cost);
 }*/
 
-output algorithms::tsp_split(vector<tuple<point, int>> tspn_result, const vector<double> &tspn_cost, point depot,
+solution algorithms::tsp_split(vector<tuple<point, int>> tspn_result, const vector<double> &tspn_cost, point depot,
                                const vector<sensor> &sensors, bool violation) {
     vector<vector<tuple<point, int>>> sol_tours;
     vector<double> sol_costs;
@@ -1009,7 +1009,7 @@ output algorithms::tsp_split(vector<tuple<point, int>> tspn_result, const vector
         }
     }
 
-    output sol;
+    solution sol;
     sol.tours = sol_tours;
     sol.tours_costs = sol_costs;
 
@@ -1067,7 +1067,7 @@ vector<point> algorithms::get_intersection_points(point pa, point pb, double rad
 }
 
 void algorithms::draw_result(vector<vector<tuple<point, int>>> tspn_tours, bool single, bool doi) {
-    ofstream htmlFile("output/sensor_deployment.html");
+    ofstream htmlFile("solution/sensor_deployment.html");
 
     htmlFile << "<!DOCTYPE html>\n<html>\n<head>\n";
     htmlFile << "<title>Sensor Deployment</title>\n";

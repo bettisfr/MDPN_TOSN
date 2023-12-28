@@ -1,6 +1,7 @@
 #include <iostream>
 
 #include "input.h"
+#include "output.h"
 #include "core/algorithms.h"
 #include "core/deployment.h"
 #include "model/energy.h"
@@ -10,6 +11,7 @@ using namespace std;
 void run_experiment(input &par) {
     print_parameters(par);
 
+    vector<solution> outputs;
     for (int i = 0; i < par.iterations; i++) {
         cout << "Iteration: " << (i + 1) << "/" << par.iterations << endl;
 
@@ -21,10 +23,13 @@ void run_experiment(input &par) {
 
         // Scenario is  -> 0: Regular; 1: With DOI; 2: With variable DTR
         // Algorithm is -> 0: TSPN_S; 1: MPN_S; 2: TSPN_M; 3: MPN_M
-        output out = alg.run_experiment(par.scenario, par.algorithm);
+        solution out = alg.run_experiment(par.scenario, par.algorithm);
 
+        outputs.push_back(out);
         cout << out << endl;
     }
+
+    save_output(par, outputs);
 }
 
 int main(int argc, char** argv) {

@@ -22,4 +22,6 @@ add_executable(TOSN
         src/model/energy.cpp
         src/model/energy.h
         src/model/quartic.cpp
-        src/definitions.h)
+        src/definitions.h
+        src/output.cpp
+        src/output.h)
