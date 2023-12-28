@@ -21,7 +21,9 @@ void run_experiment(input &par) {
 
         // Scenario is  -> 0: Regular; 1: With DOI; 2: With variable DTR
         // Algorithm is -> 0: TSPN_S; 1: MPN_S; 2: TSPN_M; 3: MPN_M
-        alg.run_experiment(par.scenario, par.algorithm);
+        output out = alg.run_experiment(par.scenario, par.algorithm);
+
+        cout << out << endl;
     }
 }
 

@@ -20,7 +20,7 @@ class algorithms {
 private:
     deployment *dep;
 
-    vector<function<void(algorithms&)>> algorithm_functions = {
+    vector<function<output(algorithms&)>> algorithm_functions = {
             &algorithms::approxTSPN_S,
             &algorithms::approxMPN_S,
             &algorithms::approxTSPN_M,
@@ -37,50 +37,50 @@ private:
             &algorithms::approxMPN_M_DTR
     };
 
-    solution internal_approxTSPN_S(double);
+    output internal_approxTSPN_S(double);
 
-    solution internal_approxMPN_S(double);
+    output internal_approxMPN_S(double);
 
-    solution internal_approxTSPN_M(double);
+    output internal_approxTSPN_M(double);
 
-    solution internal_approxMPN_M(double);
+    output internal_approxMPN_M(double);
 
 public:
     explicit algorithms(deployment *);
 
-    void run_experiment(int, int);
+    output run_experiment(int, int);
 
-    void approxTSPN_S();
+    output approxTSPN_S();
 
-    void approxMPN_S();
+    output approxMPN_S();
 
-    void approxTSPN_M();
+    output approxTSPN_M();
 
-    void approxMPN_M();
+    output approxMPN_M();
 
-    void approxMPN_S_DOI();
+    output approxMPN_S_DOI();
 
-    void approxTSPN_S_DOI();
+    output approxTSPN_S_DOI();
 
-    void approxTSPN_M_DOI();
+    output approxTSPN_M_DOI();
 
-    void approxMPN_M_DOI();
+    output approxMPN_M_DOI();
 
-    void approxTSPN_S_DTR();
+    output approxTSPN_S_DTR();
 
-    void approxMPN_S_DTR();
+    output approxMPN_S_DTR();
 
-    void approxTSPN_M_DTR();
+    output approxTSPN_M_DTR();
 
-    void approxMPN_M_DTR();
+    output approxMPN_M_DTR();
 
-    solution improved_tsp_neighbors(const vector<sensor> &, double);
+    output improved_tsp_neighbors(const vector<sensor> &, double);
 
-    solution tsp_split(vector<tuple<point, int>>, const vector<double> &, point, const vector<sensor> &, bool);
+    output tsp_split(vector<tuple<point, int>>, const vector<double> &, point, const vector<sensor> &, bool);
 
-    solution approxMPN(point, double);
+    output approxMPN(point, double);
 
-    solution appro_alg_nei(vector<sensor> V, int jth, point depot, double radius);
+    output appro_alg_nei(vector<sensor> V, int jth, point depot, double radius);
 
     void DFS(int, unordered_set<int> &, unordered_set<int> &, vector<vector<int>>);
 
@@ -104,9 +104,9 @@ public:
 
     double compute_hovering_time(sensor);
 
-    int compute_uncovered_sensors(const solution&);
+    int compute_uncovered_sensors(const output&);
 
-    tuple<double, double> compute_lost_data(const solution&);
+    tuple<double, double> compute_lost_data(const output&);
 
     void draw_result(vector<vector<tuple<point, int>>>, bool, bool);
 };

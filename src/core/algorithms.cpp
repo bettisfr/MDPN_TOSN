@@ -7,50 +7,82 @@ algorithms::algorithms(deployment *m_dep) {
 }
 
 // Useless (and stupid) method, but it was nice to use a vector of pointers to methods :-D
-void algorithms::run_experiment(int scenario, int algorithm) {
+output algorithms::run_experiment(int scenario, int algorithm) {
     int index = scenario * 4 + algorithm;
+    output out;
 
     if (index >= 0 && index < 12) {
-        algorithm_functions[index](*this);
+        out = algorithm_functions[index](*this);
     } else {
         cerr << "Invalid scenario or algorithm index." << endl;
     }
+
+    return out;
 }
 
-void algorithms::approxTSPN_S() {
-    solution sol = internal_approxTSPN_S(dep->get_sensor_radius());
-    cout << sol << endl;
+output algorithms::approxTSPN_S() {
+    output sol = internal_approxTSPN_S(dep->get_sensor_radius());
+
     draw_result(sol.tours, true, false);
-}
 
-solution algorithms::internal_approxTSPN_S(double radius) {
-    solution sol = improved_tsp_neighbors(dep->get_sensors(), radius);
-    sol = tsp_split(sol.tours[0], sol.costs, dep->get_depots()[0], dep->get_sensors(), false);
+    sol.uncovered_sensors = 0; // no DOI
+    sol.lost_data = 0; // no DTR
 
     return sol;
 }
 
-void algorithms::approxMPN_S() {
-    solution sol = internal_approxMPN_S(dep->get_sensor_radius());
+output algorithms::internal_approxTSPN_S(double radius) {
+    output sol = improved_tsp_neighbors(dep->get_sensors(), radius);
+    sol = tsp_split(sol.tours[0], sol.tours_costs, dep->get_depots()[0], dep->get_sensors(), false);
 
-    cout << sol << endl;
-    draw_result(sol.tours, true, false);
-}
-
-solution algorithms::internal_approxMPN_S(double radius) {
-    solution sol = approxMPN(dep->get_depots()[0], dep->get_sensor_radius());
+    sol.tours_number = static_cast<int>(sol.tours.size());
+    sol.tours_costs = sol.tours_costs;
+    sol.total_sensors = dep->get_num_sensors();
+    sol.uncovered_sensors = compute_uncovered_sensors(sol);
+    auto [lost_data, total_data] = compute_lost_data(sol);
+    sol.total_data = total_data;
+    sol.lost_data = lost_data;
 
     return sol;
 }
 
-void algorithms::approxTSPN_M() {
-    solution sol = internal_approxTSPN_M(dep->get_sensor_radius());
+output algorithms::approxMPN_S() {
+    output sol = internal_approxMPN_S(dep->get_sensor_radius());
 
-    cout << sol << endl;
+    draw_result(sol.tours, true, false);
+
+    sol.uncovered_sensors = 0; // no DOI
+    sol.lost_data = 0; // no DTR
+
+    return sol;
+}
+
+output algorithms::internal_approxMPN_S(double radius) {
+    output sol = approxMPN(dep->get_depots()[0], dep->get_sensor_radius());
+
+    sol.tours_number = static_cast<int>(sol.tours.size());
+    sol.tours_costs = sol.tours_costs;
+    sol.total_sensors = dep->get_num_sensors();
+    sol.uncovered_sensors = compute_uncovered_sensors(sol);
+    auto [lost_data, total_data] = compute_lost_data(sol);
+    sol.total_data = total_data;
+    sol.lost_data = lost_data;
+
+    return sol;
+}
+
+output algorithms::approxTSPN_M() {
+    output sol = internal_approxTSPN_M(dep->get_sensor_radius());
+
     draw_result(sol.tours, false, false);
+
+    sol.uncovered_sensors = 0; // no DOI
+    sol.lost_data = 0; // no DTR
+
+    return sol;
 }
 
-solution algorithms::internal_approxTSPN_M(double radius) {
+output algorithms::internal_approxTSPN_M(double radius) {
     double ecf = dep->get_energy_cons_fly();
     //double radius = dep->get_sensor_radius();
     double R_0_f = radius * ecf;
@@ -79,21 +111,32 @@ solution algorithms::internal_approxTSPN_M(double radius) {
     auto index = distance(A_d.begin(), min_element(A_d.begin(), A_d.end()));
     point depot = depots[index];
 
-    solution sol = improved_tsp_neighbors(dep->get_sensors(), radius);
-    sol = tsp_split(sol.tours[0], sol.costs, depot, dep->get_sensors(), false);
+    output sol = improved_tsp_neighbors(dep->get_sensors(), radius);
+    sol = tsp_split(sol.tours[0], sol.tours_costs, depot, dep->get_sensors(), false);
+
+    sol.tours_number = static_cast<int>(sol.tours.size());
+    sol.total_sensors = dep->get_num_sensors();
+    sol.uncovered_sensors = compute_uncovered_sensors(sol);
+    auto [lost_data, total_data] = compute_lost_data(sol);
+    sol.total_data = total_data;
+    sol.lost_data = lost_data;
 
     return sol;
 }
 
-void algorithms::approxMPN_M() {
-    solution sol = internal_approxMPN_M(dep->get_sensor_radius());
+output algorithms::approxMPN_M() {
+    output sol = internal_approxMPN_M(dep->get_sensor_radius());
 
-    cout << sol << endl;
     draw_result(sol.tours, false, false);
+
+    sol.uncovered_sensors = 0; // no DOI
+    sol.lost_data = 0; // no DTR
+
+    return sol;
 }
 
-solution algorithms::internal_approxMPN_M(double radius) {
-    solution sol;
+output algorithms::internal_approxMPN_M(double radius) {
+    output sol;
     vector<point> depots = dep->get_depots();
     vector<tuple<point, int>> vec;
     vec.emplace_back(make_tuple(0.0, 0.0), 0);
@@ -103,17 +146,24 @@ solution algorithms::internal_approxMPN_M(double radius) {
     }
 
     for (auto depot: depots) {
-        solution tmp = approxMPN(depot, radius);
+        output tmp = approxMPN(depot, radius);
         if (tmp.tours.size() < sol.tours.size()) {
             sol.tours = tmp.tours;
-            sol.costs = tmp.costs;
+            sol.tours_costs = tmp.tours_costs;
         }
     }
+
+    sol.tours_number = static_cast<int>(sol.tours.size());
+    sol.total_sensors = dep->get_num_sensors();
+    sol.uncovered_sensors = compute_uncovered_sensors(sol);
+    auto [lost_data, total_data] = compute_lost_data(sol);
+    sol.total_data = total_data;
+    sol.lost_data = lost_data;
 
     return sol;
 }
 
-int algorithms::compute_uncovered_sensors(const solution &sol) {
+int algorithms::compute_uncovered_sensors(const output &sol) {
     vector<sensor> uncovered_sensors;
     vector<int> uncovered_ids;
     for (auto tour: sol.tours) {
@@ -130,44 +180,48 @@ int algorithms::compute_uncovered_sensors(const solution &sol) {
     return static_cast<int>(uncovered_sensors.size());
 }
 
-void algorithms::approxTSPN_S_DOI() {
-    solution sol = internal_approxTSPN_S(dep->get_sensor_radius_doi());
-    cout << sol << endl;
+output algorithms::approxTSPN_S_DOI() {
+    output sol = internal_approxTSPN_S(dep->get_sensor_radius_doi());
+
     draw_result(sol.tours, true, true);
 
-    int uncovered = compute_uncovered_sensors(sol);
-    cout << "Uncovered sensors: " << uncovered << "/" << dep->get_num_sensors() << endl;
+    sol.lost_data = 0; // no DTR
+
+    return sol;
 }
 
 
-void algorithms::approxMPN_S_DOI() {
-    solution sol = internal_approxMPN_S(dep->get_sensor_radius_doi());
-    cout << sol << endl;
+output algorithms::approxMPN_S_DOI() {
+    output sol = internal_approxMPN_S(dep->get_sensor_radius_doi());
+
     draw_result(sol.tours, true, true);
 
-    int uncovered = compute_uncovered_sensors(sol);
-    cout << "Uncovered sensors: " << uncovered << "/" << dep->get_num_sensors() << endl;
+    sol.lost_data = 0; // no DTR
+
+    return sol;
 }
 
-void algorithms::approxTSPN_M_DOI() {
-    solution sol = internal_approxTSPN_M(dep->get_sensor_radius_doi());
-    cout << sol << endl;
+output algorithms::approxTSPN_M_DOI() {
+    output sol = internal_approxTSPN_M(dep->get_sensor_radius_doi());
+
     draw_result(sol.tours, false, true);
 
-    int uncovered = compute_uncovered_sensors(sol);
-    cout << "Uncovered sensors: " << uncovered << "/" << dep->get_num_sensors() << endl;
+    sol.lost_data = 0; // no DTR
+
+    return sol;
 }
 
-void algorithms::approxMPN_M_DOI() {
-    solution sol = internal_approxMPN_M(dep->get_sensor_radius_doi());
-    cout << sol << endl;
+output algorithms::approxMPN_M_DOI() {
+    output sol = internal_approxMPN_M(dep->get_sensor_radius_doi());
+
     draw_result(sol.tours, false, true);
 
-    int uncovered = compute_uncovered_sensors(sol);
-    cout << "Uncovered sensors: " << uncovered << "/" << dep->get_num_sensors() << endl;
+    sol.lost_data = 0; // no DTR
+
+    return sol;
 }
 
-tuple<double, double> algorithms::compute_lost_data(const solution& sol) {
+tuple<double, double> algorithms::compute_lost_data(const output& sol) {
     double lost_data = 0.;
     double total_data = 0.;
 
@@ -189,40 +243,44 @@ tuple<double, double> algorithms::compute_lost_data(const solution& sol) {
     return make_tuple(lost_data, total_data);
 }
 
-void algorithms::approxTSPN_S_DTR() {
-    solution sol = internal_approxTSPN_S(dep->get_sensor_radius());
-    cout << sol << endl;
+output algorithms::approxTSPN_S_DTR() {
+    output sol = internal_approxTSPN_S(dep->get_sensor_radius());
+
     draw_result(sol.tours, true, false);
 
-    auto [lost_data, total_data] = compute_lost_data(sol);
-    cout << "Lost data: " << lost_data << "/" << total_data << endl;
+    sol.uncovered_sensors = 0; // no DOI
+
+    return sol;
 }
 
-void algorithms::approxMPN_S_DTR() {
-    solution sol = internal_approxMPN_S(dep->get_sensor_radius());
-    cout << sol << endl;
+output algorithms::approxMPN_S_DTR() {
+    output sol = internal_approxMPN_S(dep->get_sensor_radius());
+
     draw_result(sol.tours, true, false);
 
-    auto [lost_data, total_data] = compute_lost_data(sol);
-    cout << "Lost data: " << lost_data << "/" << total_data << endl;
+    sol.uncovered_sensors = 0; // no DOI
+
+    return sol;
 }
 
-void algorithms::approxTSPN_M_DTR() {
-    solution sol = internal_approxTSPN_M(dep->get_sensor_radius());
-    cout << sol << endl;
+output algorithms::approxTSPN_M_DTR() {
+    output sol = internal_approxTSPN_M(dep->get_sensor_radius());
+
     draw_result(sol.tours, false, false);
 
-    auto [lost_data, total_data] = compute_lost_data(sol);
-    cout << "Lost data: " << lost_data << "/" << total_data << endl;
+    sol.uncovered_sensors = 0; // no DOI
+
+    return sol;
 }
 
-void algorithms::approxMPN_M_DTR() {
-    solution sol = internal_approxMPN_M(dep->get_sensor_radius());
-    cout << sol << endl;
+output algorithms::approxMPN_M_DTR() {
+    output sol = internal_approxMPN_M(dep->get_sensor_radius());
+
     draw_result(sol.tours, false, false);
 
-    auto [lost_data, total_data] = compute_lost_data(sol);
-    cout << "Lost data: " << lost_data << "/" << total_data << endl;
+    sol.uncovered_sensors = 0; // no DOI
+
+    return sol;
 }
 
 
@@ -354,7 +412,7 @@ double algorithms::tour_cost(vector<tuple<point, int>> T, vector<double> tspn_co
     return cost_T_k;
 }
 
-solution algorithms::approxMPN(point depot, double radius) {
+output algorithms::approxMPN(point depot, double radius) {
     vector<sensor> deployed_sensors = dep->get_sensors();
 
     // get eps and compute t
@@ -390,11 +448,11 @@ solution algorithms::approxMPN(point depot, double radius) {
         }
     }
 
-    solution sol;
+    output sol;
 
     for (int i = 0; i < V.size(); i++) {
         // for each V[i], run Minimum UAV Deployment Problem with Neighborhoods with budget 2^{j-1} epsilon B
-        solution tmp;
+        output tmp;
 
         if (V[i].size() == 1) {
             sensor s = V[i][0];
@@ -404,7 +462,7 @@ solution algorithms::approxMPN(point depot, double radius) {
             double energy_hovering = compute_energy_hovering(s);
 
             double total_energy = energy_flying * 2 + energy_hovering;
-            tmp.costs.push_back(total_energy);
+            tmp.tours_costs.push_back(total_energy);
 
             vector<tuple<point, int>> vec;
             vec.push_back(make_tuple(depot, -1));
@@ -416,19 +474,19 @@ solution algorithms::approxMPN(point depot, double radius) {
         } else {
             auto azz = appro_alg_nei(V[i], i, depot, radius);
             tmp.tours = azz.tours;
-            tmp.costs = azz.costs;
+            tmp.tours_costs = azz.tours_costs;
         }
 
         for (int k = 0; k < tmp.tours.size(); k++) {
             sol.tours.push_back(tmp.tours[k]);
-            sol.costs.push_back(tmp.costs[k]);
+            sol.tours_costs.push_back(tmp.tours_costs[k]);
         }
     }
 
     return sol;
 }
 
-solution algorithms::appro_alg_nei(vector<sensor> V, int jth, point depot, double radius) {
+output algorithms::appro_alg_nei(vector<sensor> V, int jth, point depot, double radius) {
     double budget = dep->get_energy_budget();
     double epsilon = dep->get_epsilon();
     double energy_budget = pow(2, jth - 1) * epsilon * budget;
@@ -512,12 +570,12 @@ solution algorithms::appro_alg_nei(vector<sensor> V, int jth, point depot, doubl
         vector<double> costs1;
         // for each component run tspn
         for (auto &component: components) {
-            auto [tspn_tour, tspn_cost] = improved_tsp_neighbors(component, radius); // dep->get_sensor_radius()
-            auto [tours_comp, costs_comp] = tsp_split(tspn_tour[0], tspn_cost, depot, component, true);
+            auto res = improved_tsp_neighbors(component, radius);
+            res = tsp_split(res.tours[0], res.tours_costs, depot, component, true);
 
-            for (int w = 0; w < tours_comp.size(); w++) {
-                tours1.push_back(tours_comp[w]);
-                costs1.push_back(costs_comp[w]);
+            for (int w = 0; w < res.tours.size(); w++) {
+                tours1.push_back(res.tours[w]);
+                costs1.push_back(res.tours_costs[w]);
             }
         }
         if (tours1.size() < sol_tours.size()) {
@@ -526,9 +584,9 @@ solution algorithms::appro_alg_nei(vector<sensor> V, int jth, point depot, doubl
         }
     }
 
-    solution sol;
+    output sol;
     sol.tours = sol_tours;
-    sol.costs = sol_costs;
+    sol.tours_costs = sol_costs;
 
     return sol;
 }
@@ -544,7 +602,7 @@ void algorithms::DFS(int v, unordered_set<int> &visited, unordered_set<int> &con
     }
 }
 
-solution algorithms::improved_tsp_neighbors(const vector<sensor> &sensors, double radius) {
+output algorithms::improved_tsp_neighbors(const vector<sensor> &sensors, double radius) {
     vector<tuple<point, int>> tspn_result;
     vector<double> tspn_cost;
 
@@ -689,9 +747,9 @@ solution algorithms::improved_tsp_neighbors(const vector<sensor> &sensors, doubl
     // tspn_tours.push_back(tspn_result);
     // draw_result(tspn_tours, true);
 
-    solution sol;
+    output sol;
     sol.tours.push_back(tspn_result);
-    sol.costs = tspn_cost;
+    sol.tours_costs = tspn_cost;
 
     return sol;
 }
@@ -865,7 +923,7 @@ solution algorithms::improved_tsp_neighbors(const vector<sensor> &sensors, doubl
                     tspn_cost.push_back(total_energyyyy);
                 }
 
-                // fake sensor to be replaced to s1 (only to compute distances and energy costs)
+                // fake sensor to be replaced to s1 (only to compute distances and energy tours_costs)
                 sensor fs1(get<0>(pos), get<1>(pos), orig_sensors[j_intersects.first].get_data_size(), {});
                 s1 = fs1;
             }
@@ -903,7 +961,7 @@ solution algorithms::improved_tsp_neighbors(const vector<sensor> &sensors, doubl
     return make_tuple(tspn_result, tspn_cost);
 }*/
 
-solution algorithms::tsp_split(vector<tuple<point, int>> tspn_result, const vector<double> &tspn_cost, point depot,
+output algorithms::tsp_split(vector<tuple<point, int>> tspn_result, const vector<double> &tspn_cost, point depot,
                                const vector<sensor> &sensors, bool violation) {
     vector<vector<tuple<point, int>>> sol_tours;
     vector<double> sol_costs;
@@ -951,9 +1009,9 @@ solution algorithms::tsp_split(vector<tuple<point, int>> tspn_result, const vect
         }
     }
 
-    solution sol;
+    output sol;
     sol.tours = sol_tours;
-    sol.costs = sol_costs;
+    sol.tours_costs = sol_costs;
 
     return sol;
 }
