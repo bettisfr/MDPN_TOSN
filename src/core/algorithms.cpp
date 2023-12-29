@@ -23,7 +23,7 @@ solution algorithms::run_experiment(int scenario, int algorithm) {
 solution algorithms::approxTSPN_S() {
     solution sol = internal_approxTSPN_S(dep->get_sensor_radius());
 
-    draw_result(sol.tours, true, false);
+//    draw_result(sol.tours, true, false);
 
     sol.uncovered_sensors = 0; // no DOI
     sol.lost_data = 0; // no DTR
@@ -49,7 +49,7 @@ solution algorithms::internal_approxTSPN_S(double radius) {
 solution algorithms::approxMPN_S() {
     solution sol = internal_approxMPN_S(dep->get_sensor_radius());
 
-    draw_result(sol.tours, true, false);
+//    draw_result(sol.tours, true, false);
 
     sol.uncovered_sensors = 0; // no DOI
     sol.lost_data = 0; // no DTR
@@ -74,7 +74,7 @@ solution algorithms::internal_approxMPN_S(double radius) {
 solution algorithms::approxTSPN_M() {
     solution sol = internal_approxTSPN_M(dep->get_sensor_radius());
 
-    draw_result(sol.tours, false, false);
+//    draw_result(sol.tours, false, false);
 
     sol.uncovered_sensors = 0; // no DOI
     sol.lost_data = 0; // no DTR
@@ -127,7 +127,7 @@ solution algorithms::internal_approxTSPN_M(double radius) {
 solution algorithms::approxMPN_M() {
     solution sol = internal_approxMPN_M(dep->get_sensor_radius());
 
-    draw_result(sol.tours, false, false);
+//    draw_result(sol.tours, false, false);
 
     sol.uncovered_sensors = 0; // no DOI
     sol.lost_data = 0; // no DTR
@@ -183,7 +183,7 @@ int algorithms::compute_uncovered_sensors(const solution &sol) {
 solution algorithms::approxTSPN_S_DOI() {
     solution sol = internal_approxTSPN_S(dep->get_sensor_radius_doi());
 
-    draw_result(sol.tours, true, true);
+//    draw_result(sol.tours, true, true);
 
     sol.lost_data = 0; // no DTR
 
@@ -194,7 +194,7 @@ solution algorithms::approxTSPN_S_DOI() {
 solution algorithms::approxMPN_S_DOI() {
     solution sol = internal_approxMPN_S(dep->get_sensor_radius_doi());
 
-    draw_result(sol.tours, true, true);
+//    draw_result(sol.tours, true, true);
 
     sol.lost_data = 0; // no DTR
 
@@ -204,7 +204,7 @@ solution algorithms::approxMPN_S_DOI() {
 solution algorithms::approxTSPN_M_DOI() {
     solution sol = internal_approxTSPN_M(dep->get_sensor_radius_doi());
 
-    draw_result(sol.tours, false, true);
+//    draw_result(sol.tours, false, true);
 
     sol.lost_data = 0; // no DTR
 
@@ -214,7 +214,7 @@ solution algorithms::approxTSPN_M_DOI() {
 solution algorithms::approxMPN_M_DOI() {
     solution sol = internal_approxMPN_M(dep->get_sensor_radius_doi());
 
-    draw_result(sol.tours, false, true);
+//    draw_result(sol.tours, false, true);
 
     sol.lost_data = 0; // no DTR
 
@@ -246,7 +246,7 @@ tuple<double, double> algorithms::compute_lost_data(const solution& sol) {
 solution algorithms::approxTSPN_S_DTR() {
     solution sol = internal_approxTSPN_S(dep->get_sensor_radius());
 
-    draw_result(sol.tours, true, false);
+//    draw_result(sol.tours, true, false);
 
     sol.uncovered_sensors = 0; // no DOI
 
@@ -256,7 +256,7 @@ solution algorithms::approxTSPN_S_DTR() {
 solution algorithms::approxMPN_S_DTR() {
     solution sol = internal_approxMPN_S(dep->get_sensor_radius());
 
-    draw_result(sol.tours, true, false);
+//    draw_result(sol.tours, true, false);
 
     sol.uncovered_sensors = 0; // no DOI
 
@@ -266,7 +266,7 @@ solution algorithms::approxMPN_S_DTR() {
 solution algorithms::approxTSPN_M_DTR() {
     solution sol = internal_approxTSPN_M(dep->get_sensor_radius());
 
-    draw_result(sol.tours, false, false);
+//    draw_result(sol.tours, false, false);
 
     sol.uncovered_sensors = 0; // no DOI
 
@@ -276,7 +276,7 @@ solution algorithms::approxTSPN_M_DTR() {
 solution algorithms::approxMPN_M_DTR() {
     solution sol = internal_approxMPN_M(dep->get_sensor_radius());
 
-    draw_result(sol.tours, false, false);
+//    draw_result(sol.tours, false, false);
 
     sol.uncovered_sensors = 0; // no DOI
 
