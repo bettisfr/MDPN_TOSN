@@ -48,10 +48,16 @@ void save_output(const input &par, vector<solution> &results) {
         vector<double> uncovered_sensors;
         vector<double> lost_data;
 
+//        for (const auto& out : results) {
+//            tours_numbers.push_back(out.tours_number);
+//            uncovered_sensors.push_back(out.uncovered_sensors);
+//            lost_data.push_back(out.lost_data);
+//            total_data.push_back(out.total_data);
+//        }
         for (const auto& out : results) {
             tours_numbers.push_back(out.tours_number);
-            uncovered_sensors.push_back(out.uncovered_sensors);
-            lost_data.push_back(out.lost_data);
+            uncovered_sensors.push_back(out.uncovered_sensors * 100.0 / par.num_sensors); // Calculate as a percentage
+            lost_data.push_back(out.lost_data * 100.0 / out.total_data); // Calculate as a percentage
         }
 
         tours_number_avg = calculate_average(tours_numbers);
