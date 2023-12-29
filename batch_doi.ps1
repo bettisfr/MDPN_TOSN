@@ -16,11 +16,11 @@ $tot = $algorithmRange.Count * $numSensorsRange.Count * $numDepotsRange.Count * 
 
 
 # Nested loops to iterate over parameter combinations
-foreach ($algorithm in $algorithmRange) {
+foreach ($numSensors in $numSensorsRange) {
     foreach ($numDepots in $numDepotsRange) {
         foreach ($sensorRadius in $sensorRadiusRange) {
             foreach ($energyBudget in $energyBudgetRange) {
-                foreach ($numSensors in $numSensorsRange) {
+                foreach ($algorithm in $algorithmRange) {
 					foreach ($sensorRadiusDoiPercentage in $sensorRadiusDoiPercentageRange) {
 						foreach ($doi in $doiRange) {
 							# Define the exp_name parameter based on the parameter values

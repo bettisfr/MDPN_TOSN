@@ -14,11 +14,11 @@ $tot = $algorithmRange.Count * $numSensorsRange.Count * $numDepotsRange.Count * 
 
 
 # Nested loops to iterate over parameter combinations
-foreach ($algorithm in $algorithmRange) {
+foreach ($numSensors in $numSensorsRange) {
     foreach ($numDepots in $numDepotsRange) {
         foreach ($sensorRadius in $sensorRadiusRange) {
             foreach ($energyBudget in $energyBudgetRange) {
-                foreach ($numSensors in $numSensorsRange) {
+                foreach ($algorithm in $algorithmRange) {
                     # Define the exp_name parameter based on the parameter values
                     $expName = "reg_s${numSensors}_d${numDepots}_r${sensorRadius}_b$([math]::Round($energyBudget/1e+6,2))_a${algorithm}"
 
