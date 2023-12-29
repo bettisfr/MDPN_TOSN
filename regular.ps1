@@ -1,9 +1,9 @@
 # Define the parameter ranges
 $numSensorsRange = 100, 200, 300, 400, 500
-$numDepotsRange = 1..5
-$sensorRadiusRange = 50, 60, 70, 80, 90, 100
-$energyBudgetRange = 2000000, 4000000, 6000000, 8000000, 10000000
-$algorithmRange = 0..3
+$numDepotsRange = 1, 3, 5
+$sensorRadiusRange = 50, 75, 100
+$energyBudgetRange = 2000000, 6000000, 10000000
+$algorithmRange = 0, 1, 2, 3
 
 # Define the base command
 $baseCommand = ".\cmake-build-release\TOSN.exe --params"
@@ -24,7 +24,7 @@ foreach ($numSensors in $numSensorsRange) {
                     Write-Host "Executing: $fullCommand"
 
                     # Uncomment the next line to execute the command
-                    Invoke-Expression $fullCommand
+                    #Invoke-Expression $fullCommand
                 }
             }
         }

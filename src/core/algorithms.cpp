@@ -430,7 +430,7 @@ solution algorithms::approxMPN(point depot, double radius) {
     vector<vector<sensor>> V(t + 1);
 
     // for each s in deployed_sensors compute lambd_v,d and j
-    for (auto s: deployed_sensors) {
+    for (const auto& s: deployed_sensors) {
         double dist = get_distance(s, depot);
         double energy_flying = dist * ecf;
 
@@ -465,16 +465,16 @@ solution algorithms::approxMPN(point depot, double radius) {
             tmp.tours_costs.push_back(total_energy);
 
             vector<tuple<point, int>> vec;
-            vec.push_back(make_tuple(depot, -1));
-            vec.push_back(make_tuple(make_tuple(s.get_pos_x(), s.get_pos_y()), 0));
-            vec.push_back(make_tuple(depot, -1));
+            vec.emplace_back(depot, -1);
+            vec.emplace_back(make_tuple(s.get_pos_x(), s.get_pos_y()), 0);
+            vec.emplace_back(depot, -1);
 
             tmp.tours.emplace_back(vec);
 
         } else {
-            auto azz = appro_alg_nei(V[i], i, depot, radius);
-            tmp.tours = azz.tours;
-            tmp.tours_costs = azz.tours_costs;
+            auto nei_sol = appro_alg_nei(V[i], i, depot, radius);
+            tmp.tours = nei_sol.tours;
+            tmp.tours_costs = nei_sol.tours_costs;
         }
 
         for (int k = 0; k < tmp.tours.size(); k++) {
@@ -498,7 +498,7 @@ solution algorithms::appro_alg_nei(vector<sensor> V, int jth, point depot, doubl
 
     vector<vector<tuple<point, int>>> sol_tours;
     vector<double> sol_costs;
-    for (auto s: V) {
+    for (const auto& s: V) {
         vector<tuple<point, int>> A;
         A.emplace_back(make_tuple(s.get_pos_x(), s.get_pos_y()), -1);
         sol_tours.emplace_back(A);
@@ -1067,7 +1067,7 @@ vector<point> algorithms::get_intersection_points(point pa, point pb, double rad
 }
 
 void algorithms::draw_result(vector<vector<tuple<point, int>>> tspn_tours, bool single, bool doi) {
-    ofstream htmlFile("solution/sensor_deployment.html");
+    ofstream htmlFile("output/sensor_deployment.html");
 
     htmlFile << "<!DOCTYPE html>\n<html>\n<head>\n";
     htmlFile << "<title>Sensor Deployment</title>\n";
