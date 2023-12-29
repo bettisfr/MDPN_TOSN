@@ -1,10 +1,10 @@
 # Define the parameter ranges
 $algorithmRange = 0, 1, 2, 3
-$numSensorsRange = 100, 200
+$numSensorsRange = 50, 100, 200
 $numDepotsRange = 1, 3
 $sensorRadiusRange = 50, 100
-$energyBudgetRange = 6000000, 10000000
-$sensorRadiusDoiPercentageRange = 0.8, 0.9, 1
+$energyBudgetRange = 5000000, 10000000
+$sensorRadiusDoiPercentageRange = 0.8, 0.9
 $doiRange = 0.001, 0.01, 0.1
 
 # Define the base command

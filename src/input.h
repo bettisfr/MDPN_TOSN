@@ -63,10 +63,10 @@ struct input {
     int energy_budget = 5000000;
 
     // Average energy consumption for flying for each meter traveled (in J/m)
-    double energy_cons_fly = 200;
+    double energy_cons_fly = 172;
 
     // Average energy consumption for hovering for each second spent (in J/s = W)
-    double energy_cons_hover = 700;
+    double energy_cons_hover = 314;
 
     // Maximum data transfer rate between drone and sensors (in MB/s) [hardcoded]
     double data_transfer_rate = 50.0;
