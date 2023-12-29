@@ -20,7 +20,7 @@ foreach ($algorithm in $algorithmRange) {
             foreach ($energyBudget in $energyBudgetRange) {
                 foreach ($numSensors in $numSensorsRange) {
 					# Define the exp_name parameter based on the parameter values
-					$expName = "dtr_s${numSensors}_d${numDepots}_r${sensorRadius}_rd${sensorRadiusDoiPercentage}_doi${doi}_b$([math]::Round($energyBudget/1e+6,2))_a${algorithm}"
+					$expName = "dtr_s${numSensors}_d${numDepots}_r${sensorRadius}_b$([math]::Round($energyBudget/1e+6,2))_a${algorithm}"
 
 					# Construct the full command with varying parameters
 					$fullCommand = "$baseCommand -exp_name $expName -num_sensors $numSensors -num_depots $numDepots -sensor_radius $sensorRadius -energy_budget $energyBudget -algorithm $algorithm -scenario 2"
