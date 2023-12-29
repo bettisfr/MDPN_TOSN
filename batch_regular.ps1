@@ -1,6 +1,6 @@
 # Define the parameter ranges
 $algorithmRange = 0, 1, 2, 3
-$numSensorsRange = 100, 200, 300, 400, 500
+$numSensorsRange = 100, 200, 300
 $numDepotsRange = 1, 3, 5
 $sensorRadiusRange = 50, 75, 100
 $energyBudgetRange = 2000000, 6000000, 10000000
@@ -29,7 +29,7 @@ foreach ($algorithm in $algorithmRange) {
                     Write-Host "Executing $it/$tot = $fullCommand"
 
                     # Uncomment the next line to execute the command
-                    #Invoke-Expression $fullCommand
+                    Invoke-Expression $fullCommand
 
                     # Increment the total iterations counter
                     $it++

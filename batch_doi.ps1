@@ -33,7 +33,7 @@ foreach ($algorithm in $algorithmRange) {
 							Write-Host "Executing $it/$tot = $fullCommand"
 
 							# Uncomment the next line to execute the command
-							#Invoke-Expression $fullCommand
+							Invoke-Expression $fullCommand
 
 							# Increment the total iterations counter
 							$it++
