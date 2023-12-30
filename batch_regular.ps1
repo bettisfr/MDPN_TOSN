@@ -10,8 +10,7 @@ $baseCommand = ".\cmake-build-release\TOSN.exe --params"
 
 # Initialize a counter for total iterations
 $it = 1
-$tot = $algorithmRange.Count * $numSensorsRange.Count * $numDepotsRange.Count * $sensorRadiusRange.Count * $energyBudgetRange.Count
-
+$tot = ($algorithmRange.Count * $numSensorsRange.Count * $numDepotsRange.Count * $sensorRadiusRange.Count * $energyBudgetRange.Count) / 2
 
 # Nested loops to iterate over parameter combinations
 foreach ($numSensors in $numSensorsRange) {
@@ -19,20 +18,26 @@ foreach ($numSensors in $numSensorsRange) {
         foreach ($sensorRadius in $sensorRadiusRange) {
             foreach ($energyBudget in $energyBudgetRange) {
                 foreach ($algorithm in $algorithmRange) {
-                    # Define the exp_name parameter based on the parameter values
-                    $expName = "reg_s${numSensors}_d${numDepots}_r${sensorRadius}_b$([math]::Round($energyBudget/1e+6,2))_a${algorithm}"
 
-                    # Construct the full command with varying parameters
-                    $fullCommand = "$baseCommand -exp_name $expName -num_sensors $numSensors -num_depots $numDepots -sensor_radius $sensorRadius -energy_budget $energyBudget -algorithm $algorithm -scenario 0"
+                    # Check the constraints on numDepots and algorithm
+                    if (($numDepots -eq 1 -and ($algorithm -eq 0 -or $algorithm -eq 1)) -or
+                        ($numDepots -gt 1 -and ($algorithm -eq 2 -or $algorithm -eq 3))) {
 
-                    # Display the command
-                    Write-Host "Executing $it/$tot = $fullCommand"
+                        # Define the exp_name parameter based on the parameter values
+                        $expName = "reg_s${numSensors}_d${numDepots}_r${sensorRadius}_b$([math]::Round($energyBudget/1e+6,2))_a${algorithm}"
 
-                    # Uncomment the next line to execute the command
-                    Invoke-Expression $fullCommand
+                        # Construct the full command with varying parameters
+                        $fullCommand = "$baseCommand -exp_name $expName -num_sensors $numSensors -num_depots $numDepots -sensor_radius $sensorRadius -energy_budget $energyBudget -algorithm $algorithm -scenario 0"
 
-                    # Increment the total iterations counter
-                    $it++
+                        # Display the command
+                        Write-Host "Executing $it/$tot = $fullCommand"
+
+                        # Uncomment the next line to execute the command
+                        Invoke-Expression $fullCommand
+
+                        # Increment the total iterations counter
+                        $it++
+                    }
                 }
             }
         }

@@ -22,19 +22,22 @@ struct solution {
     double total_data = -1;
     double lost_data = -1;
 
+    double running_time = -1;
+
     friend ostream& operator<<(ostream& os, const solution& out) {
-        os << "Tours Number: " << out.tours_number << "\n";
+        os << "Tours Number: " << out.tours_number << endl;
         os << "Tours Costs: ";
         for (const auto& cost : out.tours_costs) {
             os << cost << " ";
         }
-        os << "\n";
+        os << endl;
 
-        os << "Total Sensors: " << out.total_sensors << "\n";
-        os << "Uncovered Sensors: " << out.uncovered_sensors << "\n";
+        os << "Total Sensors: " << out.total_sensors << endl;
+        os << "Uncovered Sensors: " << out.uncovered_sensors << endl;
 
-        os << "Total Data: " << out.total_data << "\n";
-        os << "Lost Data: " << out.lost_data << "\n";
+        os << "Total Data: " << out.total_data << endl;
+        os << "Lost Data: " << out.lost_data << endl;
+        os << "Running Time: " << out.running_time << endl;
 
         return os;
     }

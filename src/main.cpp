@@ -1,4 +1,5 @@
 #include <iostream>
+#include <chrono>
 
 #include "input.h"
 #include "output.h"
@@ -20,10 +21,16 @@ void run_experiment(input &par) {
 
         algorithms alg(&dep);
 
+        auto start_time = chrono::high_resolution_clock::now();
         // Scenario is  -> 0: Regular; 1: With DOI; 2: With variable DTR
         // Algorithm is -> 0: TSPN_S; 1: MPN_S; 2: TSPN_M; 3: MPN_M
         solution out = alg.run_experiment(par.scenario, par.algorithm);
-//        cout << out << endl;
+
+        auto end_time = chrono::high_resolution_clock::now();
+        auto duration = chrono::duration_cast<chrono::milliseconds>(end_time - start_time);
+        out.running_time = duration.count() / 1e+3;
+
+        cout << out << endl;
 
         outputs.push_back(out);
     }
@@ -35,7 +42,7 @@ int main(int argc, char** argv) {
 //    energy e;
 
     // Set global precision for cout
-    cout << fixed << setprecision(2);
+//    cout << fixed << setprecision(2);
 
     input par;
 
