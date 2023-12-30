@@ -1,0 +1,34 @@
+\documentclass{standalone}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.17}
+
+\begin{document}
+	
+	\begin{tikzpicture}
+		\begin{axis}[
+			xlabel={Number of Sensors},
+			ylabel={Tours Number},
+			title={5 depots, B=2.5 MJ},
+			legend style={
+				at={(0.5,1.15)},
+				anchor=south,
+				legend columns=3,
+				legend cell align={left},
+				legend entries={TSPN\_M ($r=50$), TSPN\_M ($r=75$), TSPN\_M ($r=100$), MPN\_M ($r=50$), MPN\_M ($r=75$), MPN\_M ($r=100$)},
+			},
+			]
+			
+			% TSPN_M first
+			\addplot+ [blue, solid, mark options={scale=0.75}, error bars/.cd, y dir=both, y explicit] table [x=num_sensors, y=tours_number_avg, y error=tours_number_std, col sep=comma] {res_d5_r50_b2.5_a2.csv};
+			\addplot+ [green, solid, mark options={scale=0.75}, error bars/.cd, y dir=both, y explicit] table [x=num_sensors, y=tours_number_avg, y error=tours_number_std, col sep=comma] {res_d5_r75_b2.5_a2.csv};
+			\addplot+ [purple, solid, mark options={scale=0.75}, error bars/.cd, y dir=both, y explicit] table [x=num_sensors, y=tours_number_avg, y error=tours_number_std, col sep=comma] {res_d5_r100_b2.5_a2.csv};
+			
+			% Then MPN_M
+			\addplot+ [red, solid, mark options={scale=0.75}, error bars/.cd, y dir=both, y explicit] table [x=num_sensors, y=tours_number_avg, y error=tours_number_std, col sep=comma] {res_d5_r50_b2.5_a3.csv};
+			\addplot+ [orange, solid, mark options={scale=0.75}, error bars/.cd, y dir=both, y explicit] table [x=num_sensors, y=tours_number_avg, y error=tours_number_std, col sep=comma] {res_d5_r75_b2.5_a3.csv};
+			\addplot+ [brown, solid, mark options={scale=0.75}, error bars/.cd, y dir=both, y explicit] table [x=num_sensors, y=tours_number_avg, y error=tours_number_std, col sep=comma] {res_d5_r100_b2.5_a3.csv};
+			
+		\end{axis}
+	\end{tikzpicture}
+	
+\end{document}

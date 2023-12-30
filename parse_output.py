@@ -2,8 +2,9 @@ import os
 import pandas as pd
 
 
-def merge_csv_files(output_file_path):
-    folder_path='output'
+def merge_csv_files():
+    folder_path = 'output'
+    output_folder = 'plot'
 
     # Get a list of all CSV files in the directory starting with "reg_", "doi", or "dtr_"
     csv_files = [file for file in os.listdir(folder_path) if file.endswith('.csv') and file.startswith(('reg_', 'doi', 'dtr_'))]
@@ -28,14 +29,19 @@ def merge_csv_files(output_file_path):
     # Reset the index
     merged_data.reset_index(drop=True, inplace=True)
 
-    # Create a new CSV file with the merged data
+    # Create the "plot" folder if it doesn't exist
+    os.makedirs(output_folder, exist_ok=True)
+
+    # Create a new CSV file with the merged data inside the "plot" folder
+    output_file_path = os.path.join(output_folder, 'merged_output.csv')
     merged_data.to_csv(output_file_path, index=False)
 
     print(f'Merged data saved to {output_file_path}')
 
 
-def filter_and_save_subtable(input_file_path, output_file_path_prefix, scenario, energy_budget, sensor_radius, num_depots):
+def filter_plot_1(prefix, scenario, energy_budget, sensor_radius, num_depots):
     # Read the original CSV file
+    input_file_path = 'plot/merged_output.csv'
     df = pd.read_csv(input_file_path)
 
     # Filter the data based on conditions
@@ -46,10 +52,13 @@ def filter_and_save_subtable(input_file_path, output_file_path_prefix, scenario,
         (df['num_depots'] == num_depots)
         ]
 
+    # Create the "plot" folder if it doesn't exist
+    os.makedirs('plot', exist_ok=True)
+
     # Iterate over unique algorithm values and save a separate file for each
     for algorithm_value in filtered_df['algorithm'].unique():
         # Extract the suffix from the algorithm column
-        suffix = f'_{algorithm_value}'
+        suffix = f'_d{num_depots}_r{int(sensor_radius)}_b{energy_budget:.1f}_a{algorithm_value}'
 
         # Filter data for the specific algorithm
         algorithm_df = filtered_df[filtered_df['algorithm'] == algorithm_value]
@@ -57,8 +66,8 @@ def filter_and_save_subtable(input_file_path, output_file_path_prefix, scenario,
         # Sort the DataFrame by 'num_sensors' in ascending order
         algorithm_df_sorted = algorithm_df.sort_values(by='num_sensors', ascending=True)
 
-        # Construct the output file path with suffix
-        output_file_path = f'{output_file_path_prefix}{suffix}.csv'
+        # Construct the output file path with suffix inside the "plot" folder
+        output_file_path = os.path.join('plot', f'{prefix}{suffix}.csv')
 
         # Save the sorted DataFrame to CSV
         algorithm_df_sorted.to_csv(output_file_path, index=False)
@@ -67,13 +76,16 @@ def filter_and_save_subtable(input_file_path, output_file_path_prefix, scenario,
 
 
 if __name__ == "__main__":
-    file_path = 'merged_output.csv'
+    merge_csv_files()
 
-    # Define your specific conditions
-    scenario_value = 0
-    energy_budget_value = 2.5
-    sensor_radius_value = 50
-    num_depots_value = 1
+    filter_plot_1('res', 0, 2.5, 50, 1)
+    filter_plot_1('res', 0, 2.5, 75, 1)
+    filter_plot_1('res', 0, 2.5, 100, 1)
 
-    # Create subtables for each algorithm
-    filter_and_save_subtable(file_path, 'subtable_output', scenario_value, energy_budget_value, sensor_radius_value, num_depots_value)
+    filter_plot_1('res', 0, 2.5, 50, 3)
+    filter_plot_1('res', 0, 2.5, 75, 3)
+    filter_plot_1('res', 0, 2.5, 100, 3)
+
+    filter_plot_1('res', 0, 2.5, 50, 5)
+    filter_plot_1('res', 0, 2.5, 75, 5)
+    filter_plot_1('res', 0, 2.5, 100, 5)

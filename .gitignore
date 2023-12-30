@@ -63,3 +63,7 @@ cmake*/*
 *.bin
 
 *.html
+*.aux
+*.log
+*.gz
+*.pdf

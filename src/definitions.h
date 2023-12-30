@@ -2,6 +2,7 @@
 #define TOSN_DEFINITIONS_H
 
 #include <iostream>
+#include <iomanip>
 #include <vector>
 
 using namespace std;
@@ -28,8 +29,9 @@ struct solution {
         os << "Tours Number: " << out.tours_number << endl;
         os << "Tours Costs: ";
         for (const auto& cost : out.tours_costs) {
-            os << cost << " ";
+            os << fixed << setprecision(2) << cost << " ";
         }
+        os << defaultfloat; // Reset to default precision mode
         os << endl;
 
         os << "Total Sensors: " << out.total_sensors << endl;
