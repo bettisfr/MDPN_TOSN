@@ -1,0 +1,2 @@
+num_sensors,num_depots,sensor_radius,sensor_radius_doi_percentage,doi,energy_budget,epsilon,scenario,algorithm,tours_number_avg,tours_number_std,uncovered_sensors_avg,uncovered_sensors_std,lost_data_avg,lost_data_std
+50,1,100,1,0,2.5,0.1,2,0,1.96667,0.182574,0,0,25.1177,3.59976
