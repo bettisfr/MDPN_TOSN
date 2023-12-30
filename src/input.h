@@ -26,7 +26,7 @@ struct input {
     int algorithm = 0;
 
     // Number or random instances to be performed
-    int iterations = 3;
+    int iterations = 30;
 
     // Name of the experiment (just a name)
     string exp_name = "default";
