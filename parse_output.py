@@ -39,53 +39,77 @@ def merge_csv_files():
     print(f'Merged data saved to {output_file_path}')
 
 
-def filter_plot_1(prefix, scenario, energy_budget, sensor_radius, num_depots):
-    # Read the original CSV file
+def filter_plot_res(energy_budget, sensor_radius, num_depots):
     input_file_path = 'plot/merged_output.csv'
+    prefix = 'res'
     df = pd.read_csv(input_file_path)
 
     # Filter the data based on conditions
     filtered_df = df[
-        (df['scenario'] == scenario) &
+        (df['scenario'] == 0) &
         (df['energy_budget'] == energy_budget) &
         (df['sensor_radius'] == sensor_radius) &
         (df['num_depots'] == num_depots)
         ]
 
-    # Create the "plot" folder if it doesn't exist
     os.makedirs('plot', exist_ok=True)
 
-    # Iterate over unique algorithm values and save a separate file for each
     for algorithm_value in filtered_df['algorithm'].unique():
-        # Extract the suffix from the algorithm column
         suffix = f'_d{num_depots}_r{int(sensor_radius)}_b{energy_budget:.1f}_a{algorithm_value}'
 
-        # Filter data for the specific algorithm
         algorithm_df = filtered_df[filtered_df['algorithm'] == algorithm_value]
-
-        # Sort the DataFrame by 'num_sensors' in ascending order
         algorithm_df_sorted = algorithm_df.sort_values(by='num_sensors', ascending=True)
 
-        # Construct the output file path with suffix inside the "plot" folder
         output_file_path = os.path.join('plot', f'{prefix}{suffix}.csv')
 
-        # Save the sorted DataFrame to CSV
         algorithm_df_sorted.to_csv(output_file_path, index=False)
 
-        print(f'Subtable data for algorithm {algorithm_value} saved to {output_file_path}')
+        print(f'Saved to {output_file_path}')
+
+
+def filter_plot_doi(energy_budget, sensor_radius, sensor_radius_doi_percentage, doi, num_depots):
+    input_file_path = 'plot/merged_output.csv'
+    prefix = 'doi'
+    df = pd.read_csv(input_file_path)
+
+    # Filter the data based on conditions
+    filtered_df = df[
+        (df['scenario'] == 1) &
+        (df['energy_budget'] == energy_budget) &
+        (df['sensor_radius'] == sensor_radius) &
+        (df['sensor_radius_doi_percentage'] == sensor_radius_doi_percentage) &
+        (df['doi'] == doi) &
+        (df['num_depots'] == num_depots)
+        ]
+
+    os.makedirs('plot', exist_ok=True)
+
+    for algorithm_value in filtered_df['algorithm'].unique():
+        suffix = f'_d{num_depots}_r{int(sensor_radius)}_rd{sensor_radius_doi_percentage:.3f}_doi{doi:.3f}_b{energy_budget:.1f}_a{algorithm_value}'
+
+        algorithm_df = filtered_df[filtered_df['algorithm'] == algorithm_value]
+        algorithm_df_sorted = algorithm_df.sort_values(by='num_sensors', ascending=True)
+
+        output_file_path = os.path.join('plot', f'{prefix}{suffix}.csv')
+
+        algorithm_df_sorted.to_csv(output_file_path, index=False)
+
+        print(f'Saved to {output_file_path}')
 
 
 if __name__ == "__main__":
     merge_csv_files()
 
-    filter_plot_1('res', 0, 2.5, 50, 1)
-    filter_plot_1('res', 0, 2.5, 75, 1)
-    filter_plot_1('res', 0, 2.5, 100, 1)
+    # RES
+    energy_budgets = [2.5]
+    sensor_radii = [50, 75, 100]
+    num_depots_values = [1, 3, 5]
 
-    filter_plot_1('res', 0, 2.5, 50, 3)
-    filter_plot_1('res', 0, 2.5, 75, 3)
-    filter_plot_1('res', 0, 2.5, 100, 3)
+    for energy_budget in energy_budgets:
+        for sensor_radius in sensor_radii:
+            for num_depots in num_depots_values:
+                filter_plot_res(energy_budget, sensor_radius, num_depots)
 
-    filter_plot_1('res', 0, 2.5, 50, 5)
-    filter_plot_1('res', 0, 2.5, 75, 5)
-    filter_plot_1('res', 0, 2.5, 100, 5)
+
+    # DOI
+    # filter_plot_doi(5, 50, 0.8, 0.001, 1)
