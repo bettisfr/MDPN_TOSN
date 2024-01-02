@@ -101,7 +101,7 @@ if __name__ == "__main__":
     merge_csv_files()
 
     # RES
-    energy_budgets = [2.5]
+    energy_budgets = [1.5, 2, 2.5]
     sensor_radii = [50, 75, 100]
     num_depots_values = [1, 3, 5]
 
