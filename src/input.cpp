@@ -1,6 +1,7 @@
 #include "input.h"
 
 void print_parameters(const input &par) {
+    cout << "Save=" << par.save << endl;
     cout << "Seed=" << par.seed << endl;
     cout << "Experiment name=" << par.exp_name << endl;
 
@@ -50,6 +51,7 @@ void save_parameters(const input &par) {
     string cfg_filename = "input/" + par.exp_name + ".cfg";
     ofstream file_cfg(cfg_filename);
 
+    file_cfg << "save=" << par.save << endl;
     file_cfg << "seed=" << par.seed << endl;
     file_cfg << "area_length=" << par.area_length << endl;
     file_cfg << "area_width=" << par.area_width << endl;
@@ -90,7 +92,9 @@ input load_parameters(input &par) {
         string value;
 
         if (getline(lineStream, key, '=') && lineStream >> value) {
-            if (key == "seed") {
+            if (key == "save") {
+                par.save = stoi(value);
+            } else if (key == "seed") {
                 par.seed = stoi(value);
             } else if (key == "area_length") {
                 par.area_length = stoi(value);
@@ -144,6 +148,8 @@ input read_parameters(input &par, int argc, char* argv[]) {
             // Process the flag or option accordingly
             if (arg == "-exp_name") {
                 par.exp_name = argv[i + 1];
+            } else if (arg == "-save") {
+                par.save = stoi(argv[i + 1]);
             } else if (arg == "-seed") {
                 par.seed = stoi(argv[i + 1]);
             } else if (arg == "-area_length") {

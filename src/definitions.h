@@ -31,15 +31,16 @@ struct solution {
         for (const auto& cost : out.tours_costs) {
             os << fixed << setprecision(2) << cost << " ";
         }
-        os << defaultfloat; // Reset to default precision mode
         os << endl;
 
         os << "Total Sensors: " << out.total_sensors << endl;
         os << "Uncovered Sensors: " << out.uncovered_sensors << endl;
 
-        os << "Total Data: " << out.total_data << endl;
-        os << "Lost Data: " << out.lost_data << endl;
+        os << "Total Data: " << fixed << setprecision(2) << out.total_data << endl;
+        os << "Lost Data: " << fixed << setprecision(2) << out.lost_data << endl;
         os << "Running Time: " << out.running_time << endl;
+
+        os << defaultfloat; // Reset to default precision mode
 
         return os;
     }

@@ -30,12 +30,14 @@ void run_experiment(input &par) {
         auto duration = chrono::duration_cast<chrono::milliseconds>(end_time - start_time);
         out.running_time = duration.count() / 1e+3;
 
-//        cout << out << endl;
+        cout << out << endl;
 
         outputs.push_back(out);
     }
 
-    save_output(par, outputs);
+    if (par.save == 1) {
+        save_output(par, outputs);
+    }
 }
 
 int main(int argc, char** argv) {

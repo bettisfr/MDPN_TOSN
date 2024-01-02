@@ -13,6 +13,9 @@ using namespace std;
 
 // Default values
 struct input {
+    // 0: No save to CSV; 1: Save to CSV
+    int save = 1;
+
     // Application parameters
     int seed = 0;
 
