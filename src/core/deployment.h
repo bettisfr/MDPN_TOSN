@@ -27,17 +27,26 @@ private:
     double doi;
     double epsilon;
 
-    double data_transfer_rate;
     int energy_budget;
     double energy_cons_fly;
     double energy_cons_hover;
 
-    const double c = 3e8;        // Speed of light in m/s
-    // These 4 parameters depend on "data_transfer_rate = 50 MB/s", which is hardcoded
-    const double f_c = 2.4e9;    // Frequency in Hz (for 2.4 GHz Wi-Fi)
-    const double P_Tx = 20;      // Transmitting power in dBm
-    const double N = 1e-8;       // Noise power in watts
-    const double B = 20e6;       // 20 MHz
+    int wireless_technology;
+
+    // Speed of light in m/s
+    const double c = 3e8;
+
+    // Frequency in Hz
+    double f_c;
+
+    // Transmitting power in dBm
+    double P_Tx;
+
+    // Noise power in watts
+    double N;
+
+    // Channel bandwidth
+    double B;
 
     // Weibull parameters
     const double shape = 0.67;
@@ -78,8 +87,6 @@ public:
     double get_energy_cons_fly() const;
 
     double get_energy_cons_hover() const;
-
-    double get_data_transfer_rate() const;
 };
 
 

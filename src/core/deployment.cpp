@@ -19,7 +19,33 @@ deployment::deployment(const input &par) {
     energy_cons_hover = par.energy_cons_hover;
 
     // It is 50 MB/s
-    data_transfer_rate = par.data_transfer_rate;
+    wireless_technology = par.wireless_technology;
+
+    if (wireless_technology == 0) {
+        // WiFi-5
+        f_c = 5e9;
+        P_Tx = 20;
+        N = 1e-9;
+        B = 80e6;
+    } else if (wireless_technology == 1) {
+        // WiFi-4
+        f_c = 2.4e9;
+        P_Tx = 20;
+        N = 1e-9;
+        B = 20e6;
+    } else if (wireless_technology == 2) {
+        // Bluetooth
+        f_c = 2.4e9;
+        P_Tx = 0;
+        N = 1e-9;
+        B = 1e6;
+    } else if (wireless_technology == 3) {
+        // Zigbee
+        f_c = 2.4e9;
+        P_Tx = 5;
+        N = 1e-9;
+        B = 2e6;
+    }
 
     static mt19937 re(par.seed);
     uniform_real_distribution<double> length_rand(0, area_length);
@@ -132,12 +158,15 @@ double deployment::get_FSPL() const {
 }
 
 double deployment::get_DTR(double distance) const {
+    if (distance < 1) {
+        distance = 1;
+    }
     double P_Rx = P_Tx + 20 * log10(c / (4 * M_PI * f_c * distance));
     double P_Rx_W = pow(10, P_Rx / 10.0);  // Convert dB to watts
     double C = B * log2(1 + P_Rx_W / N);
     double C_MBps = C / 8e6;  // Convert bps to MB/s
 
-    return (distance <= 1 ? 50. : C_MBps);
+    return C_MBps;
 }
 
 double deployment::get_energy_budget() const {
@@ -151,10 +180,3 @@ double deployment::get_energy_cons_fly() const {
 double deployment::get_energy_cons_hover() const {
     return energy_cons_hover;
 }
-
-double deployment::get_data_transfer_rate() const {
-    return data_transfer_rate;
-}
-
-
-

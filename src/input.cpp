@@ -17,6 +17,13 @@ void print_parameters(const input &par) {
             {2, "With variable DTR"},
     };
 
+    map<int, string> wireless_technology_str = {
+            {0, "WiFi-5"},
+            {1, "WiFi-4"},
+            {2, "Bluetooth"},
+            {3, "Zigbee"},
+    };
+
     map<int, string> algorithm_str = {
             {0, "TSPN_S"},
             {1, "MPN_S"},
@@ -37,7 +44,7 @@ void print_parameters(const input &par) {
     cout << "Energy budget=" << par.energy_budget << " J" << endl;
     cout << "Energy consumption for flying=" << par.energy_cons_fly << " J/m" << endl;
     cout << "Energy consumption for hovering=" << par.energy_cons_hover << " J/s" << endl;
-    cout << "Maximum data transfer rate=" << par.data_transfer_rate << " MB/s" << endl;
+    cout << "Wireless technology=" << wireless_technology_str[par.wireless_technology] << endl;
     cout << "Epsilon (budget violation)=" << par.epsilon << endl;
 
     cout << "Scenario=" << scenario_str[par.scenario] << endl;
@@ -64,7 +71,7 @@ void save_parameters(const input &par) {
     file_cfg << "energy_budget=" << par.energy_budget << endl;
     file_cfg << "energy_cons_fly=" << par.energy_cons_fly << endl;
     file_cfg << "energy_cons_hover=" << par.energy_cons_hover << endl;
-//    file_cfg << "data_transfer_rate=" << par.data_transfer_rate << endl;
+    file_cfg << "wireless_technology=" << par.wireless_technology << endl;
     file_cfg << "epsilon=" << par.epsilon << endl;
     file_cfg << "scenario=" << par.scenario << endl;
     file_cfg << "algorithm=" << par.algorithm << endl;
@@ -118,8 +125,8 @@ input load_parameters(input &par) {
                 par.energy_cons_fly = stod(value);
             } else if (key == "energy_cons_hover") {
                 par.energy_cons_hover = stod(value);
-//            } else if (key == "data_transfer_rate") {
-//                par.data_transfer_rate = stod(value);
+            } else if (key == "wireless_technology") {
+                par.wireless_technology = stod(value);
             } else if (key == "epsilon") {
                 par.epsilon = stod(value);
             } else if (key == "scenario") {
@@ -174,6 +181,8 @@ input read_parameters(input &par, int argc, char* argv[]) {
                 par.energy_cons_fly = stoi(argv[i + 1]);
             } else if (arg == "-energy_cons_hover") {
                 par.energy_cons_hover = stoi(argv[i + 1]);
+            } else if (arg == "-wireless_technology") {
+                par.wireless_technology = stoi(argv[i + 1]);
             } else if (arg == "-epsilon") {
                 par.epsilon = stod(argv[i + 1]);
             } else if (arg == "-scenario") {

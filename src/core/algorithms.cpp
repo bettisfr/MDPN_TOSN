@@ -359,7 +359,7 @@ bool algorithms::is_within_radius_doi(const sensor &s, point p) {
 }
 
 double algorithms::compute_energy_hovering(sensor s) {
-    double dtr = dep->get_data_transfer_rate();
+    double dtr = dep->get_DTR(0);
     double ech = dep->get_energy_cons_hover();
     double sensor_data = s.get_data_size();
     double required_time = sensor_data / dtr;
@@ -367,7 +367,7 @@ double algorithms::compute_energy_hovering(sensor s) {
 }
 
 double algorithms::compute_hovering_time(sensor s) {
-    double dtr = dep->get_data_transfer_rate();
+    double dtr = dep->get_DTR(0);
     double ech = dep->get_energy_cons_hover();
     double sensor_data = s.get_data_size();
     return double(sensor_data / dtr);
@@ -382,7 +382,7 @@ double algorithms::tour_cost(vector<tuple<point, int>> T, vector<double> tspn_co
 
     double ecf = dep->get_energy_cons_fly(); // every meter (in J/m)
     double ech = dep->get_energy_cons_hover(); // every second (in J/s)
-    double dtr = dep->get_data_transfer_rate(); // constant DTR (in MB/s)
+    double dtr = dep->get_DTR(0); // constant DTR (in MB/s)
 
     double cost_T_k = 0;
 
@@ -423,7 +423,7 @@ solution algorithms::approxMPN(point depot, double radius) {
 
     double ecf = dep->get_energy_cons_fly(); // every meter (in J/m)
     double ech = dep->get_energy_cons_hover(); // every second (in J/s)
-    double dtr = dep->get_data_transfer_rate(); // constant DTR (in MB/s)
+    double dtr = dep->get_DTR(0); // constant DTR (in MB/s)
     //double radius = dep->get_sensor_radius();
     double R_0_f = radius * ecf;  // R_0
 
@@ -493,7 +493,7 @@ solution algorithms::appro_alg_nei(vector<sensor> V, int jth, point depot, doubl
 
     double ecf = dep->get_energy_cons_fly(); // every meter (in J/m)
     double ech = dep->get_energy_cons_hover(); // every second (in J/s)
-    double dtr = dep->get_data_transfer_rate(); // constant DTR (in MB/s)
+    double dtr = dep->get_DTR(0); // constant DTR (in MB/s)
     //double radius = dep->get_sensor_radius();
 
     vector<vector<tuple<point, int>>> sol_tours;

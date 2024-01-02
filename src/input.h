@@ -71,8 +71,8 @@ struct input {
     // Average energy consumption for hovering for each second spent (in J/s = W)
     double energy_cons_hover = 314;
 
-    // Maximum data transfer rate between drone and sensors (in MB/s) [hardcoded]
-    double data_transfer_rate = 50.0;
+    // 0: WiFi-5; 1: WiFi-4; 2: Bluetooth; 3: Zigbee
+    int wireless_technology = 1;
 
     // Budget violation constant (1 + \epsilon)
     // Impacts the performance of the algorithm: > 0 slow (no violation), 1 <= fast (2x budget required)

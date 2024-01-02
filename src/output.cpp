@@ -84,7 +84,7 @@ void save_output(const input &par, vector<solution> &results) {
              << par.area_width << ","
              << par.energy_cons_fly << ","
              << par.energy_cons_hover << ","
-             << par.data_transfer_rate << ","
+             << par.wireless_technology << ","
              << par.iterations << ","
              << tours_number_avg << ","
              << tours_number_std << ","
