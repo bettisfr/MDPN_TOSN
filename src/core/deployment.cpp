@@ -54,11 +54,30 @@ deployment::deployment(const input &par) {
 
     double FSPL = get_FSPL();
 
+    // Depots creation
+    for (int i = 0; i < num_depots; i++) {
+        double x = length_rand(re);
+        double y = width_rand(re);
+
+        depots.emplace_back(x, y);
+    }
+
     // Sensors creation
-    for (int i = 0; i < num_sensors; i++) {
+    int random_i = 0;
+    while (random_i < num_sensors) {
+//    for (int i = 0; i < num_sensors; i++) {
         double x = length_rand(re);
         double y = width_rand(re);
         double data = data_rand(re);
+
+        // pre-processing phase
+//        for (int j = 0; j < num_depots; j++) {
+//        required_energy = compute 2(distance + radius)*energy_per_meter + data*energy_per_time
+//        if (required_energy > energy_budget) {
+//            continue;
+//        }
+//        }
+
 
         // Suitably fix this according to Degree of Irregularity (DOI)
         // https://www.sciencedirect.com/science/article/pii/S1574119218305406 (Section 4)
@@ -83,6 +102,8 @@ deployment::deployment(const input &par) {
         }
 
         sensors.emplace_back(x, y, data, r_doi);
+
+        random_i++;
     }
 
     // Sort sensors by x-coordinate
@@ -92,14 +113,6 @@ deployment::deployment(const input &par) {
 
     for (int i = 0; i < num_sensors; i++) {
         sensors[i].set_id(i);
-    }
-
-    // Depots creation
-    for (int i = 0; i < num_depots; i++) {
-        double x = length_rand(re);
-        double y = width_rand(re);
-
-        depots.emplace_back(x, y);
     }
 }
 
