@@ -78,6 +78,34 @@ deployment::deployment(const input &par) {
 //        }
 //        }
 
+        // pre-processing phase
+        if (par.algorithm == 1 or par.algorithm == 1){
+            point dep = depots[0];
+            depots.clear();
+            depots.emplace_back(dep);
+        }
+        
+        for (auto depot: depots) {
+            // flying
+            double delta_x = x - get<0>(depot);
+            double delta_y = y - get<1>(depot);
+            double distance = sqrt(delta_x * delta_x + delta_y * delta_y) + sensor_radius;
+            double energy_flying = distance * energy_cons_fly;
+
+            // hovering
+            double dtr = get_DTR(0);
+            double required_time = data / dtr;
+            double energy_hovering = required_time * energy_cons_hover;
+
+            double required_energy = 2*(energy_flying + energy_hovering);
+            //cout << "required_energy " << required_energy << endl;
+            if (required_energy > energy_budget) {
+                cout << "ERROR(infeasible instance): not enough energy_budget" << endl;
+                cout << "required energy_budget is at least: " << required_energy << endl;
+                return;
+            }
+        }
+
 
         // Suitably fix this according to Degree of Irregularity (DOI)
         // https://www.sciencedirect.com/science/article/pii/S1574119218305406 (Section 4)
