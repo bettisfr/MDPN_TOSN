@@ -14,10 +14,10 @@ void run_experiment(input &par) {
 
     vector<solution> outputs;
     for (int i = 0; i < par.iterations; i++) {
-        cout << "Iteration: " << (i + 1) << "/" << par.iterations << endl;
-
         // Deployment creation with respect to the input parameters
         deployment dep(par);
+
+        cout << "Iteration: " << (i + 1) << "/" << par.iterations << endl;
 
         algorithms alg(&dep);
 
@@ -44,7 +44,7 @@ int main(int argc, char** argv) {
 //    energy e;
 
     // Set global precision for cout
-//    cout << fixed << setprecision(2);
+    cout << fixed << setprecision(2);
 
     input par;
 

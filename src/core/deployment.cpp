@@ -18,9 +18,7 @@ deployment::deployment(const input &par) {
     energy_cons_fly = par.energy_cons_fly;
     energy_cons_hover = par.energy_cons_hover;
 
-    // It is 50 MB/s
     wireless_technology = par.wireless_technology;
-
     if (wireless_technology == 0) {
         // WiFi-5
         f_c = 5e9;
@@ -47,6 +45,11 @@ deployment::deployment(const input &par) {
         B = 2e6;
     }
 
+    if (!check_feasibility()) {
+        cout << "Error: Feasibility error" << endl;
+        exit(1);
+    }
+
     static mt19937 re(par.seed);
     uniform_real_distribution<double> length_rand(0, area_length);
     uniform_real_distribution<double> width_rand(0, area_width);
@@ -63,49 +66,17 @@ deployment::deployment(const input &par) {
     }
 
     // Sensors creation
-    int random_i = 0;
-    while (random_i < num_sensors) {
-//    for (int i = 0; i < num_sensors; i++) {
+    for (int i = 0; i < num_sensors; i++) {
         double x = length_rand(re);
         double y = width_rand(re);
         double data = data_rand(re);
 
         // pre-processing phase
-//        for (int j = 0; j < num_depots; j++) {
-//        required_energy = compute 2(distance + radius)*energy_per_meter + data*energy_per_time
-//        if (required_energy > energy_budget) {
-//            continue;
-//        }
-//        }
-
-        // pre-processing phase
-        if (par.algorithm == 1 or par.algorithm == 1){
+        if (par.algorithm == 1){
             point dep = depots[0];
             depots.clear();
             depots.emplace_back(dep);
         }
-        
-        for (auto depot: depots) {
-            // flying
-            double delta_x = x - get<0>(depot);
-            double delta_y = y - get<1>(depot);
-            double distance = sqrt(delta_x * delta_x + delta_y * delta_y) + sensor_radius;
-            double energy_flying = distance * energy_cons_fly;
-
-            // hovering
-            double dtr = get_DTR(0);
-            double required_time = data / dtr;
-            double energy_hovering = required_time * energy_cons_hover;
-
-            double required_energy = 2*(energy_flying + energy_hovering);
-            //cout << "required_energy " << required_energy << endl;
-            if (required_energy > energy_budget) {
-                cout << "ERROR(infeasible instance): not enough energy_budget" << endl;
-                cout << "required energy_budget is at least: " << required_energy << endl;
-                return;
-            }
-        }
-
 
         // Suitably fix this according to Degree of Irregularity (DOI)
         // https://www.sciencedirect.com/science/article/pii/S1574119218305406 (Section 4)
@@ -130,8 +101,6 @@ deployment::deployment(const input &par) {
         }
 
         sensors.emplace_back(x, y, data, r_doi);
-
-        random_i++;
     }
 
     // Sort sensors by x-coordinate
@@ -202,6 +171,9 @@ double deployment::get_DTR(double distance) const {
     if (distance < 1) {
         distance = 1;
     }
+    if (distance > sensor_radius) {
+        distance = sensor_radius;
+    }
     double P_Rx = P_Tx + 20 * log10(c / (4 * M_PI * f_c * distance));
     double P_Rx_W = pow(10, P_Rx / 10.0);  // Convert dB to watts
     double C = B * log2(1 + P_Rx_W / N);
@@ -220,4 +192,24 @@ double deployment::get_energy_cons_fly() const {
 
 double deployment::get_energy_cons_hover() const {
     return energy_cons_hover;
+}
+
+bool deployment::check_feasibility() const {
+    // flying
+    double delta_x = area_length;
+    double delta_y = area_width;
+    double max_distance = sqrt(delta_x * delta_x + delta_y * delta_y) + sensor_radius;
+    double energy_flying = max_distance * energy_cons_fly;
+
+    // hovering
+    double min_dtr = get_DTR(sensor_radius);
+    double max_required_time = max_data / min_dtr;
+    double energy_hovering = max_required_time * energy_cons_hover;
+
+    double required_energy = 2*energy_flying + energy_hovering;
+    if (required_energy > energy_budget) {
+        cout << "Infeasible: required_energy=" << required_energy << " while budget=" << energy_budget << endl;
+        return false;
+    }
+    return true;
 }

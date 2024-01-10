@@ -87,6 +87,8 @@ public:
     double get_energy_cons_fly() const;
 
     double get_energy_cons_hover() const;
+
+    bool check_feasibility() const;
 };
 
 
