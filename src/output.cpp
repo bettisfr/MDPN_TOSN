@@ -70,7 +70,7 @@ void save_output(const input &par, vector<solution> &results) {
     }
 
     if (file.is_open()) {
-        file << "num_sensors,num_depots,sensor_radius,sensor_radius_doi_percentage,doi,energy_budget,epsilon,scenario,algorithm,area_length,area_width,energy_cons_fly,energy_cons_hover,data_transfer_rate,iterations,tours_number_avg,tours_number_std,uncovered_sensors_avg,uncovered_sensors_std,lost_data_avg,lost_data_std,seed,running_time_avg,running_time_std" << endl;
+        file << "num_sensors,num_depots,sensor_radius,sensor_radius_doi_percentage,doi,energy_budget,epsilon,scenario,algorithm,area_length,area_width,energy_cons_fly,energy_cons_hover,wireless_technology,iterations,tours_number_avg,tours_number_std,uncovered_sensors_avg,uncovered_sensors_std,lost_data_avg,lost_data_std,seed,running_time_avg,running_time_std" << endl;
         file << par.num_sensors << ","
              << par.num_depots << ","
              << par.sensor_radius << ","
