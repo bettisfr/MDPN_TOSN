@@ -11,7 +11,7 @@ $baseCommand = ".\cmake-build-release\TOSN.exe --params"
 
 # Initialize a counter for total iterations
 $it = 1
-$tot = ($algorithmRange.Count * $numSensorsRange.Count * $numDepotsRange.Count * $sensorRadiusRange.Count * $energyBudgetRange.Count) / 2
+$tot = ($wirelessTechnologyRange.Count * $algorithmRange.Count * $numSensorsRange.Count * $numDepotsRange.Count * $sensorRadiusRange.Count * $energyBudgetRange.Count) / 2
 
 # Nested loops to iterate over parameter combinations
 foreach ($numSensors in $numSensorsRange) {
