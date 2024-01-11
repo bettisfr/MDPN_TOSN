@@ -2,7 +2,7 @@
 $algorithmRange = 0, 1, 2, 3
 $numSensorsRange = 50, 100, 200, 400
 $numDepotsRange = 1, 3, 5
-$sensorRadiusRange = 20, 40, 60
+$sensorRadiusRange = 20, 60, 80
 $energyBudgetRange = 1500000, 2000000, 2500000
 $wirelessTechnologyRange = 0, 1, 2, 3
 
@@ -11,7 +11,7 @@ $baseCommand = ".\cmake-build-release\TOSN.exe --params"
 
 # Initialize a counter for total iterations
 $it = 1
-$tot = ($wirelessTechnologyRange.Count * $algorithmRange.Count * $numSensorsRange.Count * $numDepotsRange.Count * $sensorRadiusRange.Count * $energyBudgetRange.Count) / 2
+$tot = ($algorithmRange.Count * $numSensorsRange.Count * $numDepotsRange.Count * $sensorRadiusRange.Count * $energyBudgetRange.Count) / 2
 
 # Nested loops to iterate over parameter combinations
 foreach ($numSensors in $numSensorsRange) {

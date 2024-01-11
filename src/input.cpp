@@ -20,8 +20,8 @@ void print_parameters(const input &par) {
     map<int, string> wireless_technology_str = {
             {0, "WiFi-5"},
             {1, "WiFi-4"},
-            {2, "Bluetooth"},
-            {3, "Zigbee"},
+            {2, "Zigbee"},
+            {3, "Bluetooth"},
     };
 
     map<int, string> algorithm_str = {

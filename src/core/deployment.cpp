@@ -32,17 +32,17 @@ deployment::deployment(const input &par) {
         N = 1e-9;
         B = 20e6;
     } else if (wireless_technology == 2) {
-        // Bluetooth
-        f_c = 2.4e9;
-        P_Tx = 0;
-        N = 1e-9;
-        B = 1e6;
-    } else if (wireless_technology == 3) {
         // Zigbee
         f_c = 2.4e9;
         P_Tx = 5;
         N = 1e-9;
         B = 2e6;
+    } else if (wireless_technology == 3) {
+        // Bluetooth
+        f_c = 2.4e9;
+        P_Tx = 0;
+        N = 1e-9;
+        B = 1e6;
     }
 
     if (!check_feasibility()) {

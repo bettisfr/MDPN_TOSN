@@ -66,12 +66,12 @@ struct input {
     int energy_budget = 5000000;
 
     // Average energy consumption for flying for each meter traveled (in J/m)
-    double energy_cons_fly = 172;
+    double energy_cons_fly = 150;
 
     // Average energy consumption for hovering for each second spent (in J/s = W)
-    double energy_cons_hover = 314;
+    double energy_cons_hover = 300;
 
-    // 0: WiFi-5; 1: WiFi-4; 2: Bluetooth; 3: Zigbee
+    // 0: WiFi-5; 1: WiFi-4; 2: Zigbee; 3: Bluetooth
     int wireless_technology = 1;
 
     // Budget violation constant (1 + \epsilon)
