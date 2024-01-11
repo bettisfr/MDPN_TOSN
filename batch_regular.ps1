@@ -13,54 +13,36 @@ $baseCommand = ".\cmake-build-release\TOSN.exe --params"
 $it = 1
 $tot = ($wirelessTechnologyRange.Count * $algorithmRange.Count * $numSensorsRange.Count * $numDepotsRange.Count * $sensorRadiusRange.Count * $energyBudgetRange.Count) / 2
 
-# Create an array to store job objects
-$jobs = @()
-
 # Nested loops to iterate over parameter combinations
 foreach ($numSensors in $numSensorsRange) {
     foreach ($numDepots in $numDepotsRange) {
         foreach ($sensorRadius in $sensorRadiusRange) {
             foreach ($energyBudget in $energyBudgetRange) {
                 foreach ($algorithm in $algorithmRange) {
-                    foreach ($wirelessTechnology in $wirelessTechnologyRange) {
-                        # Check the constraints on numDepots and algorithm
-                        if (($numDepots -eq 1 -and ($algorithm -eq 0 -or $algorithm -eq 1)) -or
-                            ($numDepots -gt 1 -and ($algorithm -eq 2 -or $algorithm -eq 3))) {
+					foreach ($wirelessTechnology in $wirelessTechnologyRange) {
 
-                            # Define the exp_name parameter based on the parameter values
-                            $expName = "reg_s${numSensors}_d${numDepots}_r${sensorRadius}_b$([math]::Round($energyBudget/1e+6,2))_w${wirelessTechnology}_a${algorithm}"
+						# Check the constraints on numDepots and algorithm
+						if (($numDepots -eq 1 -and ($algorithm -eq 0 -or $algorithm -eq 1)) -or
+							($numDepots -gt 1 -and ($algorithm -eq 2 -or $algorithm -eq 3))) {
 
-                            # Construct the full command with varying parameters
-                            $fullCommand = "$baseCommand -exp_name $expName -num_sensors $numSensors -num_depots $numDepots -sensor_radius $sensorRadius -energy_budget $energyBudget -wireless_technology $wirelessTechnology -algorithm $algorithm -scenario 0"
+							# Define the exp_name parameter based on the parameter values
+							$expName = "reg_s${numSensors}_d${numDepots}_r${sensorRadius}_b$([math]::Round($energyBudget/1e+6,2))_w${wirelessTechnology}_a${algorithm}"
 
-                            # Display the command
-                            Write-Host "Executing $it/$tot = $fullCommand"
+							# Construct the full command with varying parameters
+							$fullCommand = "$baseCommand -exp_name $expName -num_sensors $numSensors -num_depots $numDepots -sensor_radius $sensorRadius -energy_budget $energyBudget -wireless_technology $wirelessTechnology -algorithm $algorithm -scenario 0"
 
-                            # Create a script block for the job
-                            $scriptBlock = {
-                                param ($cmd)
-                                Invoke-Expression $cmd
-                            }
+							# Display the command
+							Write-Host "Executing $it/$tot = $fullCommand"
 
-                            # Start the job
-                            $job = Start-Job -ScriptBlock $scriptBlock -ArgumentList $fullCommand
-                            $jobs += $job
+							# Uncomment the next line to execute the command
+							Invoke-Expression $fullCommand
 
-                            # Increment the total iterations counter
-                            $it++
-                        }
-                    }
+							# Increment the total iterations counter
+							$it++
+						}
+					}
                 }
             }
         }
     }
 }
-
-# Wait for all jobs to finish
-Wait-Job -Job $jobs
-
-# Retrieve job results if needed
-$jobResults = Receive-Job -Job $jobs
-
-# Remove the jobs
-Remove-Job -Job $jobs

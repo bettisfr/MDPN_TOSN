@@ -10,7 +10,7 @@
 using namespace std;
 
 void run_experiment(input &par) {
-//    print_parameters(par);
+    print_parameters(par);
 
     vector<solution> outputs;
     for (int i = 0; i < par.iterations; i++) {
