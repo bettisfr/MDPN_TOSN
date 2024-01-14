@@ -19,6 +19,12 @@ void run_experiment(input &par) {
 
         cout << "Iteration: " << (i + 1) << "/" << par.iterations << endl;
 
+        if ((i + 1) == 8) {
+            int a = 0;
+        } else {
+            continue;
+        }
+
         algorithms alg(&dep);
 
         auto start_time = chrono::high_resolution_clock::now();
