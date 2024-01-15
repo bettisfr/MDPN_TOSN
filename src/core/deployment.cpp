@@ -50,7 +50,10 @@ deployment::deployment(const input &par) {
         exit(1);
     }
 
-    static mt19937 re(par.seed);
+    mt19937 re_coordinates(par.seed);
+    mt19937 re_data(par.seed);
+    mt19937 re_doi(par.seed);
+
     uniform_real_distribution<double> length_rand(0, area_length);
     uniform_real_distribution<double> width_rand(0, area_width);
     uniform_int_distribution<int> data_rand(0, max_data);
@@ -59,17 +62,19 @@ deployment::deployment(const input &par) {
 
     // Depots creation
     for (int i = 0; i < num_depots; i++) {
-        double x = length_rand(re);
-        double y = width_rand(re);
+        double x = length_rand(re_coordinates);
+        double y = width_rand(re_coordinates);
 
         depots.emplace_back(x, y);
     }
 
     // Sensors creation
     for (int i = 0; i < num_sensors; i++) {
-        double x = length_rand(re);
-        double y = width_rand(re);
-        double data = data_rand(re);
+        double x = length_rand(re_coordinates);
+        double y = width_rand(re_coordinates);
+        int data = data_rand(re_data);
+
+        cout << x << ", " << y << ", " << data << endl;
 
         // pre-processing phase
         if (par.algorithm == 1){
@@ -88,9 +93,9 @@ deployment::deployment(const input &par) {
         while (abs(values.back() - values.front()) > doi) {
             values[0] = 0; // fixed to 0
             for (int j = 1; j < 360; ++j) {
-                values[j] = weibull_dist(re);
+                values[j] = weibull_dist(re_doi);
                 uniform_int_distribution<int> sgn_dist(0, 1);  // Range [0, 1]
-                int sgn = (sgn_dist(re) == 0) ? -1 : 1;
+                int sgn = (sgn_dist(re_doi) == 0) ? -1 : 1;
                 values[j] = sgn * values[j] * doi;
             }
         }
@@ -102,6 +107,8 @@ deployment::deployment(const input &par) {
 
         sensors.emplace_back(x, y, data, r_doi);
     }
+
+    exit(1);
 
     // Sort sensors by x-coordinate
     sort(sensors.begin(), sensors.end(), [](const sensor &a, const sensor &b) {
