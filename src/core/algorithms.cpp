@@ -502,6 +502,8 @@ solution algorithms::appro_alg_nei(vector<sensor> V, int jth, point depot, doubl
         vector<tuple<point, int>> A;
         A.emplace_back(make_tuple(s.get_pos_x(), s.get_pos_y()), -1);
         sol_tours.emplace_back(A);
+
+        // FIXME fill also sol_costs, otherwise at line 591 "sol.tours_costs = sol_costs;" there will be NULL
     }
 
     auto n = V.size();
