@@ -28,6 +28,7 @@ def merge_csv_files():
 
     # Reset the index
     merged_data.reset_index(drop=True, inplace=True)
+    merged_data = merged_data.sort_values(by=['num_sensors', 'num_depots'], ascending=[True, True])
 
     # Create the "plot" folder if it doesn't exist
     os.makedirs(output_folder, exist_ok=True)
@@ -39,7 +40,7 @@ def merge_csv_files():
     print(f'Merged data saved to {output_file_path}')
 
 
-def filter_plot_res(energy_budget, sensor_radius, num_depots):
+def filter_plot_res(energy_budget, sensor_radius, num_depots, wireless_technology):
     input_file_path = 'plot/merged_output.csv'
     prefix = 'res'
     df = pd.read_csv(input_file_path)
@@ -49,7 +50,8 @@ def filter_plot_res(energy_budget, sensor_radius, num_depots):
         (df['scenario'] == 0) &
         (df['energy_budget'] == energy_budget) &
         (df['sensor_radius'] == sensor_radius) &
-        (df['num_depots'] == num_depots)
+        (df['num_depots'] == num_depots) &
+        (df['wireless_technology'] == wireless_technology)
         ]
 
     os.makedirs('plot', exist_ok=True)
@@ -101,14 +103,16 @@ if __name__ == "__main__":
     merge_csv_files()
 
     # RES
-    energy_budgets = [1.5, 2, 2.5]
-    sensor_radii = [50, 75, 100]
+    energy_budgets = [1.5, 2.0, 2.5]
+    sensor_radii = [20, 60, 80]
     num_depots_values = [1, 3, 5]
+    wireless_technology_range = [0, 1, 2, 3]
 
     for energy_budget in energy_budgets:
         for sensor_radius in sensor_radii:
             for num_depots in num_depots_values:
-                filter_plot_res(energy_budget, sensor_radius, num_depots)
+                for wireless_technology in wireless_technology_range:
+                    filter_plot_res(energy_budget, sensor_radius, num_depots, wireless_technology)
 
 
     # DOI
