@@ -50,9 +50,9 @@ deployment::deployment(const input &par) {
         exit(1);
     }
 
-    mt19937 re_coordinates(par.seed);
-    mt19937 re_data(par.seed);
-    mt19937 re_doi(par.seed);
+    static mt19937 re_coordinates(par.seed);
+    static mt19937 re_data(par.seed);
+    static mt19937 re_doi(par.seed);
 
     uniform_real_distribution<double> length_rand(0, area_length);
     uniform_real_distribution<double> width_rand(0, area_width);
