@@ -502,7 +502,7 @@ solution algorithms::appro_alg_nei(vector<sensor> V, int jth, point depot, doubl
         vector<tuple<point, int>> A;
         A.emplace_back(make_tuple(s.get_pos_x(), s.get_pos_y()), -1);
         sol_tours.emplace_back(A);
-
+        sol_costs.emplace_back(energy_budget);
         // FIXME fill also sol_costs, otherwise at line 591 "sol.tours_costs = sol_costs;" there will be NULL
     }
 
@@ -580,7 +580,7 @@ solution algorithms::appro_alg_nei(vector<sensor> V, int jth, point depot, doubl
                 costs1.push_back(res.tours_costs[w]);
             }
         }
-        if (tours1.size() < sol_tours.size()) {
+        if (tours1.size() < sol_tours.size()) { // "<" -> "=<"  ,   or sol.tours.size() == 0
             sol_tours = tours1;
             sol_costs = costs1;
         }
