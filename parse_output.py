@@ -41,34 +41,48 @@ def merge_csv_files():
     print(f'Merged data saved to {output_file_path}')
 
 
+import os
+import pandas as pd
+import matplotlib.pyplot as plt
+
 def create_and_save_plot(sensor_radii, num_depots, energy_budget, wireless_technology):
     prefix = 'res_'
-    algorithms = [f'TSPN_S{sensor_radii[0]}', f'TSPN_S{sensor_radii[1]}', f'TSPN_S{sensor_radii[2]}', f'MPN_S{sensor_radii[0]}', f'MPN_S{sensor_radii[1]}', f'MPN_S{sensor_radii[2]}']
-    colors = ['blue', 'green', 'purple', 'red', 'orange', 'brown']
-    markers = ['o', 'o', 'o', 's', 's', 's']
+    algorithms = ['TSPN_S', 'MPN_S'] * len(sensor_radii)
+    colors = ['blue', 'green', 'purple', 'red', 'orange', 'black', 'cyan', 'brown']
+    markers = ['o', 's'] * len(sensor_radii)
+    linestyles = ['-', '--'] * len(sensor_radii)
 
     plt.figure(figsize=(8, 6))
     plt.title(f'{num_depots} depot, B={energy_budget} MJ')
     plt.xlabel('Number of Sensors')
     plt.ylabel('Tours Number')
 
-    for i in range(len(algorithms)):
-        algorithm = algorithms[i]
-        color = colors[i]
-        marker = markers[i]
+    a = 0
+    if num_depots > 1:
+        a = 2
 
-        filename = f'{prefix}d{num_depots}_r{int(sensor_radius)}_b{energy_budget:.1f}_w{wireless_technology}_a{i}.csv'
-        input_file_path = os.path.join('plot', filename)
+    i = 0
+    for sensor_radius in sensor_radii:
+        filename_tspn = f'{prefix}d{num_depots}_r{sensor_radius}_b{energy_budget:.1f}_w{wireless_technology}_a{a}.csv'
+        filename_mnp = f'{prefix}d{num_depots}_r{sensor_radius}_b{energy_budget:.1f}_w{wireless_technology}_a{a+1}.csv'
 
-        df = pd.read_csv(input_file_path)
+        input_file_path_tspn = os.path.join('plot', filename_tspn)
+        input_file_path_mnp = os.path.join('plot', filename_mnp)
 
-        plt.errorbar(df['num_sensors'], df['tours_number_avg'], yerr=df['tours_number_std'], label=f'{algorithm} ($r={sensor_radius}$)', color=color, marker=marker, linestyle='-')
+        df_tspn = pd.read_csv(input_file_path_tspn)
+        df_mnp = pd.read_csv(input_file_path_mnp)
 
-    plt.legend(loc='upper center', bbox_to_anchor=(0.5, 1.15), ncol=3)
+        plt.errorbar(df_tspn['num_sensors'], df_tspn['tours_number_avg'], yerr=df_tspn['tours_number_std'], label=f'{algorithms[i]} ($r={sensor_radius}$)', color=colors[i], marker=markers[i], linestyle=linestyles[i])
+        i += 1
+        plt.errorbar(df_mnp['num_sensors'], df_mnp['tours_number_avg'], yerr=df_mnp['tours_number_std'], label=f'{algorithms[i]} ($r={sensor_radius}$)', color=colors[i], marker=markers[i], linestyle=linestyles[i])
+        i += 1
+
+    plt.legend(loc='upper center', bbox_to_anchor=(0.5, 1.2), ncol=3)
     output_file_path = os.path.join('plot', f'{prefix}d{num_depots}_b{energy_budget:.1f}_w{wireless_technology}.pdf')
     plt.savefig(output_file_path, bbox_inches='tight')
     plt.close()
     print(f'Saved plot to {output_file_path}')
+
 
 
 def filter_plot_res(energy_budget, sensor_radius, num_depots, wireless_technology):
@@ -131,7 +145,7 @@ def filter_plot_doi(energy_budget, sensor_radius, sensor_radius_doi_percentage, 
 
 
 if __name__ == "__main__":
-    merge_csv_files()
+    # merge_csv_files()
 
     # RES
     energy_budgets = [1.5, 2.0, 2.5]
@@ -139,18 +153,17 @@ if __name__ == "__main__":
     num_depots_values = [1, 3, 5]
     wireless_technology_range = [0, 1, 2, 3]
 
-    for energy_budget in energy_budgets:
-        for sensor_radius in sensor_radii:
-            for num_depots in num_depots_values:
-                for wireless_technology in wireless_technology_range:
-                    filter_plot_res(energy_budget, sensor_radius, num_depots, wireless_technology)
+    # for energy_budget in energy_budgets:
+    #     for sensor_radius in sensor_radii:
+    #         for num_depots in num_depots_values:
+    #             for wireless_technology in wireless_technology_range:
+    #                 filter_plot_res(energy_budget, sensor_radius, num_depots, wireless_technology)
 
 
     for num_depots in num_depots_values:
         for energy_budget in energy_budgets:
             for wireless_technology in wireless_technology_range:
                 create_and_save_plot(sensor_radii, num_depots, energy_budget, wireless_technology)
-                exit(1)
 
     # DOI
     # filter_plot_doi(5, 50, 0.8, 0.001, 1)
