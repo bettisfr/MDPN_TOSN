@@ -1,0 +1,5 @@
+num_sensors,num_depots,sensor_radius,sensor_radius_doi_percentage,doi,energy_budget,epsilon,scenario,algorithm,area_length,area_width,energy_cons_fly,energy_cons_hover,wireless_technology,iterations,tours_number_avg,tours_number_std,uncovered_sensors_avg,uncovered_sensors_std,lost_data_avg,lost_data_std,seed,running_time_avg,running_time_std
+50,3,0,1,0,2.0,0.1,0,2,2000,2000,150,300,3,10,4.0,0.0,0,0,0,0,5,0.0077,0.00262679
+100,3,0,1,0,2.0,0.1,0,2,2000,2000,150,300,3,10,6.5,0.527046,0,0,0,0,14,0.0515,0.0365825
+200,3,0,1,0,2.0,0.1,0,2,2000,2000,150,300,3,10,11.3,0.674949,0,0,0,0,23,0.231,0.221563
+400,3,0,1,0,2.0,0.1,0,2,2000,2000,150,300,3,10,21.3,0.823273,0,0,0,0,32,1.5336,0.239001
