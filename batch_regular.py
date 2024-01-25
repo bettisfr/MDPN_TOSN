@@ -11,6 +11,8 @@ def run_simulation(wireless_technology_value):
     if not os.path.exists(output_folder):
         os.makedirs(output_folder)
 
+    baseline = True
+
     # Define the parameter ranges
     algorithm_range = [0, 1, 2, 3]
     num_sensors_range = [50, 100, 200, 400]
@@ -18,6 +20,10 @@ def run_simulation(wireless_technology_value):
     sensor_radius_range = [20, 40, 60, 80]
     energy_budget_range = [1500000, 2000000, 2500000]
     wireless_technology_range = [wireless_technology_value]
+
+    if baseline:
+        sensor_radius_range = [0]
+        algorithm_range = [0, 2]
 
     # Define the base command
     baseCommand = ".\cmake-build-release\TOSN.exe --params"
