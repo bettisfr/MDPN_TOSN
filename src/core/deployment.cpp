@@ -173,8 +173,7 @@ double deployment::get_FSPL() const {
 double deployment::get_DTR(double distance) const {
     if (distance < 1) {
         distance = 1;
-    }
-    if (distance > sensor_radius) {
+    } else if (distance > sensor_radius) {
         distance = sensor_radius;
     }
     double P_Rx = P_Tx + 20 * log10(c / (4 * M_PI * f_c * distance));

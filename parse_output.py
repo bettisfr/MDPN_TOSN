@@ -75,6 +75,15 @@ def create_and_save_plot(sensor_radii, num_depots, energy_budget, wireless_techn
 
     i = 0
     for sensor_radius in sensor_radii:
+        if sensor_radius == 0:
+            # baseline
+            filename_baseline = f'{prefix}d{num_depots}_r{sensor_radius}_b{energy_budget:.1f}_w{wireless_technology}_a{a}.csv'
+            input_file_path_baseline = os.path.join('plot\csv', filename_baseline)
+            df_baseline = pd.read_csv(input_file_path_baseline)
+            plt.errorbar(df_baseline['num_sensors'], df_baseline['tours_number_avg'], yerr=df_baseline['tours_number_std'], label='baseline', color='yellow', marker='x', linestyle='-.')
+
+            continue
+
         filename_tspn = f'{prefix}d{num_depots}_r{sensor_radius}_b{energy_budget:.1f}_w{wireless_technology}_a{a}.csv'
         filename_mnp = f'{prefix}d{num_depots}_r{sensor_radius}_b{energy_budget:.1f}_w{wireless_technology}_a{a+1}.csv'
 
@@ -89,7 +98,7 @@ def create_and_save_plot(sensor_radii, num_depots, energy_budget, wireless_techn
         plt.errorbar(df_mnp['num_sensors'], df_mnp['tours_number_avg'], yerr=df_mnp['tours_number_std'], label=f'{algorithms[i]} ($r={sensor_radius}$)', color=colors[i], marker=markers[i], linestyle=linestyles[i])
         i += 1
 
-    plt.legend(loc='upper center', bbox_to_anchor=(0.5, 1.2), ncol=4)
+    plt.legend(loc='upper center', bbox_to_anchor=(0.5, 1.2), ncol=5)
     output_file_path = os.path.join('plot\pdf', f'{prefix}d{num_depots}_b{energy_budget:.1f}_w{wireless_technology}.pdf')
     plt.savefig(output_file_path, bbox_inches='tight')
     plt.close()
@@ -156,21 +165,21 @@ def filter_plot_doi(energy_budget, sensor_radius, sensor_radius_doi_percentage, 
 
 
 if __name__ == "__main__":
-    preprocessing()
-
-    merge_csv_files()
+    # preprocessing()
+    #
+    # merge_csv_files()
 
     # REG
     energy_budgets = [1.5, 2.0, 2.5]
-    sensor_radii = [20, 40, 60, 80]
+    sensor_radii = [20, 40, 60, 80, 0]
     num_depots_values = [1, 3, 5]
     wireless_technology_range = [0, 1, 2, 3]
 
-    for energy_budget in energy_budgets:
-        for sensor_radius in sensor_radii:
-            for num_depots in num_depots_values:
-                for wireless_technology in wireless_technology_range:
-                    filter_plot_reg(energy_budget, sensor_radius, num_depots, wireless_technology)
+    # for energy_budget in energy_budgets:
+    #     for sensor_radius in sensor_radii:
+    #         for num_depots in num_depots_values:
+    #             for wireless_technology in wireless_technology_range:
+    #                 filter_plot_reg(energy_budget, sensor_radius, num_depots, wireless_technology)
 
 
     for num_depots in num_depots_values:

@@ -1069,7 +1069,7 @@ vector<point> algorithms::get_intersection_points(point pa, point pb, double rad
 }
 
 void algorithms::draw_result(vector<vector<tuple<point, int>>> tspn_tours, bool single, bool doi) {
-    ofstream htmlFile("output/sensor_deployment.html");
+    ofstream htmlFile("html/sensor_deployment.html");
 
     htmlFile << "<!DOCTYPE html>\n<html>\n<head>\n";
     htmlFile << "<title>Sensor Deployment</title>\n";

@@ -32,6 +32,8 @@ void run_experiment(input &par) {
 
         cout << out << endl;
 
+//        exit(1);
+
         outputs.push_back(out);
     }
 
