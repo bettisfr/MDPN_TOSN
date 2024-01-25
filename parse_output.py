@@ -3,6 +3,20 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 
+def preprocessing():
+    def create_folder(folder_path):
+        if not os.path.exists(folder_path):
+            os.makedirs(folder_path)
+            print(f"Folder created: {folder_path}")
+        else:
+            print(f"Folder already exists: {folder_path}")
+
+    # Create folders
+    subfolders = ["output", "plot", "plot/csv", "plot/pdf"]
+    for subfolder in subfolders:
+        create_folder(subfolder)
+
+
 def merge_csv_files():
     folder_path = 'output'
     output_folder = 'plot'
@@ -43,7 +57,7 @@ def merge_csv_files():
 
 def create_and_save_plot(sensor_radii, num_depots, energy_budget, wireless_technology):
     prefix = 'reg_'
-    algorithms = ['TSPN_S', 'MPN_S'] * len(sensor_radii)
+    algorithms = ['TSPN_M', 'MPN_M'] * len(sensor_radii) if num_depots > 1 else ['TSPN_S', 'MPN_S'] * len(sensor_radii)
     colors = ['blue', 'green', 'purple', 'red', 'orange', 'black', 'cyan', 'brown']
     markers = ['o', 's'] * len(sensor_radii)
     linestyles = ['-', '--'] * len(sensor_radii)
@@ -142,7 +156,9 @@ def filter_plot_doi(energy_budget, sensor_radius, sensor_radius_doi_percentage, 
 
 
 if __name__ == "__main__":
-    # merge_csv_files()
+    preprocessing()
+
+    merge_csv_files()
 
     # REG
     energy_budgets = [1.5, 2.0, 2.5]
@@ -150,11 +166,11 @@ if __name__ == "__main__":
     num_depots_values = [1, 3, 5]
     wireless_technology_range = [0, 1, 2, 3]
 
-    # for energy_budget in energy_budgets:
-    #     for sensor_radius in sensor_radii:
-    #         for num_depots in num_depots_values:
-    #             for wireless_technology in wireless_technology_range:
-    #                 filter_plot_reg(energy_budget, sensor_radius, num_depots, wireless_technology)
+    for energy_budget in energy_budgets:
+        for sensor_radius in sensor_radii:
+            for num_depots in num_depots_values:
+                for wireless_technology in wireless_technology_range:
+                    filter_plot_reg(energy_budget, sensor_radius, num_depots, wireless_technology)
 
 
     for num_depots in num_depots_values:
