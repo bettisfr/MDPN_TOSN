@@ -627,7 +627,7 @@ solution algorithms::improved_tsp_neighbors(const vector<sensor> &sensors, doubl
                 if (checked_sensors[deployed_sensors[j].get_id()] == 0) {
                     // find intersect of i and j
                     point p2 = deployed_sensors[j].get_position();
-                    vector<point> intersec_points = get_intersection_points(p1, p2, radius);
+                    vector<point> intersec_points = get_circles_intersections(p1, p2, radius);
                     if (!intersec_points.empty()) {
                         intersections[deployed_sensors[i].get_id()][deployed_sensors[j].get_id()] = intersec_points;
                         intersect = 1;
@@ -786,7 +786,7 @@ solution algorithms::improved_tsp_neighbors(const vector<sensor> &sensors, doubl
                     // add another if to check whether the distance between sensor i and j is less than 2R
                     // find intersect of i and j
                     point p2 = deployed_sensors[j].get_position();
-                    vector<point> intersec_points = get_intersection_points(p1, p2, radius_doi);
+                    vector<point> intersec_points = get_circles_intersections(p1, p2, radius_doi);
                     if (!intersec_points.empty()) {
                         intersections[deployed_sensors[i].get_id()][deployed_sensors[j].get_id()] = intersec_points;
                         intersect = 1;
@@ -1018,9 +1018,8 @@ solution algorithms::tsp_split(vector<tuple<point, int>> tspn_result, const vect
     return sol;
 }
 
-
-vector<point> algorithms::get_intersection_points(point pa, point pb, double radius) {
-    // given two points a and b, returns the intersection points
+// given two points pa and pb, returns the intersection points
+vector<point> algorithms::get_circles_intersections(const point &pa, const point &pb, const double radius) {
     point int_ab_1 = {-1, -1};
     point int_ab_2 = {-1, -1};
     vector<point> int_points;
@@ -1055,10 +1054,6 @@ vector<point> algorithms::get_intersection_points(point pa, point pb, double rad
     double int_x2 = x3 - h * (y2 - y1) / distance;
     double int_y2 = y3 + h * (x2 - x1) / distance;
 
-    // Output the intersection points
-    // cout << "Intersection Point 1: (" << int_x1 << ", " << int_y1 << ")" << endl;
-    // cout << "Intersection Point 2: (" << int_x2 << ", " << int_y2 << ")" << endl;
-
     int_ab_1 = {int_x1, int_y1};
     int_ab_2 = {int_x2, int_y2};
 
@@ -1066,6 +1061,76 @@ vector<point> algorithms::get_intersection_points(point pa, point pb, double rad
     int_points.push_back(int_ab_2);
 
     return int_points;
+}
+
+// "pa" is a point, "pb" is the center of a circle of radius "radius".
+// Return the intersection points between the line that passes through "pa" and "pb" which intersects the circle centered in "pb"
+vector<point> algorithms::get_line_circle_intersections(const point& pa, const point& pb, double radius) {
+    return get_line_circle_intersections_helper(pa, pb, radius, pb);
+}
+
+// "pa" is a point, "pb" is the center of a circle of radius "radius", "pc" is another point
+// Return the intersection points between the line that passes through "pa" and "pc" which intersects the circle centered in "pb"
+vector<point> algorithms::get_line_circle_intersections(const point& pa, const point& pb, double radius, const point& pc) {
+    return get_line_circle_intersections_helper(pa, pb, radius, pc);
+}
+
+vector<point> algorithms::get_line_circle_intersections_helper(const point &pa, const point &pb, double radius, const point &pc) {
+    // Extract coordinates from tuples
+    double xa, ya, xb, yb, xc, yc;
+    tie(xa, ya) = pa;
+    tie(xb, yb) = pb;
+    tie(xc, yc) = pc;
+
+    // Helper function to check equality with epsilon
+    auto are_equal = [](double a, double b) {
+        return fabs(a - b) < numeric_limits<double>::epsilon();
+    };
+
+    // Check if the line PaPc is vertical
+    if (are_equal(xa, xc)) {
+        // For a vertical line, calculate the x-coordinate of the line
+        double x = xa;
+
+        // Calculate the y-coordinates of the intersection points
+        double y1 = yb + sqrt(radius * radius - (x - xb) * (x - xb));
+        double y2 = yb - sqrt(radius * radius - (x - xb) * (x - xb));
+
+        // Add the intersection points to the vector
+        return {make_tuple(x, y1), make_tuple(x, y2)};
+    }
+
+    // Calculate the slope of the line PaPc
+    double slope_pc = (yc - ya) / (xc - xa);
+
+    // Calculate the y-intercept of the line PaPc
+    double intercept_pc = ya - slope_pc * xa;
+
+    // Calculate coefficients for the quadratic equation
+    double a = 1 + slope_pc * slope_pc;
+    double b = -2 * xb + 2 * slope_pc * intercept_pc - 2 * yb * slope_pc;
+    double c = xb * xb + yb * yb + intercept_pc * intercept_pc - 2 * intercept_pc * yb - radius * radius;
+
+    // Calculate the discriminant
+    double discriminant = b * b - 4 * a * c;
+
+    vector<point> intersections;
+
+    if (discriminant >= 0) {
+        // Calculate the x-coordinates of intersection points
+        double x1 = (-b + sqrt(discriminant)) / (2 * a);
+        double x2 = (-b - sqrt(discriminant)) / (2 * a);
+
+        // Calculate the corresponding y-coordinates
+        double y1 = slope_pc * x1 + intercept_pc;
+        double y2 = slope_pc * x2 + intercept_pc;
+
+        // Add the intersection points to the vector
+        intersections.emplace_back(x1, y1);
+        intersections.emplace_back(x2, y2);
+    }
+
+    return intersections;
 }
 
 void algorithms::draw_result(vector<vector<tuple<point, int>>> tspn_tours, bool single, bool doi) {

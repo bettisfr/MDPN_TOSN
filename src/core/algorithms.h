@@ -45,6 +45,8 @@ private:
 
     solution internal_approxMPN_M(double);
 
+    static vector<point> get_line_circle_intersections_helper(const point&, const point&, double, const point&);
+
 public:
     explicit algorithms(deployment *);
 
@@ -80,7 +82,7 @@ public:
 
     solution approxMPN(point, double);
 
-    solution appro_alg_nei(vector<sensor> V, int jth, point depot, double radius);
+    solution appro_alg_nei(vector<sensor>, int, point, double);
 
     void DFS(int, unordered_set<int> &, unordered_set<int> &, vector<vector<int>>);
 
@@ -96,7 +98,11 @@ public:
 
     static bool is_within_radius_doi(const sensor &, point);
 
-    vector<point> get_intersection_points(point, point, double);
+    static vector<point> get_circles_intersections(const point&, const point&, double);
+
+    static vector<point> get_line_circle_intersections(const point&, const point&, double);
+
+    static vector<point> get_line_circle_intersections(const point&, const point&, double, const point&);
 
     double tour_cost(vector<tuple<point, int>>, vector<double>, int, int, point, const vector<sensor> &);
 
