@@ -45,30 +45,6 @@ void run_experiment(input &par) {
 int main(int argc, char** argv) {
 //    energy e;
 
-//    // Example usage
-//    point pa = {-6, 2};
-//    point pb = {-2.5, 2.5};
-//    point pc = {1, 0.5};
-//    double radius = 2;
-//
-//    auto points = algorithms::get_line_circle_intersections(pa, pb, radius);
-//    // Output the intersection points
-//    for (const auto& intersection : points) {
-//        double x = get<0>(intersection);
-//        double y = get<1>(intersection);
-//        cout << "Intersection Point: (" << x << ", " << y << ")\n";
-//    }
-//    cout << "----" << endl;
-//    points = algorithms::get_line_circle_intersections(pa, pb, radius, pc);
-//    // Output the intersection points
-//    for (const auto& intersection : points) {
-//        double x = get<0>(intersection);
-//        double y = get<1>(intersection);
-//        cout << "Intersection Point: (" << x << ", " << y << ")\n";
-//    }
-//    exit(1);
-
-
     // Set global precision for cout
     cout << fixed << setprecision(2);
 

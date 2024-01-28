@@ -76,7 +76,9 @@ public:
 
     solution approxMPN_M_DTR();
 
-    solution improved_tsp_neighbors(const vector<sensor> &, double);
+    solution tsp_neighbors_v1(const vector<sensor> &, double);
+
+    solution tsp_neighbors_v2(const vector<sensor> &, double);
 
     solution tsp_split(vector<tuple<point, int>>, const vector<double> &, point, const vector<sensor> &, bool);
 
