@@ -1,5 +1,5 @@
 #include "algorithms.h"
-
+#include <vector>
 #include <unordered_set>
 
 algorithms::algorithms(deployment *m_dep) {
@@ -23,7 +23,7 @@ solution algorithms::run_experiment(int scenario, int algorithm) {
 solution algorithms::approxTSPN_S() {
     solution sol = internal_approxTSPN_S(dep->get_sensor_radius());
 
-//    draw_result(sol.tours, true, false);
+    draw_result(sol.tours, true, false);
 
     sol.uncovered_sensors = 0; // no DOI
     sol.lost_data = 0; // no DTR
@@ -32,7 +32,10 @@ solution algorithms::approxTSPN_S() {
 }
 
 solution algorithms::internal_approxTSPN_S(double radius) {
-    solution sol = tsp_neighbors_v1(dep->get_sensors(), radius);
+    //solution sol = tsp_neighbors_v1(dep->get_sensors(), radius);    //////////////
+    solution sol = tsp_neighbors_v2(dep->get_sensors(), radius);
+
+
     sol = tsp_split(sol.tours[0], sol.tours_costs, dep->get_depots()[0], dep->get_sensors(), false);
 
     sol.tours_number = static_cast<int>(sol.tours.size());
@@ -503,7 +506,6 @@ solution algorithms::appro_alg_nei(vector<sensor> V, int jth, point depot, doubl
         A.emplace_back(make_tuple(s.get_pos_x(), s.get_pos_y()), -1);
         sol_tours.emplace_back(A);
         sol_costs.emplace_back(energy_budget);
-        // FIXME fill also sol_costs, otherwise at line 591 "sol.tours_costs = sol_costs;" there will be NULL
     }
 
     auto n = V.size();
@@ -580,7 +582,7 @@ solution algorithms::appro_alg_nei(vector<sensor> V, int jth, point depot, doubl
                 costs1.push_back(res.tours_costs[w]);
             }
         }
-        if (tours1.size() < sol_tours.size()) { // "<" -> "=<"  ,   or sol.tours.size() == 0
+        if (tours1.size() < sol_tours.size()) {
             sol_tours = tours1;
             sol_costs = costs1;
         }
@@ -735,7 +737,8 @@ solution algorithms::tsp_neighbors_v1(const vector<sensor> &sensors, double radi
     for (int i = 0; i < tspn_result.size() - 1; i++) {
         sensor s1 = orig_sensors[get<1>(tspn_result[i])];
         sensor s2 = orig_sensors[get<1>(tspn_result[i + 1])];
-        double dist = get_distance(s1, s2);
+        //double dist = get_distance(s1, s2);
+        double dist = get_distance(get<0>(tspn_result[i]), get<0>(tspn_result[i+1]));
         double energy_flying = dist * ecf;
 
         double energy_hovering_s1 = compute_energy_hovering(s1);
@@ -756,19 +759,183 @@ solution algorithms::tsp_neighbors_v1(const vector<sensor> &sensors, double radi
     return sol;
 }
 
+
+//////////////////////////////////////
 solution algorithms::tsp_neighbors_v2(const vector<sensor> &sensors, double radius) {
     vector<tuple<point, int>> tspn_result;
     vector<double> tspn_cost;
 
     vector<sensor> deployed_sensors = sensors;
 
-    // Step 1: TSP Christofides on all vertices
+    vector<sensor> orig_sensors = dep->get_sensors();
+    // Sort sensors by x-coordinate
+    sort(deployed_sensors.begin(), deployed_sensors.end(), [](const sensor &a, const sensor &b) {
+        return a.get_pos_x() < b.get_pos_x();
+    });
+
+    // for (auto s:deployed_sensors)
+    // {
+    //     cout << s.get_pos_x() << ", " << s.get_pos_y() << endl;
+    // }
+    
+
+    // Step 1: TSP Christofides on all vertices(deployed_sensors)
+    vector<point_2d> points;
+    for (const auto &s: deployed_sensors) {
+        // find id of every s in orig_sensors
+        int id = distance(orig_sensors.begin(), find(orig_sensors.begin(), orig_sensors.end(), s));
+        //cout << "id   " << id << endl;
+        point_2d new_point = {orig_sensors[id].get_pos_x(), orig_sensors[id].get_pos_y(), id};
+        points.push_back(new_point);
+    }
+
+    TSP tsp(points);
+    tsp.solve();
+
+    vector<int> tsp_result_id = tsp.get_path_id();
+
+    // for (auto t : tsp_result_id)
+    // {
+    //     cout << "id  " << t << endl;
+    // }
+    
+
     // Step 2: for any consecutive vertices u->v, see the intersections among line u->v, and the circle centered in v
     //    point u, v;
     //    vector<point> result = get_line_circle_intersections(u, v, radius);
+
+    if (radius > 0){
+       
+        point point_u;
+        int id_u;
+        int id_v;
+        for (int i = 0; i < tsp_result_id.size(); i++) {
+
+            if (i == tsp_result_id.size() - 1){
+                // add last point to the begining of tspn_result
+                tuple<point, int> p = {point_u, id_v};
+                tspn_result.insert(tspn_result.begin(), p);
+                break;
+            }
+
+            // update u to the new obtained point from its intersection with v
+            // v is sensor, u is a point with id_u
+
+            // if (i == tsp_result_id.size() - 2){  // no need
+            //     id_u = points[tsp_result_id[i]].id;
+            //     id_v = points[tsp_result_id[0]].id;
+            // } else {
+            id_u = points[tsp_result_id[i]].id;
+            id_v = points[tsp_result_id[i+1]].id;
+            // }
+            
+            if (i == 0){
+                point_u = {orig_sensors[id_u].get_pos_x(), orig_sensors[id_u].get_pos_y()};
+            }
+            
+            sensor v = orig_sensors[id_v];
+            
+            vector<point> result = get_line_circle_intersections(point_u, make_tuple(v.get_pos_x(), v.get_pos_y()), radius);
+            // if u is inside v, select the center of v
+            double dist_u_v = get_distance(v, point_u); 
+
+            if (dist_u_v <= radius){
+                tspn_result.emplace_back(make_tuple(v.get_pos_x(), v.get_pos_y()), id_v);
+                point_u = make_tuple(v.get_pos_x(), v.get_pos_y());
+            } else {
+                // select the intersection point closest to u
+                double dist1 = get_distance(point_u, result[0]);
+                double dist2 = get_distance(point_u, result[1]);
+                if (dist1 < dist2){
+                    tspn_result.emplace_back(result[0], id_v);
+                    point_u = result[0];
+                } else {
+                    tspn_result.emplace_back(result[1], id_v);
+                    point_u = result[1];
+                }
+            }
+        }
+
+        // Step 3: for any consecutive vertices u->v->w, see the intersections among line u->w, and the circle centered in v
+        //    point u, v, w;
+        //    vector<point> result = get_line_circle_intersections(u, v, radius, w);
+
+        for (int j = 0; j < tspn_result.size(); j++){    // j < tspn_result.size() - ...      ???
+            point a = get<0>(tspn_result[j]);
+            point b = get<0>(tspn_result[j+1]);
+            point c = get<0>(tspn_result[j+2]);
+
+            vector<point> result2 = get_line_circle_intersections(a, b, radius, c);
+            
+            double dist_ab = get_distance(a, b);
+            double dist_bc = get_distance(b, c);
+            double dist_abc = dist_ab + dist_bc;
+            double min_dist = dist_abc;
+            point best_p;
+            // select best p, from a to c
+            for (auto p: result2){
+                double dist_ap = get_distance(a, p);
+                double dist_pc = get_distance(p, c);
+                double dist_apc = dist_ap + dist_pc;
+                if (dist_apc < min_dist){
+                    min_dist = dist_apc;
+                    best_p = p;
+                }
+            }
+            
+            /////// CONTINUE
+        }
+        
+
+
+     
+
+    } else {
+        for (int i = 0; i < tsp_result_id.size(); i++) {
+            int id = points[tsp_result_id[i]].id;
+            sensor s = orig_sensors[id];
+            tspn_result.emplace_back(make_tuple(s.get_pos_x(), s.get_pos_y()), id);
+        }
+
+    }
+
+    // cout << "tspn_result.size()  " << tspn_result.size() << endl;
+    // for (size_t j = 0; j < tspn_result.size(); j++){
+    //     cout << "tsp " << get<0>(get<0>(tspn_result[j])) << ", " << get<1>(get<0>(tspn_result[j])) << " : " << get<1>(tspn_result[j]) <<  endl;
+    // }
+    
+
+
+   
+    
+
+    // compute the cost
+    double ecf = dep->get_energy_cons_fly(); // every meter (in J/m)
+    double tot_flying = 0.;                ////////////////////////////////////
+    double tot_hovering = 0.;        ////////////////////////////
+    for (int i = 0; i < tspn_result.size() - 1; i++) {
+        sensor s1 = orig_sensors[get<1>(tspn_result[i])];
+        sensor s2 = orig_sensors[get<1>(tspn_result[i + 1])];
+        double dist = get_distance(get<0>(tspn_result[i]), get<0>(tspn_result[i+1]));
+        double energy_flying = dist * ecf;
+        tot_flying = tot_flying + energy_flying;
+
+        double energy_hovering_s1 = compute_energy_hovering(s1);
+        tot_hovering = tot_hovering + energy_hovering_s1;
+        double energy_hovering_s2 = compute_energy_hovering(s2);
+
+        double total_energy = energy_flying + energy_hovering_s1 / 2. + energy_hovering_s2 / 2.;
+        tspn_cost.push_back(total_energy);
+    }
+     //cout << "Tot flyingg  " << tot_flying << endl;
+     //cout << "Tot hovering  " << tot_hovering << endl;
+
+
+
     // Step 3: for any consecutive vertices u->v->w, see the intersections among line u->w, and the circle centered in v
     //    point u, v, w;
     //    vector<point> result = get_line_circle_intersections(u, v, radius, w);
+
 
 //        // Example usage
 //        point pa = {-6, 2};
@@ -972,6 +1139,9 @@ vector<point> algorithms::get_line_circle_intersections_helper(const point &pa, 
 
 void algorithms::draw_result(vector<vector<tuple<point, int>>> tspn_tours, bool single, bool doi) {
     ofstream htmlFile("html/sensor_deployment.html");
+    //ofstream htmlFile("../output/sensor_deployment.html");
+
+
 
     htmlFile << "<!DOCTYPE html>\n<html>\n<head>\n";
     htmlFile << "<title>Sensor Deployment</title>\n";
