@@ -106,6 +106,8 @@ public:
 
     static vector<point> get_line_circle_intersections(const point&, const point&, double, const point&);
 
+    static vector<point> get_line_segment_circle_intersections(const point&, const point&, double, const point&);
+
     double tour_cost(vector<tuple<point, int>>, vector<double>, int, int, point, const vector<sensor> &);
 
     double compute_energy_hovering(sensor);
