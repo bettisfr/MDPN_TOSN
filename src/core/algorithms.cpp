@@ -52,7 +52,7 @@ solution algorithms::internal_approxTSPN_S(double radius) {
 solution algorithms::approxMPN_S() {
     solution sol = internal_approxMPN_S(dep->get_sensor_radius());
 
-//    draw_result(sol.tours, true, false);
+    //draw_result(sol.tours, true, false);
 
     sol.uncovered_sensors = 0; // no DOI
     sol.lost_data = 0; // no DTR
@@ -574,7 +574,8 @@ solution algorithms::appro_alg_nei(vector<sensor> V, int jth, point depot, doubl
         vector<double> costs1;
         // for each component run tspn
         for (auto &component: components) {
-            auto res = tsp_neighbors_v1(component, radius);
+            // auto res = tsp_neighbors_v1(component, radius);
+            auto res = tsp_neighbors_v2(component, radius);
             res = tsp_split(res.tours[0], res.tours_costs, depot, component, true);
 
             for (int w = 0; w < res.tours.size(); w++) {
@@ -787,9 +788,6 @@ solution algorithms::tsp_neighbors_v2(const vector<sensor> &sensors, double radi
     vector<int> tsp_result_id = tsp.get_path_id();
 
     // Step 2: for any consecutive vertices u->v, see the intersections among line u->v, and the circle centered in v
-    //    point u, v;
-    //    vector<point> result = get_line_circle_intersections(u, v, radius);
-
     if (radius > 0){
         point point_u;
         int id_u;
@@ -836,9 +834,6 @@ solution algorithms::tsp_neighbors_v2(const vector<sensor> &sensors, double radi
         }
 
         // Step 3: for any consecutive vertices u->v->w, see the intersections among line u->w, and the circle centered in v
-        //    point u, v, w;
-        //    vector<point> result = get_line_circle_intersections(u, v, radius, w);
-
         vector<tuple<point, int>> tspn_result_2;
 
         int j = 0;
@@ -846,26 +841,24 @@ solution algorithms::tsp_neighbors_v2(const vector<sensor> &sensors, double radi
         int a_id = get<1>(tspn_result[j]);
 
         // b is the center of sensor
-        point b_point = get<0>(tspn_result[j+1]);
-        int b_id = get<1>(tspn_result[j+1]);
-        point b_center = {orig_sensors[b_id].get_pos_x(), orig_sensors[b_id].get_pos_y()};
+        point b_point; // = get<0>(tspn_result[j+1]);
+        int b_id; // = get<1>(tspn_result[j+1]);
+        point b_center; // = {orig_sensors[b_id].get_pos_x(), orig_sensors[b_id].get_pos_y()};
 
-        point c = get<0>(tspn_result[j+2]);
-        int c_id = get<1>(tspn_result[j+2]);
+        point c; // = get<0>(tspn_result[j+2]);
+        int c_id; // = get<1>(tspn_result[j+2]);
         
         tspn_result_2.emplace_back(a, a_id);
 
         while(j < tspn_result.size()){
+            point b_point = get<0>(tspn_result[j+1]);
+            int b_id = get<1>(tspn_result[j+1]);
+            point b_center = {orig_sensors[b_id].get_pos_x(), orig_sensors[b_id].get_pos_y()};
 
-            // cout << "jjjjjjjj " << j << endl;
-            // cout << "point a    " << get<0>(a) << ", " << get<1>(a) << endl;
-            // cout << "point b    " << get<0>(b_point) << ", " << get<1>(b_point) << endl;
-            // cout << "point c    " << get<0>(c) << ", " << get<1>(c) << endl;
+            point c = get<0>(tspn_result[j+2]);
+            int c_id = get<1>(tspn_result[j+2]);
 
             vector<point> result2 = get_line_segment_circle_intersections(a, b_center, radius, c);
-            // for (auto w : result2){
-            //     cout << "w  " << get<0>(w) << " , " << get<1>(w) << endl;
-            // }
 
             double dist_ab = get_distance(a, b_point);
             double dist_bc = get_distance(b_point, c);
@@ -891,13 +884,6 @@ solution algorithms::tsp_neighbors_v2(const vector<sensor> &sensors, double radi
                 a = best_p;
                 a_id = b_id;
 
-                b_point = get<0>(tspn_result[j+1]);
-                b_id = get<1>(tspn_result[j+1]);
-                b_center = {orig_sensors[b_id].get_pos_x(), orig_sensors[b_id].get_pos_y()};
-                
-                c = get<0>(tspn_result[j+2]);
-                c_id = get<1>(tspn_result[j+2]);
-
             } else {
                 // add b, c
                 tspn_result_2.emplace_back(b_point, b_id);
@@ -907,18 +893,12 @@ solution algorithms::tsp_neighbors_v2(const vector<sensor> &sensors, double radi
                 a = get<0>(tspn_result[j]);
                 a_id = get<1>(tspn_result[j]);
 
-                b_point = get<0>(tspn_result[j+1]);
-                b_id = get<1>(tspn_result[j+1]);
-                b_center = {orig_sensors[b_id].get_pos_x(), orig_sensors[b_id].get_pos_y()};
-                
-                c = get<0>(tspn_result[j+2]);
-                c_id = get<1>(tspn_result[j+2]);
             }
 
-             if (j == tspn_result.size() - 2){
+            if (j >= tspn_result.size() - 2){                //  ==
                 tspn_result_2.emplace_back(tspn_result_2[0]);
                 break;
-             }
+            }
            
         }
     
