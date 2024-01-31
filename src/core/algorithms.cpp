@@ -21,25 +21,9 @@ solution algorithms::run_experiment(int scenario, int algorithm) {
 }
 
 solution algorithms::approxTSPN_S() {
-
-    // point a  = {8, 7};
-    // point b = {10, 8};
-    // point c  = {12, 7};
-    // double radius = 3;
-    
-
-    // vector<point> result2 = get_line_segment_circle_intersections(a, b, radius, c);
-
-    // for (auto p:result2){
-    //     cout << "pppppppppp " <<  get<0>(p) << ", " << get<1>(p)<< endl;
-    // }
-    
-    // exit(1);
-
-
     solution sol = internal_approxTSPN_S(dep->get_sensor_radius());
 
-    draw_result(sol.tours, true, false);
+    //draw_result(sol.tours, true, false);
 
     sol.uncovered_sensors = 0; // no DOI
     sol.lost_data = 0; // no DTR
@@ -48,11 +32,9 @@ solution algorithms::approxTSPN_S() {
 }
 
 
-
 solution algorithms::internal_approxTSPN_S(double radius) {
     //solution sol = tsp_neighbors_v1(dep->get_sensors(), radius);    //////////////
     solution sol = tsp_neighbors_v2(dep->get_sensors(), radius);
-
 
     sol = tsp_split(sol.tours[0], sol.tours_costs, dep->get_depots()[0], dep->get_sensors(), false);
 
@@ -1217,8 +1199,8 @@ vector<point> algorithms::get_line_circle_intersections_helper(const point &pa, 
 }
 
 void algorithms::draw_result(vector<vector<tuple<point, int>>> tspn_tours, bool single, bool doi) {
-    //ofstream htmlFile("html/sensor_deployment.html");  /////////////
-    ofstream htmlFile("../output/sensor_deployment.html");
+    ofstream htmlFile("html/sensor_deployment.html");  /////////////
+    //ofstream htmlFile("../output/sensor_deployment.html");
 
     htmlFile << "<!DOCTYPE html>\n<html>\n<head>\n";
     htmlFile << "<title>Sensor Deployment</title>\n";
