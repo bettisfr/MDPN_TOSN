@@ -77,7 +77,7 @@ solution algorithms::internal_approxMPN_S(double radius) {
 solution algorithms::approxTSPN_M() {
     solution sol = internal_approxTSPN_M(dep->get_sensor_radius());
 
-//    draw_result(sol.tours, false, false);
+    //draw_result(sol.tours, false, false);
 
     sol.uncovered_sensors = 0; // no DOI
     sol.lost_data = 0; // no DTR
@@ -114,7 +114,8 @@ solution algorithms::internal_approxTSPN_M(double radius) {
     auto index = distance(A_d.begin(), min_element(A_d.begin(), A_d.end()));
     point depot = depots[index];
 
-    solution sol = tsp_neighbors_v1(dep->get_sensors(), radius);
+    //solution sol = tsp_neighbors_v1(dep->get_sensors(), radius);
+    solution sol = tsp_neighbors_v2(dep->get_sensors(), radius);
     sol = tsp_split(sol.tours[0], sol.tours_costs, depot, dep->get_sensors(), false);
 
     sol.tours_number = static_cast<int>(sol.tours.size());
@@ -130,7 +131,7 @@ solution algorithms::internal_approxTSPN_M(double radius) {
 solution algorithms::approxMPN_M() {
     solution sol = internal_approxMPN_M(dep->get_sensor_radius());
 
-//    draw_result(sol.tours, false, false);
+    //draw_result(sol.tours, false, false);
 
     sol.uncovered_sensors = 0; // no DOI
     sol.lost_data = 0; // no DTR
@@ -801,7 +802,7 @@ solution algorithms::tsp_neighbors_v2(const vector<sensor> &sensors, double radi
             }
 
             // update u to the new obtained point from its intersection with v
-            // v is sensor, u is a point with id_u
+            // v is sensor, u is a point
 
             id_u = points[tsp_result_id[i]].id;
             id_v = points[tsp_result_id[i+1]].id;
@@ -852,11 +853,11 @@ solution algorithms::tsp_neighbors_v2(const vector<sensor> &sensors, double radi
 
         while(j < tspn_result.size()){
             point b_point = get<0>(tspn_result[j+1]);
-            int b_id = get<1>(tspn_result[j+1]);
+            b_id = get<1>(tspn_result[j+1]);
             point b_center = {orig_sensors[b_id].get_pos_x(), orig_sensors[b_id].get_pos_y()};
 
             point c = get<0>(tspn_result[j+2]);
-            int c_id = get<1>(tspn_result[j+2]);
+            c_id = get<1>(tspn_result[j+2]);
 
             vector<point> result2 = get_line_segment_circle_intersections(a, b_center, radius, c);
 
@@ -877,7 +878,7 @@ solution algorithms::tsp_neighbors_v2(const vector<sensor> &sensors, double radi
                         best_p = p;
                     }
                 }
-                // add best_p to tspn_result_2 (new vector)
+                // add best_p to tspn_result_2
                 tspn_result_2.emplace_back(best_p, b_id);
                 j++;
                 // update a(best_p) b(tspn_results[j+1]) c(tspn_results[j+2])
@@ -885,7 +886,7 @@ solution algorithms::tsp_neighbors_v2(const vector<sensor> &sensors, double radi
                 a_id = b_id;
 
             } else {
-                // add b, c
+                // add b, c to tspn_result_2
                 tspn_result_2.emplace_back(b_point, b_id);
                 tspn_result_2.emplace_back(c, c_id);
 
@@ -919,24 +920,21 @@ solution algorithms::tsp_neighbors_v2(const vector<sensor> &sensors, double radi
 
     // compute the cost
     double ecf = dep->get_energy_cons_fly(); // every meter (in J/m)
-    double tot_flying = 0.;                ////////////////////////////////////
-    double tot_hovering = 0.;        ////////////////////////////
+    //double tot_flying = 0.;                
     for (int i = 0; i < tspn_result.size() - 1; i++) {
         sensor s1 = orig_sensors[get<1>(tspn_result[i])];
         sensor s2 = orig_sensors[get<1>(tspn_result[i + 1])];
         double dist = get_distance(get<0>(tspn_result[i]), get<0>(tspn_result[i+1]));
         double energy_flying = dist * ecf;
-        tot_flying = tot_flying + energy_flying;
+        //tot_flying = tot_flying + energy_flying;
 
         double energy_hovering_s1 = compute_energy_hovering(s1);
-        tot_hovering = tot_hovering + energy_hovering_s1;
         double energy_hovering_s2 = compute_energy_hovering(s2);
 
         double total_energy = energy_flying + energy_hovering_s1 / 2. + energy_hovering_s2 / 2.;
         tspn_cost.push_back(total_energy);
     }
-    // cout << "Tot flyingg  " << tot_flying << endl;
-    // cout << "Tot hovering  " << tot_hovering << endl;
+     //cout << "Tot flyingg  " << tot_flying << endl;
 
 
     // Step 2: for any consecutive vertices u->v, see the intersections among line u->v, and the circle centered in v
@@ -1094,10 +1092,6 @@ vector<point> algorithms::get_line_circle_intersections(const point& pa, const p
 // Return the intersection points between the line-segment that passes through "pa" and "pc" which intersects the circle centered in "pb"
 vector<point> algorithms::get_line_segment_circle_intersections(const point& pa, const point& pb, double radius, const point& pc) {
     vector<point> intersections = get_line_circle_intersections_helper(pa, pb, radius, pc);
-
-    // for (auto q : intersections){
-    //     cout << "qqqq " << get<0>(q) << ", " << get<1>(q) << endl;
-    // }
     
     // find the rectangle created by pa pc
     point p1 = {get<0>(pc), get<1>(pa)};
@@ -1127,7 +1121,7 @@ vector<point> algorithms::get_line_segment_circle_intersections(const point& pa,
         top_right = rec_coordinates[2];
     }
     
-    // check if intersections are inside the rectangle
+    // check if any point q in intersections is inside the rectangle
     vector<point> results;
     for (auto q: intersections){
         if (get<0>(bottom_left) <= get<0>(q) && get<0>(q) <= get<0>(top_right) && get<1>(bottom_left) <= get<1>(q) && get<1>(q) <= get<1>(top_right)){
