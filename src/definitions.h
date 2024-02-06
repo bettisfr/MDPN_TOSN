@@ -25,10 +25,10 @@ struct solution {
 
     double running_time = -1;
 
-    friend ostream& operator<<(ostream& os, const solution& out) {
+    friend ostream &operator<<(ostream &os, const solution &out) {
         os << "Tours Number: " << out.tours_number << endl;
         os << "Tours Costs: ";
-        for (const auto& cost : out.tours_costs) {
+        for (const auto &cost: out.tours_costs) {
             os << cost << " ";
         }
         os << endl;

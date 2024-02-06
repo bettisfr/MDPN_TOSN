@@ -57,7 +57,8 @@ double energy::get_energy_hovering(double time, double payload_weight, double wi
     return E;
 }
 
-double energy::get_energy_movement(double distance, double payload_weight, double drone_speed, double wind_speed, double relative_wind_direction) {
+double energy::get_energy_movement(double distance, double payload_weight, double drone_speed, double wind_speed,
+                                   double relative_wind_direction) {
     double m_package = payload_weight;
 
     double v_north = drone_speed - wind_speed * cos(relative_wind_direction * M_PI / 180);

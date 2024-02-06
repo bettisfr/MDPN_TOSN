@@ -32,6 +32,8 @@ public:
 
     double get_pos_y() const;
 
+    void set_pos(double, double);
+
     double get_data_size() const;
 
     double get_radius_doi(int) const;

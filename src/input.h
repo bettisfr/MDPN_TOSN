@@ -81,8 +81,11 @@ struct input {
 };
 
 void print_parameters(const input &);
+
 void save_parameters(const input &);
+
 input load_parameters(input &);
-input read_parameters(input &, int, char* []);
+
+input read_parameters(input &, int, char *[]);
 
 #endif //TOSN_INPUT_H

@@ -144,7 +144,7 @@ input load_parameters(input &par) {
     return par;
 }
 
-input read_parameters(input &par, int argc, char* argv[]) {
+input read_parameters(input &par, int argc, char *argv[]) {
     // Iterate through command line arguments
     // Start from 2 to skip program name and --params
     for (int i = 2; i < argc; ++i) {

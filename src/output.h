@@ -14,8 +14,10 @@
 
 using namespace std;
 
-double calculate_average(const vector<double>&);
-double calculate_stddev(const vector<double>&, double);
+double calculate_average(const vector<double> &);
+
+double calculate_stddev(const vector<double> &, double);
+
 void save_output(const input &par, vector<solution> &);
 
 #endif //TOSN_OUTPUT_H

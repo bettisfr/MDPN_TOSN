@@ -1,13 +1,13 @@
 #include "output.h"
 
 // Function to calculate the average of a vector of doubles
-double calculate_average(const vector<double>& values) {
+double calculate_average(const vector<double> &values) {
     if (values.empty()) {
         return 0.0; // Handle the case where there are no values to average
     }
 
     double sum = 0.0;
-    for (double value : values) {
+    for (double value: values) {
         sum += value;
     }
 
@@ -15,13 +15,13 @@ double calculate_average(const vector<double>& values) {
 }
 
 // Function to calculate the standard deviation of a vector of doubles
-double calculate_stddev(const vector<double>& values, double average) {
+double calculate_stddev(const vector<double> &values, double average) {
     if (values.size() <= 1) {
         return 0.0; // Handle the case where there is insufficient data for standard deviation
     }
 
     double sum_squared_diff = 0.0;
-    for (double value : values) {
+    for (double value: values) {
         double diff = value - average;
         sum_squared_diff += diff * diff;
     }
@@ -51,7 +51,7 @@ void save_output(const input &par, vector<solution> &results) {
         vector<double> lost_data;
         vector<double> running_times;
 
-        for (const auto& out : results) {
+        for (const auto &out: results) {
             tours_numbers.push_back(out.tours_number);
             uncovered_sensors.push_back(out.uncovered_sensors * 100.0 / par.num_sensors); // Calculate as a percentage
             lost_data.push_back(out.lost_data * 100.0 / out.total_data); // Calculate as a percentage
@@ -70,13 +70,15 @@ void save_output(const input &par, vector<solution> &results) {
     }
 
     if (file.is_open()) {
-        file << "num_sensors,num_depots,sensor_radius,sensor_radius_doi_percentage,doi,energy_budget,epsilon,scenario,algorithm,area_length,area_width,energy_cons_fly,energy_cons_hover,wireless_technology,iterations,tours_number_avg,tours_number_std,uncovered_sensors_avg,uncovered_sensors_std,lost_data_avg,lost_data_std,seed,running_time_avg,running_time_std" << endl;
+        file
+                << "num_sensors,num_depots,sensor_radius,sensor_radius_doi_percentage,doi,energy_budget,epsilon,scenario,algorithm,area_length,area_width,energy_cons_fly,energy_cons_hover,wireless_technology,iterations,tours_number_avg,tours_number_std,uncovered_sensors_avg,uncovered_sensors_std,lost_data_avg,lost_data_std,seed,running_time_avg,running_time_std"
+                << endl;
         file << par.num_sensors << ","
              << par.num_depots << ","
              << par.sensor_radius << ","
              << par.sensor_radius_doi_percentage << ","
              << par.doi << ","
-             << par.energy_budget/1.e+6 << "," // in MJ
+             << par.energy_budget / 1.e+6 << "," // in MJ
              << par.epsilon << ","
              << par.scenario << ","
              << par.algorithm << ","

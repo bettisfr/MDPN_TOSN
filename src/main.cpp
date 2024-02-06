@@ -32,8 +32,6 @@ void run_experiment(input &par) {
 
         cout << out << endl;
 
-//        exit(1);
-
         outputs.push_back(out);
     }
 
@@ -42,7 +40,7 @@ void run_experiment(input &par) {
     }
 }
 
-int main(int argc, char** argv) {
+int main(int argc, char **argv) {
 //    energy e;
 
     // Set global precision for cout

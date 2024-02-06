@@ -75,7 +75,7 @@ deployment::deployment(const input &par) {
         int data = static_cast<int>(data_rand(re_data));
 
         // pre-processing phase
-        if (par.algorithm == 1){
+        if (par.algorithm == 1) {
             point dep = depots[0];
             depots.clear();
             depots.emplace_back(dep);
@@ -208,7 +208,7 @@ bool deployment::check_feasibility() const {
     double max_required_time = max_data / min_dtr;
     double energy_hovering = max_required_time * energy_cons_hover;
 
-    double required_energy = 2*energy_flying + energy_hovering;
+    double required_energy = 2 * energy_flying + energy_hovering;
     if (required_energy > energy_budget) {
         cout << "Infeasible: required_energy=" << required_energy << " while budget=" << energy_budget << endl;
         return false;

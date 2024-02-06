@@ -225,7 +225,7 @@ solution algorithms::approxMPN_M_DOI() {
     return sol;
 }
 
-tuple<double, double> algorithms::compute_lost_data(const solution& sol) {
+tuple<double, double> algorithms::compute_lost_data(const solution &sol) {
     double lost_data = 0.;
     double total_data = 0.;
 
@@ -434,7 +434,7 @@ solution algorithms::approxMPN(point depot, double radius) {
     vector<vector<sensor>> V(t + 1);
 
     // for each s in deployed_sensors compute lambd_v,d and j
-    for (const auto& s: deployed_sensors) {
+    for (const auto &s: deployed_sensors) {
         double dist = get_distance(s, depot);
         double energy_flying = dist * ecf;
 
@@ -502,7 +502,7 @@ solution algorithms::appro_alg_nei(vector<sensor> V, int jth, point depot, doubl
 
     vector<vector<tuple<point, int>>> sol_tours;
     vector<double> sol_costs;
-    for (const auto& s: V) {
+    for (const auto &s: V) {
         vector<tuple<point, int>> A;
         A.emplace_back(make_tuple(s.get_pos_x(), s.get_pos_y()), -1);
         sol_tours.emplace_back(A);
@@ -740,7 +740,7 @@ solution algorithms::tsp_neighbors_v1(const vector<sensor> &sensors, double radi
         sensor s1 = orig_sensors[get<1>(tspn_result[i])];
         sensor s2 = orig_sensors[get<1>(tspn_result[i + 1])];
         //double dist = get_distance(s1, s2);
-        double dist = get_distance(get<0>(tspn_result[i]), get<0>(tspn_result[i+1]));
+        double dist = get_distance(get<0>(tspn_result[i]), get<0>(tspn_result[i + 1]));
         double energy_flying = dist * ecf;
 
         double energy_hovering_s1 = compute_energy_hovering(s1);
@@ -789,12 +789,12 @@ solution algorithms::tsp_neighbors_v2(const vector<sensor> &sensors, double radi
     vector<int> tsp_result_id = tsp.get_path_id();
 
     // Step 2: for any consecutive vertices u->v, see the intersections among line u->v, and the circle centered in v
-    if (radius > 0){
+    if (radius > 0) {
         point point_u;
         int id_u;
         int id_v;
         for (int i = 0; i < tsp_result_id.size(); i++) {
-            if (i == tsp_result_id.size() - 1){
+            if (i == tsp_result_id.size() - 1) {
                 // add last point to the begining of tspn_result
                 tuple<point, int> p = {point_u, id_v};
                 tspn_result.insert(tspn_result.begin(), p);
@@ -805,26 +805,27 @@ solution algorithms::tsp_neighbors_v2(const vector<sensor> &sensors, double radi
             // v is sensor, u is a point
 
             id_u = points[tsp_result_id[i]].id;
-            id_v = points[tsp_result_id[i+1]].id;
-            
-            if (i == 0){
+            id_v = points[tsp_result_id[i + 1]].id;
+
+            if (i == 0) {
                 point_u = {orig_sensors[id_u].get_pos_x(), orig_sensors[id_u].get_pos_y()};
             }
-            
-            sensor v = orig_sensors[id_v];
-            
-            vector<point> result = get_line_circle_intersections(point_u, make_tuple(v.get_pos_x(), v.get_pos_y()), radius);
-            // if u is inside v, select the center of v
-            double dist_u_v = get_distance(v, point_u); 
 
-            if (dist_u_v <= radius){
+            sensor v = orig_sensors[id_v];
+
+            vector<point> result = get_line_circle_intersections(point_u, make_tuple(v.get_pos_x(), v.get_pos_y()),
+                                                                 radius);
+            // if u is inside v, select the center of v
+            double dist_u_v = get_distance(v, point_u);
+
+            if (dist_u_v <= radius) {
                 tspn_result.emplace_back(make_tuple(v.get_pos_x(), v.get_pos_y()), id_v);
                 point_u = make_tuple(v.get_pos_x(), v.get_pos_y());
             } else {
                 // select the intersection point closest to u
                 double dist1 = get_distance(point_u, result[0]);
                 double dist2 = get_distance(point_u, result[1]);
-                if (dist1 < dist2){
+                if (dist1 < dist2) {
                     tspn_result.emplace_back(result[0], id_v);
                     point_u = result[0];
                 } else {
@@ -835,83 +836,97 @@ solution algorithms::tsp_neighbors_v2(const vector<sensor> &sensors, double radi
         }
 
         // Step 3: for any consecutive vertices u->v->w, see the intersections among line u->w, and the circle centered in v
-        vector<tuple<point, int>> tspn_result_2;
+        if (tspn_result.size() >= 3) {
+            vector<tuple<point, int>> tspn_result_2;
 
-        int j = 0;
-        point a = get<0>(tspn_result[j]);
-        int a_id = get<1>(tspn_result[j]);
+            int j = 0;
+            point a = get<0>(tspn_result[j]);
+            int a_id = get<1>(tspn_result[j]);
 
-        // b is the center of sensor
-        point b_point; // = get<0>(tspn_result[j+1]);
-        int b_id; // = get<1>(tspn_result[j+1]);
-        point b_center; // = {orig_sensors[b_id].get_pos_x(), orig_sensors[b_id].get_pos_y()};
+            // b is the center of sensor
+            point b_point; // = get<0>(tspn_result[j+1]);
+            int b_id; // = get<1>(tspn_result[j+1]);
+            point b_center; // = {orig_sensors[b_id].get_pos_x(), orig_sensors[b_id].get_pos_y()};
 
-        point c; // = get<0>(tspn_result[j+2]);
-        int c_id; // = get<1>(tspn_result[j+2]);
-        
-        tspn_result_2.emplace_back(a, a_id);
+            point c; // = get<0>(tspn_result[j+2]);
+            int c_id; // = get<1>(tspn_result[j+2]);
 
-        while(j < tspn_result.size()){
-            point b_point = get<0>(tspn_result[j+1]);
-            b_id = get<1>(tspn_result[j+1]);
-            point b_center = {orig_sensors[b_id].get_pos_x(), orig_sensors[b_id].get_pos_y()};
+//            if (a_id > 100) {
+//                cout << "azzzz" << endl;
+//            }
+            tspn_result_2.emplace_back(a, a_id);
 
-            point c = get<0>(tspn_result[j+2]);
-            c_id = get<1>(tspn_result[j+2]);
+            while (j < tspn_result.size()) {
+                b_point = get<0>(tspn_result[j + 1]);
+                b_id = get<1>(tspn_result[j + 1]);
+//                if (b_id > 100) {
+//                    cout << "azzzz" << endl;
+//                }
+                b_center = {orig_sensors[b_id].get_pos_x(), orig_sensors[b_id].get_pos_y()};
 
-            vector<point> result2 = get_line_segment_circle_intersections(a, b_center, radius, c);
+                c = get<0>(tspn_result[j + 2]);
+                c_id = get<1>(tspn_result[j + 2]);
+//                if (c_id > 100) {
+//                    cout << "azzzz" << endl;
+//                }
 
-            double dist_ab = get_distance(a, b_point);
-            double dist_bc = get_distance(b_point, c);
-            double dist_abc = dist_ab + dist_bc;
-            double min_dist = dist_abc;
-            point best_p = b_point;
+                vector<point> result2 = get_line_segment_circle_intersections(a, b_center, radius, c);
 
-            // select best p, from a to c
-            if (!result2.empty()){
-                for (auto p: result2){
-                    double dist_ap = get_distance(a, p);
-                    double dist_pc = get_distance(p, c);
-                    double dist_apc = dist_ap + dist_pc;
-                    if (dist_apc < min_dist){
-                        min_dist = dist_apc;
-                        best_p = p;
+                double dist_ab = get_distance(a, b_point);
+                double dist_bc = get_distance(b_point, c);
+                double dist_abc = dist_ab + dist_bc;
+                double min_dist = dist_abc;
+                point best_p = b_point;
+
+                // select best p, from a to c
+                if (!result2.empty()) {
+                    for (auto p: result2) {
+                        double dist_ap = get_distance(a, p);
+                        double dist_pc = get_distance(p, c);
+                        double dist_apc = dist_ap + dist_pc;
+                        if (dist_apc < min_dist) {
+                            min_dist = dist_apc;
+                            best_p = p;
+                        }
                     }
+                    // add best_p to tspn_result_2
+                    tspn_result_2.emplace_back(best_p, b_id);
+                    j++;
+                    // update a(best_p) b(tspn_results[j+1]) c(tspn_results[j+2])
+                    a = best_p;
+                    a_id = b_id;
+
+                } else {
+                    // add b, c to tspn_result_2
+                    tspn_result_2.emplace_back(b_point, b_id);
+                    tspn_result_2.emplace_back(c, c_id);
+
+                    j = j + 2;
+                    a = get<0>(tspn_result[j]);
+                    a_id = get<1>(tspn_result[j]);
+
                 }
-                // add best_p to tspn_result_2
-                tspn_result_2.emplace_back(best_p, b_id);
-                j++;
-                // update a(best_p) b(tspn_results[j+1]) c(tspn_results[j+2])
-                a = best_p;
-                a_id = b_id;
 
-            } else {
-                // add b, c to tspn_result_2
-                tspn_result_2.emplace_back(b_point, b_id);
-                tspn_result_2.emplace_back(c, c_id);
-
-                j = j + 2;
-                a = get<0>(tspn_result[j]);
-                a_id = get<1>(tspn_result[j]);
+                if (j >= tspn_result.size() - 2) {                //  ==
+                    tspn_result_2.emplace_back(tspn_result_2[0]);
+                    break;
+                }
 
             }
 
-            if (j >= tspn_result.size() - 2){                //  ==
-                tspn_result_2.emplace_back(tspn_result_2[0]);
-                break;
-            }
-           
+            tspn_result = tspn_result_2;
         }
-    
-        tspn_result = tspn_result_2; 
 
         // for (int z = 0; z < tspn_result.size(); z++){
         //     cout << "tsp " << get<0>(get<0>(tspn_result[z])) << ", " << get<1>(get<0>(tspn_result[z])) << ": " << get<1>(tspn_result[z]) << endl;
         // }
 
     } else {
-        for (int i = 0; i < tsp_result_id.size(); i++) {
-            int id = points[tsp_result_id[i]].id;
+        for (int i: tsp_result_id) {
+            int id = points[i].id;
+//            if (id > 100) {
+//                cout << "azzzz" << endl;
+//            }
             sensor s = orig_sensors[id];
             tspn_result.emplace_back(make_tuple(s.get_pos_x(), s.get_pos_y()), id);
         }
@@ -922,9 +937,13 @@ solution algorithms::tsp_neighbors_v2(const vector<sensor> &sensors, double radi
     double ecf = dep->get_energy_cons_fly(); // every meter (in J/m)
     //double tot_flying = 0.;                
     for (int i = 0; i < tspn_result.size() - 1; i++) {
+        if (get<1>(tspn_result[i + 1]) > 1000) {
+            cout << "d..eddd" << endl;
+            cout << "azz: " << get<1>(tspn_result[i + 1]) << endl;
+        }
         sensor s1 = orig_sensors[get<1>(tspn_result[i])];
         sensor s2 = orig_sensors[get<1>(tspn_result[i + 1])];
-        double dist = get_distance(get<0>(tspn_result[i]), get<0>(tspn_result[i+1]));
+        double dist = get_distance(get<0>(tspn_result[i]), get<0>(tspn_result[i + 1]));
         double energy_flying = dist * ecf;
         //tot_flying = tot_flying + energy_flying;
 
@@ -934,7 +953,7 @@ solution algorithms::tsp_neighbors_v2(const vector<sensor> &sensors, double radi
         double total_energy = energy_flying + energy_hovering_s1 / 2. + energy_hovering_s2 / 2.;
         tspn_cost.push_back(total_energy);
     }
-     //cout << "Tot flyingg  " << tot_flying << endl;
+    //cout << "Tot flyingg  " << tot_flying << endl;
 
 
     // Step 2: for any consecutive vertices u->v, see the intersections among line u->v, and the circle centered in v
@@ -1078,21 +1097,23 @@ vector<point> algorithms::get_circles_intersections(const point &pa, const point
 
 // "pa" is a point, "pb" is the center of a circle of radius "radius".
 // Return the intersection points between the line that passes through "pa" and "pb" which intersects the circle centered in "pb"
-vector<point> algorithms::get_line_circle_intersections(const point& pa, const point& pb, double radius) {
+vector<point> algorithms::get_line_circle_intersections(const point &pa, const point &pb, double radius) {
     return get_line_circle_intersections_helper(pa, pb, radius, pb);
 }
 
 // "pa" is a point, "pb" is the center of a circle of radius "radius", "pc" is another point
 // Return the intersection points between the line that passes through "pa" and "pc" which intersects the circle centered in "pb"
-vector<point> algorithms::get_line_circle_intersections(const point& pa, const point& pb, double radius, const point& pc) {
+vector<point>
+algorithms::get_line_circle_intersections(const point &pa, const point &pb, double radius, const point &pc) {
     return get_line_circle_intersections_helper(pa, pb, radius, pc);
 }
 
 // "pa" is a point, "pb" is the center of a circle of radius "radius", "pc" is another point
 // Return the intersection points between the line-segment that passes through "pa" and "pc" which intersects the circle centered in "pb"
-vector<point> algorithms::get_line_segment_circle_intersections(const point& pa, const point& pb, double radius, const point& pc) {
+vector<point>
+algorithms::get_line_segment_circle_intersections(const point &pa, const point &pb, double radius, const point &pc) {
     vector<point> intersections = get_line_circle_intersections_helper(pa, pb, radius, pc);
-    
+
     // find the rectangle created by pa pc
     point p1 = {get<0>(pc), get<1>(pa)};
     point p2 = {get<0>(pa), get<1>(pc)};
@@ -1108,31 +1129,33 @@ vector<point> algorithms::get_line_segment_circle_intersections(const point& pa,
     });
 
     point bottom_left;
-    if (get<1>(rec_coordinates[0]) <= get<1>(rec_coordinates[1])){
+    if (get<1>(rec_coordinates[0]) <= get<1>(rec_coordinates[1])) {
         bottom_left = rec_coordinates[0];
     } else {
         bottom_left = rec_coordinates[1];
     }
 
     point top_right;
-    if (get<1>(rec_coordinates[3]) >= get<1>(rec_coordinates[2])){
+    if (get<1>(rec_coordinates[3]) >= get<1>(rec_coordinates[2])) {
         top_right = rec_coordinates[3];
     } else {
         top_right = rec_coordinates[2];
     }
-    
+
     // check if any point q in intersections is inside the rectangle
     vector<point> results;
-    for (auto q: intersections){
-        if (get<0>(bottom_left) <= get<0>(q) && get<0>(q) <= get<0>(top_right) && get<1>(bottom_left) <= get<1>(q) && get<1>(q) <= get<1>(top_right)){
+    for (auto q: intersections) {
+        if (get<0>(bottom_left) <= get<0>(q) && get<0>(q) <= get<0>(top_right) && get<1>(bottom_left) <= get<1>(q) &&
+            get<1>(q) <= get<1>(top_right)) {
             results.emplace_back(q);
         }
     }
-    
+
     return results;
 }
 
-vector<point> algorithms::get_line_circle_intersections_helper(const point &pa, const point &pb, double radius, const point &pc) {
+vector<point>
+algorithms::get_line_circle_intersections_helper(const point &pa, const point &pb, double radius, const point &pc) {
     // Extract coordinates from tuples
     double xa, ya, xb, yb, xc, yc;
     tie(xa, ya) = pa;
@@ -1141,7 +1164,7 @@ vector<point> algorithms::get_line_circle_intersections_helper(const point &pa, 
 
     // Helper function to check equality with epsilon
     auto are_equal = [](double a, double b) {
-        return fabs(a - b) < numeric_limits<double>::epsilon();
+        return fabs(a - b) < 0.001; // numeric_limits<double>::epsilon();
     };
 
     // Check if the line PaPc is vertical
@@ -1307,7 +1330,8 @@ void algorithms::draw_result(vector<vector<tuple<point, int>>> tspn_tours, bool 
 
     // Draw TSP circuit connecting points in the order specified by tspn_tours
     vector<string> path_colors = {"red", "blue", "green", "orange", "purple", "cyan", "magenta",
-                                  "yellow", "pink", "brown", "teal", "olive", "maroon", "navy", "lavender", "turquoise", "indigo"};
+                                  "yellow", "pink", "brown", "teal", "olive", "maroon", "navy", "lavender", "turquoise",
+                                  "indigo"};
     int col = 0;
     for (auto &tspn_tour: tspn_tours) {
         htmlFile << "ctx.beginPath();\n";

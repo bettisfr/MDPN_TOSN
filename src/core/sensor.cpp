@@ -3,19 +3,16 @@
 #include <utility>
 
 sensor::sensor(double x, double y, double data, vector<double> r_doi) {
-    id = -1;
-    pos_x = x;
-    pos_y = y;
+    set_id(-1);
+    set_pos(x, y);
     data_size = data;
     radius_doi = std::move(r_doi);
 }
 
 sensor::sensor(double x, double y) {
-    pos_x = x;
-    pos_y = y;
-    data_size = -1;
+    set_id(-1);
+    set_pos(x, y);
 }
-
 
 tuple<double, double> sensor::get_position() const {
     return make_tuple(pos_x, pos_y);
@@ -57,6 +54,11 @@ void sensor::set_id(int new_id) {
 
 int sensor::get_id() const {
     return id;
+}
+
+void sensor::set_pos(double x, double y) {
+    pos_x = x;
+    pos_y = y;
 }
 
 

@@ -20,7 +20,7 @@ class algorithms {
 private:
     deployment *dep;
 
-    vector<function<solution(algorithms&)>> algorithm_functions = {
+    vector<function<solution(algorithms &)>> algorithm_functions = {
             &algorithms::approxTSPN_S,
             &algorithms::approxMPN_S,
             &algorithms::approxTSPN_M,
@@ -45,7 +45,7 @@ private:
 
     solution internal_approxMPN_M(double);
 
-    static vector<point> get_line_circle_intersections_helper(const point&, const point&, double, const point&);
+    static vector<point> get_line_circle_intersections_helper(const point &, const point &, double, const point &);
 
 public:
     explicit algorithms(deployment *);
@@ -100,13 +100,13 @@ public:
 
     static bool is_within_radius_doi(const sensor &, point);
 
-    static vector<point> get_circles_intersections(const point&, const point&, double);
+    static vector<point> get_circles_intersections(const point &, const point &, double);
 
-    static vector<point> get_line_circle_intersections(const point&, const point&, double);
+    static vector<point> get_line_circle_intersections(const point &, const point &, double);
 
-    static vector<point> get_line_circle_intersections(const point&, const point&, double, const point&);
+    static vector<point> get_line_circle_intersections(const point &, const point &, double, const point &);
 
-    static vector<point> get_line_segment_circle_intersections(const point&, const point&, double, const point&);
+    static vector<point> get_line_segment_circle_intersections(const point &, const point &, double, const point &);
 
     double tour_cost(vector<tuple<point, int>>, vector<double>, int, int, point, const vector<sensor> &);
 
@@ -114,9 +114,9 @@ public:
 
     double compute_hovering_time(sensor);
 
-    int compute_uncovered_sensors(const solution&);
+    int compute_uncovered_sensors(const solution &);
 
-    tuple<double, double> compute_lost_data(const solution&);
+    tuple<double, double> compute_lost_data(const solution &);
 
     void draw_result(vector<vector<tuple<point, int>>>, bool, bool);
 };
