@@ -61,7 +61,7 @@ solution algorithms::approxMPN_S() {
 }
 
 solution algorithms::internal_approxMPN_S(double radius) {
-    solution sol = approxMPN(dep->get_depots()[0], dep->get_sensor_radius());
+    solution sol = approxMPN(dep->get_depots()[0], radius);
 
     sol.tours_number = static_cast<int>(sol.tours.size());
     sol.tours_costs = sol.tours_costs;
@@ -198,7 +198,7 @@ solution algorithms::approxTSPN_S_DOI() {
 solution algorithms::approxMPN_S_DOI() {
     solution sol = internal_approxMPN_S(dep->get_sensor_radius_doi());
 
-    draw_result(sol.tours, true, true);
+//    draw_result(sol.tours, true, true);
 
     sol.lost_data = 0; // no DTR
 
