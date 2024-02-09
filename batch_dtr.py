@@ -15,7 +15,7 @@ def run_simulation():
     algorithm_range = [0, 1]
     num_sensors_range = [50, 100, 200, 400]
     num_depots = 1
-    sensor_radius_range = [40, 80]
+    sensor_radius_range = [40, 60, 80]
     wireless_technology = 1
     energy_budget = 1500000
 
