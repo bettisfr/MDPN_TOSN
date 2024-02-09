@@ -20,6 +20,7 @@ def run_simulation(wireless_technology_value):
     sensor_radius_range = [20, 40, 60, 80]
     energy_budget_range = [1500000, 2000000, 2500000]
     wireless_technology_range = [wireless_technology_value]
+    iterations = 10
 
     if baseline:
         sensor_radius_range = [0]
@@ -44,7 +45,7 @@ def run_simulation(wireless_technology_value):
                                 expName = f"reg_s{num_sensors}_d{num_depots}_r{sensor_radius}_b{round(energy_budget / 1e+6, 2)}_w{wireless_technology}_a{algorithm}"
 
                                 # Construct the full command with varying parameters
-                                fullCommand = f"{baseCommand} -exp_name {expName} -iterations 10 -num_sensors {num_sensors} -num_depots {num_depots} -sensor_radius {sensor_radius} -energy_budget {energy_budget} -wireless_technology {wireless_technology} -algorithm {algorithm} -seed {it} -scenario 0"
+                                fullCommand = f"{baseCommand} -exp_name {expName} -iterations {iterations} -num_sensors {num_sensors} -num_depots {num_depots} -sensor_radius {sensor_radius} -energy_budget {energy_budget} -wireless_technology {wireless_technology} -algorithm {algorithm} -seed {it} -scenario 0"
 
                                 # Display the command
                                 print(f"Executing {it}/{tot} = {fullCommand}")

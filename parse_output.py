@@ -22,7 +22,7 @@ def merge_csv_files():
     output_folder = 'plot'
 
     # Get a list of all CSV files in the directory starting with "reg_", "doi", or "dtr_"
-    csv_files = [file for file in os.listdir(folder_path) if file.endswith('.csv') and file.startswith(('reg_', 'doi', 'dtr_'))]
+    csv_files = [file for file in os.listdir(folder_path) if file.endswith('.csv') and file.startswith(('reg_', 'doi_', 'dtr_'))]
 
     # Read the first CSV file to get the header
     first_file_path = os.path.join(folder_path, csv_files[0])
