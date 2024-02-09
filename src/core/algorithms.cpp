@@ -354,7 +354,7 @@ bool algorithms::is_within_radius(const sensor &s, point p) {
 }
 
 bool algorithms::is_within_radius_doi(const sensor &s, point p) {
-    double dist = get_distance(s, p);
+    double dist = get_distance(s, p) - epsilon;
 
     int angle = get_angle(s, p);
     double actual_radius = s.get_radius_doi(angle);
@@ -1164,7 +1164,7 @@ algorithms::get_line_circle_intersections_helper(const point &pa, const point &p
 
     // Helper function to check equality with epsilon
     auto are_equal = [](double a, double b) {
-        return fabs(a - b) < 0.001; // numeric_limits<double>::epsilon();
+        return fabs(a - b) < epsilon; // numeric_limits<double>::epsilon();
     };
 
     // Check if the line PaPc is vertical

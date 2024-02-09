@@ -20,6 +20,8 @@ class algorithms {
 private:
     deployment *dep;
 
+    constexpr static const double epsilon = 0.01;
+
     vector<function<solution(algorithms &)>> algorithm_functions = {
             &algorithms::approxTSPN_S,
             &algorithms::approxMPN_S,
