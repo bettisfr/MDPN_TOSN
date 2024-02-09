@@ -21,7 +21,9 @@ def run_simulation():
     radius = 80
     wireless_technology = 1
     energy_budget = 1500000
+
     iterations = 10
+    scenario = 1
 
     # Define the base command
     baseCommand = ".\cmake-build-release\TOSN.exe --params"
@@ -38,7 +40,7 @@ def run_simulation():
                     expName = f"doi_s{num_sensors}_d{num_depots}_r{radius}_rd{sensor_radius_doi_percentage}_doi{doi}_b{round(energy_budget / 1e+6, 2)}_w{wireless_technology}_a{algorithm}"
 
                     # Construct the full command with varying parameters
-                    fullCommand = f"{baseCommand} -exp_name {expName} -iterations {iterations} -num_sensors {num_sensors} -num_depots {num_depots} -sensor_radius {radius} -sensor_radius_doi_percentage {sensor_radius_doi_percentage} -doi {doi}i -energy_budget {energy_budget} -wireless_technology {wireless_technology} -algorithm {algorithm} -seed {it} -scenario 1"
+                    fullCommand = f"{baseCommand} -exp_name {expName} -iterations {iterations} -num_sensors {num_sensors} -num_depots {num_depots} -sensor_radius {radius} -sensor_radius_doi_percentage {sensor_radius_doi_percentage} -doi {doi} -energy_budget {energy_budget} -wireless_technology {wireless_technology} -algorithm {algorithm} -seed {it} -scenario {scenario}"
 
                     # Display the command
                     print(f"Executing {it}/{tot} = {fullCommand}")
