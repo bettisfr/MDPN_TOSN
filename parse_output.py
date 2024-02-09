@@ -186,7 +186,7 @@ def filter_plot_reg(energy_budget, sensor_radius, num_depots, wireless_technolog
         print(f'Saved to {output_file_path}')
 
 
-def filter_plot_doi(energy_budget, sensor_radius, sensor_radius_doi_percentage, doi, num_depots):
+def filter_plot_doi(energy_budget, sensor_radius, doi, num_depots, algorithm):
     input_file_path = 'plot/merged_output.csv'
     prefix = 'doi'
     df = pd.read_csv(input_file_path)
@@ -196,59 +196,101 @@ def filter_plot_doi(energy_budget, sensor_radius, sensor_radius_doi_percentage, 
         (df['scenario'] == 1) &
         (df['energy_budget'] == energy_budget) &
         (df['sensor_radius'] == sensor_radius) &
-        (df['sensor_radius_doi_percentage'] == sensor_radius_doi_percentage) &
+        (df['algorithm'] == algorithm) &
         (df['doi'] == doi) &
         (df['num_depots'] == num_depots)
         ]
 
     os.makedirs('plot', exist_ok=True)
 
-    for algorithm_value in filtered_df['algorithm'].unique():
-        suffix = f'_d{num_depots}_r{int(sensor_radius)}_rd{sensor_radius_doi_percentage:.3f}_doi{doi:.3f}_b{energy_budget:.1f}_a{algorithm_value}'
+    for sensor_radius_doi_percentage_value in filtered_df['sensor_radius_doi_percentage'].unique():
+        suffix = f'_d{num_depots}_r{int(sensor_radius)}_rd{sensor_radius_doi_percentage_value:.3f}_doi{doi:.3f}_b{energy_budget:.1f}_a{algorithm}'
 
-        algorithm_df = filtered_df[filtered_df['algorithm'] == algorithm_value]
+        algorithm_df = filtered_df[filtered_df['sensor_radius_doi_percentage'] == sensor_radius_doi_percentage_value]
         algorithm_df_sorted = algorithm_df.sort_values(by='num_sensors', ascending=True)
 
-        output_file_path = os.path.join('plot', f'{prefix}{suffix}.csv')
+        output_file_path = os.path.join('plot/csv', f'{prefix}{suffix}.csv')
 
         algorithm_df_sorted.to_csv(output_file_path, index=False)
 
         print(f'Saved to {output_file_path}')
 
 
+def create_and_save_plot_doi(energy_budget, sensor_radius, sensor_radius_doi_percentage_range, doi, num_depots, wireless_technology, algorithm):
+    prefix = 'doi_'
+    colors = ['blue', 'green', 'orange', 'red', 'purple', 'black', 'cyan', 'brown']
+    markers = ['o', 's'] * len(sensor_radius_doi_percentage_range)
+    linestyles = ['-', '--'] * len(sensor_radius_doi_percentage_range)
+    algorithms = ['ATSPN_S', 'AMPN_S']
+    wireless_str = ['WiFi-5', 'WiFi-4', 'Zigbee', 'Bluetooth']
+
+    plt.figure(figsize=(4.25, 3.25))
+    plt.title(f'{algorithms[algorithm]}, DOI={doi}, wireless={wireless_str[wireless_technology]}')
+    plt.xlabel('Number of Sensors')
+    plt.ylabel('Uncovered Sensors percentage')
+
+    i = 0
+    for sensor_radius_doi_percentage in sensor_radius_doi_percentage_range:
+        filename = f'{prefix}d{num_depots}_r{int(sensor_radius)}_rd{sensor_radius_doi_percentage:.3f}_doi{doi:.3f}_b{energy_budget:.1f}_a{algorithm}.csv'
+        input_file_path = os.path.join('plot\csv', filename)
+        df = pd.read_csv(input_file_path)
+        plt.errorbar(df['num_sensors'], df['uncovered_sensors_avg'], yerr=df['uncovered_sensors_std'], label=f'R\'={sensor_radius_doi_percentage}R', color=colors[i], marker=markers[i], linestyle=linestyles[i])
+        i += 1
+
+    plt.legend(loc='upper center', bbox_to_anchor=(0.5, 1.275), ncol=4, fontsize='small')
+    output_file_path = os.path.join('plot\pdf', f'{prefix}d{num_depots}_doi{doi:.2f}_b{energy_budget:.1f}_w{wireless_technology}_a{algorithm}.pdf')
+    plt.savefig(output_file_path, bbox_inches='tight')
+    plt.close()
+    print(f'Saved plot to {output_file_path}')
+
+
 if __name__ == "__main__":
     # preprocessing()
-    #
+
     # merge_csv_files()
 
-    # REG
-    energy_budgets = [1.5, 2.0, 2.5]
-    sensor_radii = [40, 80, 0]
-    num_depots_values = [1, 3, 5]
-    wireless_technology_range = [0, 1, 2, 3]
-    algorithm_range = [0, 1, 2, 3]
-
-    for energy_budget in energy_budgets:
-        for sensor_radius in sensor_radii:
-            for num_depots in num_depots_values:
-                for wireless_technology in wireless_technology_range:
-                    filter_plot_reg(energy_budget, sensor_radius, num_depots, wireless_technology)
-
-    for num_depots in num_depots_values:
-        for energy_budget in energy_budgets:
-            for wireless_technology in wireless_technology_range:
-                create_and_save_plot_impact_normal(sensor_radii, num_depots, energy_budget, wireless_technology)
-
-    sensor_radii = [20, 40, 60, 80, 0]
-    for num_depots in num_depots_values:
-        for energy_budget in energy_budgets:
-            for wireless_technology in wireless_technology_range:
-                for algorithm in algorithm_range:
-                    if num_depots == 1 and algorithm < 2:
-                        create_and_save_plot_impact_radius(sensor_radii, num_depots, energy_budget, wireless_technology, algorithm)
-
-                    if num_depots > 1 and algorithm >= 2:
-                        create_and_save_plot_impact_radius(sensor_radii, num_depots, energy_budget, wireless_technology, algorithm)
+    # # REG
+    # energy_budgets = [1.5, 2.0, 2.5]
+    # sensor_radii = [40, 80, 0]
+    # num_depots_values = [1, 3, 5]
+    # wireless_technology_range = [0, 1, 2, 3]
+    # algorithm_range = [0, 1, 2, 3]
+    #
+    # for energy_budget in energy_budgets:
+    #     for sensor_radius in sensor_radii:
+    #         for num_depots in num_depots_values:
+    #             for wireless_technology in wireless_technology_range:
+    #                 filter_plot_reg(energy_budget, sensor_radius, num_depots, wireless_technology)
+    #
+    # for num_depots in num_depots_values:
+    #     for energy_budget in energy_budgets:
+    #         for wireless_technology in wireless_technology_range:
+    #             create_and_save_plot_impact_normal(sensor_radii, num_depots, energy_budget, wireless_technology)
+    #
+    # sensor_radii = [20, 40, 60, 80, 0]
+    # for num_depots in num_depots_values:
+    #     for energy_budget in energy_budgets:
+    #         for wireless_technology in wireless_technology_range:
+    #             for algorithm in algorithm_range:
+    #                 if num_depots == 1 and algorithm < 2:
+    #                     create_and_save_plot_impact_radius(sensor_radii, num_depots, energy_budget, wireless_technology, algorithm)
+    #
+    #                 if num_depots > 1 and algorithm >= 2:
+    #                     create_and_save_plot_impact_radius(sensor_radii, num_depots, energy_budget, wireless_technology, algorithm)
 
     # DOI
-    # filter_plot_doi(5, 50, 0.8, 0.001, 1)
+    sensor_radius_doi_percentage_range = [1, 0.9, 0.85, 0.8]
+    doi_range = [0.01, 0.05, 0.1]
+    algorithm_range = [0, 1]
+    num_depots = 1
+    energy_budget = 1.5
+    sensor_radius = 80
+    wireless_technology = 1
+
+    for doi in doi_range:
+        for algorithm in algorithm_range:
+            filter_plot_doi(energy_budget, sensor_radius, doi, num_depots, algorithm)
+
+    for doi in doi_range:
+        for algorithm in algorithm_range:
+            create_and_save_plot_doi(energy_budget, sensor_radius, sensor_radius_doi_percentage_range, doi, num_depots, wireless_technology, algorithm)
