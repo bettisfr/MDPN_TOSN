@@ -26,7 +26,7 @@ def run_simulation():
     scenario = 1
 
     # Define the base command
-    baseCommand = ".\cmake-build-release\TOSN.exe --params"
+    baseCommand = "./cmake-build-release/TOSN --params"
 
     # Initialize a counter for total iterations
     it = 1

@@ -937,10 +937,10 @@ solution algorithms::tsp_neighbors_v2(const vector<sensor> &sensors, double radi
     double ecf = dep->get_energy_cons_fly(); // every meter (in J/m)
     //double tot_flying = 0.;                
     for (int i = 0; i < tspn_result.size() - 1; i++) {
-        if (get<1>(tspn_result[i + 1]) > 1000) {
-            cout << "d..eddd" << endl;
-            cout << "azz: " << get<1>(tspn_result[i + 1]) << endl;
-        }
+//        if (get<1>(tspn_result[i + 1]) > 1000) {
+//            cout << "d..eddd" << endl;
+//            cout << "azz: " << get<1>(tspn_result[i + 1]) << endl;
+//        }
         sensor s1 = orig_sensors[get<1>(tspn_result[i])];
         sensor s2 = orig_sensors[get<1>(tspn_result[i + 1])];
         double dist = get_distance(get<0>(tspn_result[i]), get<0>(tspn_result[i + 1]));
