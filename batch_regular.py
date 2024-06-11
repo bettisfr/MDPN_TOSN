@@ -11,12 +11,12 @@ def run_simulation(wireless_technology_value):
     if not os.path.exists(output_folder):
         os.makedirs(output_folder)
 
-    baseline = False
+    baseline = True
 
     # Define the parameter ranges
     algorithm_range = [0]
     # num_sensors_range = [50, 100, 200, 400]
-    num_sensors_range = [5000, 10000, 20000]
+    num_sensors_range = [50, 100, 200, 400, 1000, 5000, 10000, 20000]
     num_depots_range = [1]
     sensor_radius_range = [40, 80]
     energy_budget_range = [1500000]
