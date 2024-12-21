@@ -1,4 +1,4 @@
-# C++ Code for Single- and Multi-Depot Optimization for UAV-Based IoT Data Collection in Neighborhoods
+# C++ Code Minimum Rooted Drone Deployment Problem with Neighborhoods (MDPN)
 
 ![C++](https://img.shields.io/badge/-C++-blue?logo=cplusplus)
 ![License](https://img.shields.io/badge/license-MIT-green)
@@ -18,9 +18,9 @@ We present the **Minimum Rooted Drone Deployment Problem with Neighborhoods (MDP
 Clone the repository and follow these steps to build the project:
 
 ```bash
-git clone https://github.com/bettisfr/TOSN.git
-cd TOSN
-cmake -B build
+git clone https://github.com/bettisfr/MDPN_TOSN.git
+cd MDPN_TOSN
+cmake -B build -DCMAKE_BUILD_TYPE=Release
 cmake --build build
 ./build/TOSN
 ```
