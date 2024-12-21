@@ -37,6 +37,9 @@ If you use this repository, please cite our paper:
   author={Betti Sorbelli, Francesco and Ghobadi, Sajjad and Pinotti, Cristina M.},
   journal={ACM Transactions on Sensor Networks},
   year={2025},
+  issn = {1550-4859},
+  url = {https://doi.org/10.1145/3704810},
+  doi = {10.1145/3704810},
   note={To appear}
 }
 ```
