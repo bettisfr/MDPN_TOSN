@@ -1,4 +1,4 @@
-# C++ Code Minimum Rooted Drone Deployment Problem with Neighborhoods (MDPN)
+# C++ Code for Minimum Rooted Drone Deployment Problem with Neighborhoods (MDPN)
 
 ![C++](https://img.shields.io/badge/-C++-blue?logo=cplusplus)
 ![License](https://img.shields.io/badge/license-MIT-green)
